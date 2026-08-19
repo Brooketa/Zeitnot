@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3C13035A9A700ED9FBC /* CoreUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		7026E3A43035A9A700ED9FBC /* Zeitnot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zeitnot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7026E3C43035A9A700ED9FBC /* CoreUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CoreUI; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -34,6 +40,7 @@
 			children = (
 				7026E3A63035A9A700ED9FBC /* Zeitnot */,
 				7026E3A53035A9A700ED9FBC /* Products */,
+				7026E3C43035A9A700ED9FBC /* CoreUI */,
 			);
 			sourceTree = "<group>";
 		};
@@ -65,6 +72,7 @@
 			);
 			name = Zeitnot;
 			packageProductDependencies = (
+				7026E3C13035A9A700ED9FBC /* CoreUI */,
 			);
 			productName = Zeitnot;
 			productReference = 7026E3A43035A9A700ED9FBC /* Zeitnot.app */;
@@ -94,6 +102,8 @@
 			);
 			mainGroup = 7026E39B3035A9A700ED9FBC;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7026E3A53035A9A700ED9FBC /* Products */;
 			projectDirPath = "";
@@ -355,6 +365,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7026E3C13035A9A700ED9FBC /* CoreUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CoreUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7026E39C3035A9A700ED9FBC /* Project object */;
 }
