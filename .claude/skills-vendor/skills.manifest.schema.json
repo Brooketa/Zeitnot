@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://beattime/skills.manifest.schema.json",
+  "title": "Vendored Claude Code skills manifest",
+  "description": "Declares which Claude Code skills are vendored into .claude/skills/ from upstream git repositories.",
+  "type": "object",
+  "required": ["skills"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": { "type": "string" },
+    "comment": { "type": "string" },
+    "skills": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "repo", "subpath", "ref"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "description": "Destination folder under .claude/skills/. Should match the skill's own SKILL.md `name`."
+          },
+          "repo": {
+            "type": "string",
+            "format": "uri",
+            "description": "Upstream git repository URL."
+          },
+          "subpath": {
+            "type": "string",
+            "description": "Path inside the upstream repo that contains the skill's SKILL.md."
+          },
+          "ref": {
+            "type": "string",
+            "description": "Branch or tag to vendor from (e.g. \"main\" or \"1.2.0\")."
+          }
+        }
+      }
+    }
+  }
+}
