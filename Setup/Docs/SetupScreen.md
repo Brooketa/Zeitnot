@@ -8,6 +8,56 @@ describe intent only.
 
 ---
 
+## Screen Shell
+
+The frame every section sits in — background, header and section structure.
+
+Top to bottom:
+
+- **Background** — the screen's surface colour behind everything, extending under the status bar and
+  the home indicator.
+- **Title** — `Chess Clock`, carried by the navigation bar as its **large title**. It is the system's
+  title, not a custom one, so it collapses into the inline bar title on scroll for free. The
+  navigation container itself belongs to the app, not to this screen — the screen only names its
+  title, which is what lets a pushed screen carry its own.
+- **Subtitle** — `Choose how long you want to play.`, the first thing in the scrolling content,
+  directly beneath the title.
+- **Sections** — each one a section header above a card.
+
+**Everything below the navigation bar scrolls as one list**, subtitle included, so the copy moves out
+of the way as the player works down the list. Content is full width with the same margins on every
+device, from the smallest supported iPhone up to iPad.
+
+### Section header
+
+The small, letter-spaced, uppercase label that introduces a section's card. It is a single reusable
+component, built here and reused by every section that follows — `CUSTOM` (ZN-18) and `PREFERENCES`
+(ZN-19).
+
+Like the cell's category, the title is **supplied in natural casing** (`Preset Rulesets`) and
+uppercased for display, so it is spoken as words rather than letters.
+
+### Sections that exist
+
+Only **PRESET RULESETS**. `CUSTOM` and `PREFERENCES` arrive with their own tickets, and no empty
+header stands in for them in the meantime — a section appears when it has something to show. The
+screen has no bottom bar yet either, so the content scrolls to its natural end (ZN-22).
+
+### Appearance
+
+The app runs in the **light appearance** regardless of the device setting, pinned once at the root.
+The colour palette has light values only, so in dark mode the screen's own colours held while
+system-drawn chrome — the navigation title above all — flipped to white against them. Dark mode is a
+deliberate later pass; until the palette carries dark values, the app asks for light.
+
+### Orientation
+
+The screen is portrait, and the app is portrait-only on iPhone. The clock screen is the app's one
+landscape screen; it re-introduces landscape support together with the per-screen orientation
+control it needs (ZN-23). iPad currently still rotates.
+
+---
+
 ## Ruleset Cell
 
 One row representing a single ruleset. Used for every preset, and in an adapted form for the custom
@@ -134,18 +184,26 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 
 ## Not Built Yet
 
-- The `PRESET RULESETS` heading and the rest of the screen shell (ZN-21). The list itself renders
-  and responds to taps; it is currently the whole screen, wired straight into the app.
-- Which ruleset is selected, and that exactly one is selected at all times (ZN-17)
 - The `CUSTOM` section and its steppers (ZN-18)
 - The `PREFERENCES` section and the sound preference (ZN-19)
 - Selection, custom values and preferences surviving a relaunch (ZN-20)
-- The sticky `START GAME` bar and navigation to the clock (ZN-21, ZN-22)
+- The sticky `START GAME` bar and navigation to the clock (ZN-22)
 - VoiceOver support for this screen's controls (ZN-59)
 
 ---
 
 ## Acceptance Checklist
+
+### Screen shell
+
+- [x] Background, subtitle and the `PRESET RULESETS` section header match the design.
+- [x] `Chess Clock` is the navigation bar's large title, not a custom one, with the navigation
+      container owned by the app rather than the screen.
+- [x] The section header is a reusable component, not styling applied inline once.
+- [x] Everything below the navigation bar scrolls as one list, subtitle included.
+- [x] The screen is portrait.
+- [x] The screen renders in the light appearance with a black title, whatever the device setting.
+- [x] The layout holds from the smallest supported iPhone up to iPad.
 
 ### Ruleset cell
 
@@ -169,7 +227,7 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 - [x] Exactly one ruleset is selected at all times.
 - [x] Tapping the already-selected ruleset is a no-op, not a deselect.
 - [ ] The START GAME subtitle updates immediately on selection — the bar does not exist yet
-      (ZN-21 / ZN-22).
+      (ZN-22).
 - [ ] The custom ruleset participates in the selection group — deferred; selection currently spans
       the six presets only (ZN-18).
 

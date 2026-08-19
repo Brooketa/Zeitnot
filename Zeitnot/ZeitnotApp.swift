@@ -6,7 +6,10 @@ struct ZeitnotApp: App {
 
     var body: some Scene {
         WindowGroup {
-            SetupView()
+            NavigationStack {
+                SetupView()
+            }
+            .preferredColorScheme(.light)
         }
     }
 
