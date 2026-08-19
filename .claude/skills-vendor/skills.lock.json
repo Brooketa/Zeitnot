@@ -1,0 +1,17 @@
+{
+  "generated": "2026-08-19T13:39:41Z",
+  "skills": {
+    "swiftui-expert-skill": {
+      "repo": "https://github.com/AvdLee/SwiftUI-Agent-Skill",
+      "ref": "main",
+      "subpath": "skills/swiftui-expert-skill",
+      "commit": "4c6a97d15aa5e023538c3cb06b5192f241dd451d"
+    },
+    "swift-concurrency": {
+      "repo": "https://github.com/AvdLee/Swift-Concurrency-Agent-Skill",
+      "ref": "main",
+      "subpath": "skills/swift-concurrency",
+      "commit": "45fa49e4e0b2af4d43b1cb458903f8030ac993bd"
+    }
+  }
+}

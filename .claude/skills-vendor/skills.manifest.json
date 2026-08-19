@@ -1,0 +1,18 @@
+{
+  "$schema": "./skills.manifest.schema.json",
+  "comment": "Declares Claude Code skills vendored from upstream repos into ../skills/. Run ./sync-skills.sh to (re)vendor them and refresh skills.lock.json. Run ./sync-skills.sh --check to see if any have drifted from upstream. See README.md.",
+  "skills": [
+    {
+      "name": "swiftui-expert-skill",
+      "repo": "https://github.com/AvdLee/SwiftUI-Agent-Skill",
+      "subpath": "skills/swiftui-expert-skill",
+      "ref": "main"
+    },
+    {
+      "name": "swift-concurrency",
+      "repo": "https://github.com/AvdLee/Swift-Concurrency-Agent-Skill",
+      "subpath": "skills/swift-concurrency",
+      "ref": "main"
+    }
+  ]
+}
