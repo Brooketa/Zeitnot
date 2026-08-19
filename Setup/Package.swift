@@ -13,12 +13,20 @@ let package = Package(
             targets: ["Setup"])
     ],
     dependencies: [
+        .package(name: "Core", path: "../Core"),
         .package(name: "CoreUI", path: "../CoreUI")
     ],
     targets: [
         .target(
             name: "Setup",
-            dependencies: ["CoreUI"],
+            dependencies: ["Core", "CoreUI"],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+                .defaultIsolation(MainActor.self)
+            ]),
+        .testTarget(
+            name: "SetupTests",
+            dependencies: ["Setup"],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
                 .defaultIsolation(MainActor.self)

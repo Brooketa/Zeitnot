@@ -3,7 +3,8 @@
 Zero-dependency foundation module. Holds the app's domain value types, plus non-UI utilities and
 extensions shared across features. Nothing here imports SwiftUI or UIKit.
 
-Feature modules cannot import each other, so anything more than one screen needs lives here.
+Feature modules cannot import each other, so anything more than one screen needs lives here — and
+nothing that doesn't. `TimeControl` is currently the whole module.
 
 ---
 
@@ -28,45 +29,45 @@ Storing plain integers also keeps the persisted form legible for ZN-20: `{"baseM
 
 ### Reading a time control
 
-Core exposes the two values and deliberately does not render them. The `3 | 2` reading shown on the ruleset cells, under the START GAME button and in the
-clock's navigation title is built by each screen's Presenter from those two values.
+Core exposes the two values and deliberately does not render them. The `3 | 2` reading shown on the
+ruleset cells, under the START GAME button and in the clock's navigation title is built by each
+screen's Presenter from those two values.
 
-This is a deliberate decision to keep presentation out of the domain type. The trade-off accepted
-with it: the same `"\(baseMinutes) | \(incrementSeconds)"` format is written in Setup and Clock,
-which are separate modules that cannot import one another, so nothing structurally prevents the two
-from drifting apart. The planned resolution is a single String Catalog entry
-taking both numbers as arguments (**ZN-60**), which single-sources the format without putting a
-computed property back on the model.
+This keeps presentation out of the domain type. The trade-off accepted with it: the same
+`"\(baseMinutes) | \(incrementSeconds)"` format is written in Setup and Clock, which are separate
+modules that cannot import one another, so nothing structurally prevents the two from drifting
+apart. The planned resolution is a single String Catalog entry taking both numbers as arguments
+(**ZN-60**), which single-sources the format without putting a computed property back on the model.
 
-## Ruleset
+---
 
-A category paired with the time control it is played under. This is what the clock screen's
-navigation title reads from (`● CLASSICAL · 90 | 30`) and what a started game is configured from.
+## What Deliberately Is Not Here
 
-`isCustom` derives from the category rather than being stored separately, so the two cannot
-disagree.
+The preset catalogue lives in the **Setup** module. There is no `Ruleset` type and no category type
+anywhere — a preset carries its category name, time control and description directly. A struct
+wrapping two of those, and an enum whose only job was to return a label, both earned nothing.
 
-A ruleset deliberately carries **no description**. The short line under each option on the setup
-screen is catalogue copy that appears on that screen and nowhere else — not on the clock, and not on
-Statistics — so it belongs with the presets (ZN-15) rather than in the shared module.
+A time control is what a game is genuinely played under — the clock counts it down, reset restores
+it, rematch reuses it. Everything else about a ruleset is presentation belonging to the screen that
+presents it: the category name, the description under each option, whether it is the editable custom
+one.
 
-## Ruleset Category
+The clock screen does display `● CLASSICAL · 90 | 30`, which looks like a reason to share the types.
+It isn't. The clock needs a time control to run a game and a *string* to put in its title bar. When
+ZN-22 wires START GAME to the clock, the hand-off carries a `TimeControl` plus display text, so the
+clock never needs to know what a category is.
 
-`Bullet`, `Blitz`, `Rapid`, `Classical`, `Custom`. Each supplies the `title` shown at the top of a
-ruleset cell.
-
-Titles are **natural-cased** (`"Bullet"`). The uppercase treatment on the cells is presentation and
-is applied by the view.
+Moved out of Core on 2026-08-19, during ZN-15.
 
 ---
 
 ## Not Built Yet
 
-- The six preset rulesets and their copy (ZN-15)
-- How a selection is identified and persisted (ZN-17, ZN-20)
+- The Setup → Clock hand-off model (ZN-22). It belongs here, since feature modules cannot import one
+  another. Open question: whether it carries a fully-rendered title or the category name plus the
+  time control, with the clock composing its own `● … · …` chrome.
 - Duration formatting for the clock, turns and statistics screens (ZN-23 onwards)
-- A String Catalog for user-facing copy, including `RulesetCategory.title` and the `3 | 2` notation
-  key (ZN-60)
+- A String Catalog for user-facing copy, including the `3 | 2` notation key (ZN-60)
 - Multi-stage time controls (ZN-53) — deliberately absent; a stage needs a move-number trigger that
   fires per player, which a bare extra duration cannot express
 
@@ -74,12 +75,6 @@ is applied by the view.
 
 ## Acceptance Checklist
 
-- [x] A time control expresses a match time and a per-move increment, and zero increment is
+- [x] A time control expresses a base time and a per-move increment, and zero increment is
       supported.
-- [x] A ruleset carries its category and time control, and custom is distinguishable from a preset.
-      Description was removed as setup-only catalogue copy (see ZN-14 note, 2026-08-19).
-- [x] Every category has the title used on the cells.
-- [ ] A time control renders as `3 | 2`, and `1 | 0` when there is no increment — **not Core's
-      job**; each Presenter formats it from `baseMinutes` / `incrementSeconds`. Verified where those
-      Presenters are built (ZN-21 onwards).
 - [x] Covered by unit tests.
