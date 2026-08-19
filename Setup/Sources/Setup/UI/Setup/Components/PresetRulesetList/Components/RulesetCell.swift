@@ -1,4 +1,5 @@
 import SwiftUI
+import Core
 import CoreUI
 
 struct RulesetCell: View {
@@ -15,18 +16,23 @@ struct RulesetCell: View {
         .buttonStyle(.plain)
     }
 
-    private var content: some View {
+}
+
+private extension RulesetCell {
+
+    var content: some View {
         HStack(spacing: .lg) {
             VStack(alignment: .leading, spacing: .xs) {
-                Text(model.category)
+                Text(model.ruleset.category)
                     .micro()
                     .textCase(.uppercase)
 
-                Text(model.timeControl)
+                Text(timeControlNotation)
                     .title()
 
-                Text(model.description)
-                    .footnote()
+                Text(model.ruleset.description)
+                    .callout()
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -36,16 +42,24 @@ struct RulesetCell: View {
         .contentShape(.rect)
     }
 
+    var timeControlNotation: String {
+        let timeControl = model.ruleset.timeControl
+
+        return "\(timeControl.baseMinutes) | \(timeControl.incrementSeconds)"
+    }
+
 }
 
 extension RulesetCell {
 
-    struct Model {
+    struct Model: Identifiable {
 
-        let category: String
-        let timeControl: String
-        let description: String
+        let ruleset: PresetRuleset
         let isSelected: Bool
+
+        var id: String {
+			ruleset.rawValue
+        }
 
     }
 
