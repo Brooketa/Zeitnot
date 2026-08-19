@@ -49,6 +49,48 @@ SwiftUI produces by default. See ZN-59.
 
 ---
 
+## Preset Rulesets
+
+The six options the player picks from, in this display order. The catalogue is an enum, so the order
+is the declaration order and there is no separate list to keep in sync.
+
+| Category | Time control | Description |
+|---|---|---|
+| BULLET | 1 \| 0 | One minute each. Sudden death. |
+| BLITZ | 3 \| 2 | Three minutes, plus 2s on every completed move. |
+| BLITZ | 5 \| 0 | Five minutes each — the classic blitz game. |
+| RAPID | 10 \| 0 | Ten minutes each, no increment. |
+| RAPID | 15 \| 10 | Fifteen minutes, plus 10s per move. |
+| CLASSICAL | 90 \| 30 | 90 minutes each, plus 30s per move. |
+
+**Blitz `3 | 2` is what a first launch with nothing stored shows as selected.** That default is not
+expressed in the catalogue — which option starts selected is screen behaviour, so it belongs with
+whatever resolves a stored selection to a shown one (the Presenter, or the repository reading
+storage once ZN-20 exists). The catalogue lists the six and says nothing about which one wins.
+
+**Presets are not editable.** No code enforces this: an enum case has no setter, so the guarantee is
+structural. Only the custom ruleset is editable, and it is a separate thing entirely.
+
+A preset exposes exactly what its consumers need — `category`, `timeControl` and `description`.
+Category is a plain string, because nothing branches on it: its only use is the label at the top of
+a cell. There is no wrapping ruleset type either — the cell is handed display strings by its
+Presenter, and a started game is handed a `TimeControl`.
+
+`TimeControl` is the only real model here. Everything else a preset carries is display copy.
+
+Each preset carries a **stable storage key** (`"blitz-3-2"`) that is deliberately not derived from
+its time control values. ZN-20 persists the key, so changing a preset's values in a later release
+cannot orphan a saved selection — which matters, because Classical's copy has already been revised
+once and ZN-53 will change its values again.
+
+### On the Classical preset
+
+Its copy reads "90 minutes each, plus 30s per move", which is **not** the standard Classical format.
+The real thing adds 30 minutes after move 40, and multi-stage time controls are deferred to ZN-53.
+The copy was rewritten so the app does not describe behaviour it does not have.
+
+---
+
 ## Card Container
 
 Sections of the screen sit in a card: a surface-coloured rounded rectangle that **clips its
@@ -62,7 +104,8 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 
 ## Not Built Yet
 
-- The preset ruleset list and its `PRESET RULESETS` heading (ZN-15, ZN-21)
+- The `PRESET RULESETS` list rendering and its heading (ZN-21) — the catalogue exists, but nothing
+  displays it yet
 - Which ruleset is selected, and that exactly one is selected at all times (ZN-17)
 - The `CUSTOM` section and its steppers (ZN-18)
 - The `PREFERENCES` section and the sound preference (ZN-19)
@@ -82,6 +125,13 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
       check.
 - [x] Tapping anywhere in the row — not only the control — reports a selection.
 - [x] Long descriptions wrap rather than truncate, and the row grows to fit.
+
+### Preset rulesets
+
+- [x] All six presets exist with exactly the copy and order above.
+- [ ] Blitz `3 | 2` is the selection on a first launch with nothing stored — **not the catalogue's
+      job**; decided where the selection is resolved (ZN-17 / ZN-20).
+- [x] Presets are not editable by the player.
 
 ### Card container
 
