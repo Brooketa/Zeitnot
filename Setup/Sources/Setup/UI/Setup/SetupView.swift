@@ -9,18 +9,41 @@ public struct SetupView: View {
 
     public var body: some View {
         ScrollView {
-            PresetRulesetList(models: presenter.rulesetModels, action: onPresetRulesetListAction)
-                .padding(.lg)
+            VStack(alignment: .leading, spacing: .xxl) {
+                subtitle
+
+                PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSelected)
+            }
+            .padding(.horizontal, .lg)
+            .padding(.bottom, .xxl)
         }
         .background(ColorPalette.background)
+        .navigationTitle(Constants.title)
+        .navigationBarTitleDisplayMode(.large)
+    }
+
+	var subtitle: some View {
+		Text(Constants.subtitle)
+			.callout()
+	}
+
+}
+
+private extension SetupView {
+
+    func onPresetRulesetSelected(_ ruleset: PresetRuleset) {
+        presenter.select(ruleset)
     }
 
 }
 
 private extension SetupView {
 
-    func onPresetRulesetListAction(_ ruleset: PresetRuleset) {
-        presenter.select(ruleset)
+    enum Constants {
+
+        static var title: String { "Chess Clock" }
+        static var subtitle: String { "Choose how long you want to play." }
+
     }
 
 }
