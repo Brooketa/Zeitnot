@@ -48,7 +48,8 @@ The `CoreUI` module contains all **reusable UI building blocks** — anything Sw
 - Custom `ViewModifier`s (e.g. `readHeightModifier`, `roundedCardModifier`, background/padding style modifiers)
 - View extensions (e.g. `.onFirstAppear()`, `.conditionalModifier()`)
 - Reusable UI components (e.g. `PrimaryButton`, `CustomTextField`, `LoadingOverlay`, `EmptyStateView`)
-- Design system tokens (typography, color palette, spacing constants)
+- Design system tokens (typography, color palette, spacing constants), grouped under `Design/` with
+  one subfolder per token family — `Design/Colors/`, `Design/Typography/`, `Design/Spacing/`
 - Images and assets shared across modules (e.g. `AppImages` enum wrapping `ImageResource`)
 - Custom `Shape`s and `Style`s (e.g. `RoundedCornerShape`)
 - SwiftUI `PreferenceKey` implementations (e.g. `HeightPreferenceKey`)
@@ -72,66 +73,155 @@ Each feature module represents **one large, user-facing product area**. Examples
 
 ## Full Project Layout
 
+Every module is its own local Swift package folder at the **repository root**, sitting as a sibling
+of `Zeitnot.xcodeproj` and the app target folder. There is no `Packages/` container directory and no
+`Features/` grouping directory — `Core`, `CoreUI` and every feature package live side by side at the
+top level.
+
 ```
 Zeitnot/
 ├── Zeitnot.xcodeproj
+├── CLAUDE.md
 ├── Zeitnot/                            # Main app target
-│   ├── RootView.swift                  # @main entry point (SwiftUI App struct)
+│   ├── ZeitnotApp.swift                # @main entry point (SwiftUI App struct)
 │   ├── AppRouter.swift                 # Top-level navigation/routing
-│   ├── Services/                       # App-level services, initiated via AppDelegate
-│   └── Resources/                      # App-level assets, Info.plist, etc.
+│   ├── Services/                       # App-level services
+│   └── Assets.xcassets/                # App-level assets (app icon, accent colour)
 │
-└── Packages/
-    ├── Core/
-    │   ├── Package.swift
-    │   └── Sources/
-    │       └── Core/
-    │           ├── Extensions/
-    │           │   ├── String+Extensions.swift
-    │           │   ├── Date+Extensions.swift
-    │           │   └── ...
-    │           └── Types/
-    │               ├── AppError.swift
-    │               ├── LoadingState.swift
-    │               └── ...
-    │
-    ├── CoreUI/
-    │   ├── Package.swift
-    │   └── Sources/
-    │       └── CoreUI/
-    │           ├── Components/
-    │           │   ├── PrimaryButton.swift
-    │           │   ├── CustomTextField.swift
-    │           │   └── ...
-    │           ├── Modifiers/
-    │           │   ├── ReadHeightModifier.swift
-    │           │   ├── BackgroundModifier.swift
-    │           │   └── ...
-    │           ├── Extensions/
-    │           │   └── View+Extensions.swift
-    │           ├── Styles/
-    │           │   └── Typography.swift
-    │           └── Images/
-    │               └── AppImages.swift
-    │
-    └── Features/
-        ├── Authentication/
-        │   ├── Package.swift
-        │   └── Sources/
-        │       └── Authentication/
-        │           └── ...
-        ├── Dashboard/
-        │   ├── Package.swift
-        │   └── Sources/
-        │       └── Dashboard/
-        │           └── ...
-        └── Settings/
-            ├── Package.swift
-            └── Sources/
-                └── Settings/
-                    └── ...
+├── Core/                               # Local Swift package
+│   ├── Package.swift
+│   ├── Docs/
+│   │   └── Core.md
+│   └── Sources/
+│       └── Core/
+│           ├── Extensions/
+│           │   ├── String+Extensions.swift
+│           │   ├── Date+Extensions.swift
+│           │   └── ...
+│           └── Types/
+│               ├── AppError.swift
+│               ├── LoadingState.swift
+│               └── ...
+│
+├── CoreUI/                             # Local Swift package
+│   ├── Package.swift
+│   ├── Docs/
+│   └── Sources/
+│       └── CoreUI/
+│           ├── Design/
+│           │   ├── Colors/
+│           │   │   ├── ColorPalette.swift
+│           │   │   └── Colors.xcassets/
+│           │   ├── Typography/
+│           │   │   ├── Typography.swift
+│           │   │   └── Text+Typography.swift
+│           │   └── Spacing/
+│           │       └── CGFloat+Spacing.swift
+│           ├── Components/
+│           │   ├── PrimaryButton.swift
+│           │   └── ...
+│           ├── Modifiers/
+│           │   ├── ReadHeightModifier.swift
+│           │   └── ...
+│           ├── Extensions/
+│           │   └── View+Extensions.swift
+│           └── Images/
+│               └── AppImages.swift
+│
+├── Setup/                              # Feature package
+│   ├── Package.swift
+│   ├── Docs/
+│   │   └── SetupScreen.md
+│   └── Sources/
+│       └── Setup/
+│           └── ...
+│
+└── Clock/                              # Feature package
+    ├── Package.swift
+    ├── Docs/
+    │   └── ClockScreen.md
+    └── Sources/
+        └── Clock/
+            └── ...
 ```
 
+`CoreUI` and the app target are what exist today; `Core`, `Setup` and `Clock` above show where
+modules land as they are added.
+
+Notes on the tree:
+
+- The package folder name, the `Package.swift` product name, the target name and the
+  `Sources/<Module>/` folder all carry the **same** module name.
+- Sources always sit under `Sources/<ModuleName>/`, never directly under `Sources/`.
+- `Docs/` holds the module's behavioural spec files (see Workflow → Feature Spec Files). It sits at
+  the package root, beside `Package.swift` — not under `Sources/`.
+- `CoreUI` groups its design system tokens under `Design/`, with one subfolder per token family
+  (`Colors/`, `Typography/`, `Spacing/`). Asset catalogues live beside the code that wraps them and
+  are declared as `resources: [.process(...)]` in `Package.swift`.
+
+---
+
+## Referencing A Package In The Xcode Project
+
+A local package is referenced as a **folder reference off the project's main group**, so it appears
+in the navigator as a package folder alongside the app target folder.
+
+**Never add a local package through _Package Dependencies_.** That writes an
+`XCLocalSwiftPackageReference` into the project's `packageReferences` and parks the package under
+the Package Dependencies node. It is the more obvious route in Xcode's UI and it is the wrong one.
+`packageReferences` is reserved for *remote* dependencies (`XCRemoteSwiftPackageReference`) — no
+local package ever appears there.
+
+Adding a module means four entries in `Zeitnot.xcodeproj/project.pbxproj`. Substitute the module
+name for `<Module>` throughout:
+
+**1. `PBXFileReference`** — the package folder itself, typed as a `wrapper`:
+
+```
+<UUID_A> /* <Module> */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = <Module>; sourceTree = "<group>"; };
+```
+
+**2. Main group `children`** — so the folder shows in the navigator:
+
+```
+children = (
+    <UUID_APP_TARGET> /* Zeitnot */,
+    <UUID_PRODUCTS> /* Products */,
+    <UUID_A> /* <Module> */,
+);
+```
+
+**3. `XCSwiftPackageProductDependency`** — the product link, carrying **only** `productName`. There
+is deliberately no `package` key, because there is no package reference to point at:
+
+```
+<UUID_B> /* <Module> */ = {isa = XCSwiftPackageProductDependency; productName = <Module>; };
+```
+
+It is listed in the target's `packageProductDependencies`.
+
+**4. `PBXBuildFile`** — links the product, and goes in the target's **Frameworks** build phase:
+
+```
+<UUID_C> /* <Module> in Frameworks */ = {isa = PBXBuildFile; productRef = <UUID_B> /* <Module> */; };
+```
+
+After adding a module, confirm `packageReferences` still contains no local package.
+
+**Cross-package dependencies** are declared by relative path, since every package folder is a
+sibling at the repository root:
+
+```swift
+dependencies: [
+    .package(name: "Core", path: "../Core"),
+    .package(name: "CoreUI", path: "../CoreUI")
+],
+targets: [
+    .target(
+        name: "Setup",
+        dependencies: ["Core", "CoreUI"])
+]
+```
 ---
 
 ## Feature Module Internal Structure
@@ -180,7 +270,7 @@ FeatureName/
 ### Concrete Example — Movies Feature
 
 ```
-Features/Movies/
+Movies/
 └── Sources/
     └── Movies/
         ├── UI/
@@ -325,12 +415,19 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 
 ## Adding a New Module Checklist
 
-1. Create a new folder under `Packages/Features/FeatureName/`
-2. Add a `Package.swift` declaring dependencies on `Core` and `CoreUI`
-3. Add the local package to `Zeitnot.xcodeproj`
-4. Link the module product to the App target
-5. Wire the module's entry screen into `AppRouter.swift`
-6. Do not import other feature modules — use protocol-based injection if cross-feature communication is needed
+1. Create the package folder at the **repository root**, `FeatureName/`, as a sibling of
+   `Zeitnot.xcodeproj` — not under a `Packages/` or `Features/` directory.
+2. Add `Package.swift` with the product, target and `Sources/FeatureName/` folder all named after the
+   module, declaring `Core` and `CoreUI` by relative path (`.package(name: "Core", path: "../Core")`).
+3. Reference the package folder in `Zeitnot.xcodeproj` as a **wrapper folder reference** off the
+   project's main group — **not** through _Package Dependencies_. See Referencing A Package In The
+   Xcode Project for the exact `project.pbxproj` entries.
+4. Link the module product to the App target: an `XCSwiftPackageProductDependency` with only
+   `productName`, plus a `PBXBuildFile` in the target's Frameworks build phase. Confirm
+   `packageReferences` still contains no local packages.
+5. Add a `Docs/` folder at the package root for the module's behavioural spec file(s).
+6. Wire the module's entry screen into `AppRouter.swift`.
+7. Do not import other feature modules — use protocol-based injection if cross-feature communication is needed.
 
 ## Adding a New Screen Checklist
 
