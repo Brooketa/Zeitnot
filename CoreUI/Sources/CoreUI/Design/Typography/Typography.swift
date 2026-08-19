@@ -2,30 +2,33 @@ import SwiftUI
 
 public enum Typography {
 
-    public static let largeTitle = Font.system(size: 32, weight: .bold)
-    public static let title = Font.system(size: 22, weight: .heavy)
-    public static let headline = Font.system(size: 19, weight: .bold)
-    public static let body = Font.system(size: 17, weight: .semibold)
-    public static let calloutBold = Font.system(size: 15, weight: .semibold)
-    public static let buttonLabel = Font.system(size: 15, weight: .semibold)
-    public static let callout = Font.system(size: 15, weight: .regular)
-    public static let footnote = Font.system(size: 13, weight: .regular)
-    public static let label = Font.system(size: 12, weight: .semibold)
-    public static let micro = Font.system(size: 10, weight: .semibold)
+    public static let largeTitle = Style(size: 32, weight: .bold, tracking: -0.8, color: ColorPalette.ink)
+    public static let title = Style(size: 22, weight: .heavy, tracking: -0.6, color: ColorPalette.ink)
+    public static let headline = Style(size: 19, weight: .bold, color: ColorPalette.ink)
+    public static let body = Style(size: 17, weight: .semibold, color: ColorPalette.ink)
+    public static let calloutBold = Style(size: 15, weight: .semibold, color: ColorPalette.ink)
+    public static let buttonLabel = Style(size: 15, weight: .semibold, tracking: 0.6, color: ColorPalette.inkInverse)
+    public static let callout = Style(size: 15, weight: .regular, color: ColorPalette.textSecondary)
+    public static let footnote = Style(size: 13, weight: .regular, color: ColorPalette.textSecondary)
+    public static let label = Style(size: 12, weight: .semibold, tracking: 1.4, color: ColorPalette.textTertiary)
+    public static let micro = Style(size: 10, weight: .semibold, tracking: 1.8, color: ColorPalette.accent)
 
 }
 
-public enum Tracking {
+public extension Typography {
 
-    public static let largeTitle: CGFloat = -0.8
-    public static let title: CGFloat = -0.6
-    public static let headline: CGFloat = 0
-    public static let body: CGFloat = 0
-    public static let calloutBold: CGFloat = 0
-    public static let buttonLabel: CGFloat = 0.6
-    public static let callout: CGFloat = 0
-    public static let footnote: CGFloat = 0
-    public static let label: CGFloat = 1.4
-    public static let micro: CGFloat = 1.8
+    struct Style {
+
+        public let font: Font
+        public let tracking: CGFloat
+        public let color: Color
+
+        init(size: CGFloat, weight: Font.Weight, tracking: CGFloat = 0, color: Color) {
+            font = .system(size: size, weight: weight)
+            self.tracking = tracking
+            self.color = color
+        }
+
+    }
 
 }
