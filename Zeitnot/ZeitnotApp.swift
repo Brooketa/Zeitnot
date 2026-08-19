@@ -1,10 +1,13 @@
 import SwiftUI
+import Setup
 
 @main
 struct ZeitnotApp: App {
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SetupView()
         }
     }
+
 }

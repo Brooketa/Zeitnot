@@ -58,7 +58,7 @@ is the declaration order and there is no separate list to keep in sync.
 |---|---|---|
 | BULLET | 1 \| 0 | One minute each. Sudden death. |
 | BLITZ | 3 \| 2 | Three minutes, plus 2s on every completed move. |
-| BLITZ | 5 \| 0 | Five minutes each — the classic blitz game. |
+| BLITZ | 5 \| 0 | Five minutes each, classic blitz game. |
 | RAPID | 10 \| 0 | Ten minutes each, no increment. |
 | RAPID | 15 \| 10 | Fifteen minutes, plus 10s per move. |
 | CLASSICAL | 90 \| 30 | 90 minutes each, plus 30s per move. |
@@ -91,6 +91,36 @@ The copy was rewritten so the app does not describe behaviour it does not have.
 
 ---
 
+## Selection
+
+Exactly one preset is selected at all times. The Presenter holds a single `PresetRuleset`, so three
+of the rules are structural rather than coded:
+
+- selecting one **deselects the others** — there is nothing else holding a selection,
+- **exactly one is always selected** — the property cannot be empty,
+- tapping the **already-selected** one is a no-op — assigning the same value changes nothing.
+
+**Blitz `3 | 2` is selected on launch.** The Presenter decides this, not the catalogue.
+
+### How a row is identified
+
+A row is **the preset plus whether it is selected**, and nothing else. The cell reads its category,
+time control and description from the preset directly, because restating them alongside it would be
+two representations of one fact. A tap hands the whole row back, so the Presenter reads the preset it
+already constructed — there is no lookup that can fail and no unknown-identifier case to handle.
+
+Storage keys stay out of this. `PresetRuleset.rawValue` is used only at the persistence boundary
+(ZN-20), not to move a selection between the view and the Presenter.
+
+When the custom ruleset joins the group, the row identity becomes the two-case selection rather than
+a preset — the same change, one type wider.
+
+The `3 | 2` reading is built in the cell, from the time control's two numbers — the first place that
+format appears in the app. ZN-60 replaces it with a shared String Catalog key, which views reference
+directly, so the format stays where it is read.
+
+---
+
 ## Card Container
 
 Sections of the screen sit in a card: a surface-coloured rounded rectangle that **clips its
@@ -104,8 +134,8 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 
 ## Not Built Yet
 
-- The `PRESET RULESETS` list rendering and its heading (ZN-21) — the catalogue exists, but nothing
-  displays it yet
+- The `PRESET RULESETS` heading and the rest of the screen shell (ZN-21). The list itself renders
+  and responds to taps; it is currently the whole screen, wired straight into the app.
 - Which ruleset is selected, and that exactly one is selected at all times (ZN-17)
 - The `CUSTOM` section and its steppers (ZN-18)
 - The `PREFERENCES` section and the sound preference (ZN-19)
@@ -129,9 +159,19 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 ### Preset rulesets
 
 - [x] All six presets exist with exactly the copy and order above.
-- [ ] Blitz `3 | 2` is the selection on a first launch with nothing stored — **not the catalogue's
-      job**; decided where the selection is resolved (ZN-17 / ZN-20).
+- [x] Blitz `3 | 2` is the selection on launch. Decided by the Presenter, not the catalogue.
+      Surviving a relaunch with something stored is still ZN-20.
 - [x] Presets are not editable by the player.
+
+### Selection
+
+- [x] Selecting a ruleset deselects all others.
+- [x] Exactly one ruleset is selected at all times.
+- [x] Tapping the already-selected ruleset is a no-op, not a deselect.
+- [ ] The START GAME subtitle updates immediately on selection — the bar does not exist yet
+      (ZN-21 / ZN-22).
+- [ ] The custom ruleset participates in the selection group — deferred; selection currently spans
+      the six presets only (ZN-18).
 
 ### Card container
 
