@@ -2,48 +2,48 @@ import SwiftUI
 
 public extension Text {
 
-    func largeTitle(_ color: Color = Typography.largeTitle.color) -> Text {
+    func largeTitle(_ color: Color? = nil) -> Text {
         styled(Typography.largeTitle, color)
     }
 
-    func title(_ color: Color = Typography.title.color) -> Text {
+    func title(_ color: Color? = nil) -> Text {
         styled(Typography.title, color)
     }
 
-    func headline(_ color: Color = Typography.headline.color) -> Text {
+    func headline(_ color: Color? = nil) -> Text {
         styled(Typography.headline, color)
     }
 
-    func body(_ color: Color = Typography.body.color) -> Text {
+    func body(_ color: Color? = nil) -> Text {
         styled(Typography.body, color)
     }
 
-    func calloutBold(_ color: Color = Typography.calloutBold.color) -> Text {
+    func calloutBold(_ color: Color? = nil) -> Text {
         styled(Typography.calloutBold, color)
     }
 
-    func buttonLabel(_ color: Color = Typography.buttonLabel.color) -> Text {
+    func buttonLabel(_ color: Color? = nil) -> Text {
         styled(Typography.buttonLabel, color)
     }
 
-    func callout(_ color: Color = Typography.callout.color) -> Text {
+    func callout(_ color: Color? = nil) -> Text {
         styled(Typography.callout, color)
     }
 
-    func footnote(_ color: Color = Typography.footnote.color) -> Text {
+    func footnote(_ color: Color? = nil) -> Text {
         styled(Typography.footnote, color)
     }
 
-    func label(_ color: Color = Typography.label.color) -> Text {
+    func label(_ color: Color? = nil) -> Text {
         styled(Typography.label, color)
     }
 
-    func micro(_ color: Color = Typography.micro.color) -> Text {
+    func micro(_ color: Color? = nil) -> Text {
         styled(Typography.micro, color)
     }
 
-    private func styled(_ style: Typography.Style, _ color: Color) -> Text {
-        font(style.font).tracking(style.tracking).foregroundStyle(color)
+    private func styled(_ style: Typography.Style, _ color: Color?) -> Text {
+        font(style.font).tracking(style.tracking).foregroundStyle(color ?? style.color)
     }
 
 }
