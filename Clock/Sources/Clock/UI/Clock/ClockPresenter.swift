@@ -21,10 +21,16 @@ public final class ClockPresenter {
         makeClockModel(for: .black)
     }
 
+    var isPaused: Bool {
+        if case .running = state.phase { false } else { true }
+    }
+
     private let gameConfiguration: GameConfiguration
     private let gameService: GameServiceProtocol
 
-	private var state: GameState
+    private var state: GameState {
+        gameService.state
+    }
 
     private var category: String {
         gameConfiguration.category.uppercased()
@@ -37,14 +43,6 @@ public final class ClockPresenter {
     public init(gameConfiguration: GameConfiguration, gameService: GameServiceProtocol) {
         self.gameConfiguration = gameConfiguration
         self.gameService = gameService
-        state = gameService.state
-    }
-
-    func startTicking() async {
-        while !Task.isCancelled {
-            refresh()
-            try? await Task.sleep(for: Constants.tickInterval)
-        }
     }
 
     func press(_ side: ClockFace.Side) {
@@ -55,37 +53,14 @@ public final class ClockPresenter {
         case let .running(active) where active == player: gameService.endTurn()
         default: break
         }
-
-        refresh()
     }
 
     func pause() {
         gameService.pause()
-        refresh()
     }
 
     func reset() {
         gameService.reset()
-        refresh()
-    }
-
-	func refresh() {
-		let latest = gameService.state
-
-		guard latest != state else { return }
-
-		state = latest
-	}
-
-}
-
-// MARK: Constants
-private extension ClockPresenter {
-
-    enum Constants {
-
-        static let tickInterval: Duration = .milliseconds(100)
-
     }
 
 }

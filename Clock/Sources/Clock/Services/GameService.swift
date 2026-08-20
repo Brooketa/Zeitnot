@@ -1,5 +1,7 @@
+import Observation
 import Core
 
+@Observable
 public final class GameService: GameServiceProtocol {
 
     public var state: GameState {
