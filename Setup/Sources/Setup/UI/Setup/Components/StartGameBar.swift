@@ -16,7 +16,7 @@ struct StartGameBar: View {
         .buttonStyle(.plain)
         .padding(.horizontal, .lg)
         .padding(.vertical, .xs)
-        .frame(maxWidth: .infinity)
+        .maxWidth()
         .background {
             scrim
         }
@@ -33,14 +33,13 @@ struct StartGameBar: View {
 	var content: some View {
 		HStack(spacing: .lg) {
 			label
-
-			Spacer(minLength: 0)
+				.alignLeading()
 
 			arrow
 		}
 		.padding(.horizontal, .xl)
 		.padding(.vertical, .md)
-		.frame(maxWidth: .infinity)
+		.maxWidth()
 		.background(ColorPalette.accent)
 		.clipShape(.capsule)
 		.contentShape(.rect)

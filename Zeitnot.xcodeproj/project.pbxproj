@@ -46,9 +46,9 @@
 			children = (
 				7026E3A63035A9A700ED9FBC /* Zeitnot */,
 				7026E3A53035A9A700ED9FBC /* Products */,
+				7026E3E03035A9A700ED9FBC /* Core */,
 				7026E3C43035A9A700ED9FBC /* CoreUI */,
 				7026E3D03035A9A700ED9FBC /* Setup */,
-				7026E3E03035A9A700ED9FBC /* Core */,
 			);
 			sourceTree = "<group>";
 		};
