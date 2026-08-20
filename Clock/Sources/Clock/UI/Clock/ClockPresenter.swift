@@ -59,6 +59,14 @@ public final class ClockPresenter {
         }
     }
 
+    private var warningThreshold: Duration {
+        min(Constants.warningThreshold, baseTime / Constants.warningShareOfBaseTime)
+    }
+
+    private var baseTime: Duration {
+        .seconds(timeControl.baseMinutes * Constants.secondsPerMinute)
+    }
+
     private var playerToMove: Player {
         switch state.phase {
         case let .running(player), let .paused(player): player
@@ -122,6 +130,20 @@ public final class ClockPresenter {
 
 }
 
+// MARK: Constants
+
+private extension ClockPresenter {
+
+	enum Constants {
+
+		static let warningThreshold: Duration = .seconds(10)
+		static let warningShareOfBaseTime = 10
+		static let secondsPerMinute = 60
+
+	}
+
+}
+
 // MARK: Mappers
 private extension ClockPresenter {
 
@@ -161,9 +183,16 @@ private extension ClockPresenter {
 	func faceState(for player: Player) -> ClockFace.State {
 		switch state.phase {
 		case .notStarted: .awaitingStart
-		case let .running(active), let .paused(active): active == player ? .toMove : .waiting
+		case let .running(active): runningFaceState(for: player, active: active)
+		case let .paused(active): active == player ? .toMove : .waiting
 		case let .finished(winner): winner == player ? .waiting : .flagged
 		}
+	}
+
+	func runningFaceState(for player: Player, active: Player) -> ClockFace.State {
+		guard active == player else { return .waiting }
+
+		return state[player].remaining <= warningThreshold ? .lowTime : .toMove
 	}
 
 }

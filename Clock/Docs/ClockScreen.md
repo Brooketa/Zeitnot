@@ -157,6 +157,7 @@ reading the app can produce (`1:30:00`) on the smallest supported iPhone, so not
 | **Awaiting start** — before the first tap, nothing running | white | grey | grey | none |
 | **To move** — the half counting down, only ever one | white | accent | ink | 3pt accent, inset |
 | **Waiting** — frozen where its player passed the turn | white | grey | grey | none |
+| **Low time** — to move, and under the warning threshold | white | accent | ink | 3pt accent, pulsing |
 | **Flagged** — this player's time ran out | accent | inverse | inverse | none |
 
 The turn is shown by the ring and the accent name, never by a dark fill: both players read the
@@ -266,6 +267,24 @@ translate.
 
 ---
 
+## The Low-Time Warning
+
+The running half's ring **pulses** once its player drops under the threshold — a warning meant to be
+caught in peripheral vision, since the player it is for is looking at the board, not the screen.
+
+**The threshold is ten seconds, or a tenth of the base time, whichever is shorter.** A flat ten
+seconds would put a `1 | 0` bullet game into the warning state for a sixth of its length, which
+makes the warning meaningless; that game warns at six seconds instead. Anything from `2 | 0` upward
+uses the full ten.
+
+It applies **only to the player actually counting down**. Switching, pausing and resetting all clear
+it because they all end that player's turn or stop the clock, and a flagged card has its own state.
+The waiting half is never warned — it is not their time running out.
+
+Only the running side ever animates.
+
+---
+
 ## Orientation
 
 This is the **only landscape screen in the app**. It declares that with the single modifier CoreUI
@@ -292,10 +311,6 @@ on screen. **Deliberately absent** afterwards is the opposite: things that were 
 
 - **Backgrounding** — a running game must come back paused and still correct after the app has been
   suspended or interrupted, and the screen must not sleep through a long think.
-- **Low-time warning** — a pulsing accent border on the running half below ten seconds. The clock
-  face gains two more states with it: the running half keeps its fill and gains the border, and the
-  *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
-  only the running side ever animates.
 Zero must be reached **exactly**, at the correct instant, regardless of how often the display
 refreshes. A clock that only notices it has flagged on the next redraw ends the game late and shows
 a negative time on the way there.
@@ -381,3 +396,6 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] The winner's card is untouched, and neither final time is covered by anything.
 - [x] Presses do nothing once the game is over, and `PAUSE` is disabled.
 - [x] `RESET` clears the flagged card and returns a fresh game without asking.
+- [x] The running half pulses below the threshold, and the waiting half never does.
+- [x] The threshold is ten seconds, or a tenth of the base time for very short games.
+- [x] The warning clears on switching, pausing, resetting and flagging.

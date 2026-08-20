@@ -4,6 +4,8 @@ import CoreUI
 
 struct ClockFace: View {
 
+    @SwiftUI.State private var isPulsing = false
+
     let model: Model
     let action: (Action) -> Void
 
@@ -55,7 +57,18 @@ struct ClockFace: View {
         if model.state.showsTurnRing {
             cardShape
                 .strokeBorder(ColorPalette.accent, lineWidth: Constants.turnRingWidth)
+                .opacity(isPulsing ? Constants.pulseOpacity : 1)
+                .animation(pulseAnimation, value: isPulsing)
+                .task(id: model.state) {
+                    isPulsing = model.state == .lowTime
+                }
         }
+    }
+
+    var pulseAnimation: Animation? {
+        guard isPulsing else { return nil }
+
+        return .easeInOut(duration: Constants.pulseDuration).repeatForever(autoreverses: true)
     }
 
 }
@@ -101,6 +114,7 @@ extension ClockFace {
 
         case awaitingStart
         case toMove
+        case lowTime
         case waiting
         case flagged
 
@@ -112,7 +126,7 @@ private extension ClockFace.State {
 
     var fill: Color {
         switch self {
-        case .awaitingStart, .toMove, .waiting: ColorPalette.surface
+        case .awaitingStart, .toMove, .lowTime, .waiting: ColorPalette.surface
         case .flagged: ColorPalette.accent
         }
     }
@@ -120,7 +134,7 @@ private extension ClockFace.State {
     var digitsColor: Color {
         switch self {
         case .awaitingStart, .waiting: ColorPalette.textSecondary
-        case .toMove: ColorPalette.ink
+        case .toMove, .lowTime: ColorPalette.ink
         case .flagged: ColorPalette.inkInverse
         }
     }
@@ -128,20 +142,20 @@ private extension ClockFace.State {
     var nameColor: Color {
         switch self {
         case .awaitingStart, .waiting: ColorPalette.textSecondary
-        case .toMove: ColorPalette.accent
+        case .toMove, .lowTime: ColorPalette.accent
         case .flagged: ColorPalette.inkInverse
         }
     }
 
     var captionColor: Color {
         switch self {
-        case .awaitingStart, .toMove, .waiting: ColorPalette.accent
+        case .awaitingStart, .toMove, .lowTime, .waiting: ColorPalette.accent
         case .flagged: ColorPalette.inkInverse
         }
     }
 
     var showsTurnRing: Bool {
-        self == .toMove
+        self == .toMove || self == .lowTime
     }
 
 }
@@ -158,6 +172,8 @@ private extension ClockFace {
         static let shadowOffset: CGFloat = 1
         static let shadowOpacity: CGFloat = 0.12
         static let stateChangeDuration: TimeInterval = 0.2
+        static let pulseDuration: TimeInterval = 0.5
+        static let pulseOpacity: CGFloat = 0.25
 
     }
 
