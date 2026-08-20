@@ -207,12 +207,29 @@ No time is consumed while it is up, however long the pause lasts, and resuming c
 turn** — the move counts do not change and no increment is credited.
 
 The clocks cannot be pressed while paused because the dialog is in the way, so that is a matter of
-layout rather than a rule the press logic has to enforce.
+layout rather than a rule the press logic has to enforce. It covers the clocks only — the control
+bar stays reachable, so a paused game can still be reset.
 
 The dialog covers the board but **not the navigation bar**, which stays above it — the back button
 and the move number remain visible and live while a game is paused. Covering them would mean
 replacing the system bar with a custom header, which is a decision for the whole app rather than
 this dialog.
+
+---
+
+## Resetting
+
+`RESET` returns the game to not started: both clocks back to full base time, both move counts to
+zero, Black to press first. It is reachable while a game runs, while it is paused, and once it has
+finished — the pause dialog covers the clocks but not the control bar, so the button stays live
+behind it.
+
+**It asks first, but only when there is something to lose.** A game that is running or paused raises
+a confirmation dialog; a game that has not started, or one that has already finished, resets
+immediately, because there is nothing left to protect.
+
+Cancelling changes nothing at all — and a running clock **keeps counting while the dialog is up**.
+Opening a dialog is not a way to stop your own clock; only `PAUSE` does that.
 
 ---
 
@@ -242,8 +259,6 @@ on screen. **Deliberately absent** afterwards is the opposite: things that were 
 
 - **Backgrounding** — a running game must come back paused and still correct after the app has been
   suspended or interrupted, and the screen must not sleep through a long think.
-- **The reset confirmation** — `RESET` works, but does not yet ask before throwing away a game in
-  progress.
 - **Low-time warning** — a pulsing accent border on the running half below ten seconds. The clock
   face gains two more states with it: the running half keeps its fill and gains the border, and the
   *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
@@ -326,3 +341,8 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] No time reaches either clock while paused, however long the pause lasts.
 - [x] Resuming continues the same turn, leaving the move counts untouched.
 - [x] The clocks cannot be pressed while the pause dialog is up.
+- [x] Reset restores full base time to both clocks and zeroes both move counts.
+- [x] Reset asks for confirmation only when a game is running or paused.
+- [x] Cancelling a reset leaves the game exactly as it was, clock still counting.
+- [x] After a reset the game behaves like a fresh one, Black pressing first.
+- [x] Reset is reachable while running, while paused, and once finished.

@@ -188,6 +188,86 @@ struct ClockPresenterTests {
         #expect(presenter.whiteClock.time == "2:50")
     }
 
+    @Test
+    func resettingAGameThatHasNotStartedNeedsNoConfirmation() {
+        let presenter = makePresenter()
+
+        presenter.reset()
+
+        #expect(!presenter.showResetDialog)
+        #expect(presenter.whiteClock.state == .awaitingStart)
+    }
+
+    @Test
+    func resettingAGameInProgressAsksFirstAndChangesNothingYet() {
+        let presenter = makePresenter()
+
+        presenter.press(.black)
+        timeSource.advance(by: .seconds(10))
+        presenter.reset()
+
+        #expect(presenter.showResetDialog)
+        #expect(presenter.whiteClock.state == .toMove)
+        #expect(presenter.whiteClock.time == "2:50")
+    }
+
+    @Test
+    func resettingWhilePausedAsksFirst() {
+        let presenter = makePresenter()
+
+        presenter.press(.black)
+        presenter.pause()
+        presenter.reset()
+
+        #expect(presenter.showResetDialog)
+    }
+
+    @Test
+    func confirmingTheResetRestoresAFreshGame() {
+        let presenter = makePresenter()
+
+        presenter.press(.black)
+        timeSource.advance(by: .seconds(10))
+        presenter.press(.white)
+        presenter.reset()
+        presenter.confirmReset()
+
+        #expect(!presenter.showResetDialog)
+        #expect(presenter.whiteClock.time == "3:00")
+        #expect(presenter.blackClock.time == "3:00")
+        #expect(presenter.whiteClock.state == .awaitingStart)
+        #expect(presenter.blackClock.caption == "Press to start")
+        #expect(String(localized: presenter.moveNumber) == "Move 1")
+    }
+
+    @Test
+    func cancellingTheResetKeepsTheGameRunning() {
+        let presenter = makePresenter()
+
+        presenter.press(.black)
+        timeSource.advance(by: .seconds(10))
+        presenter.reset()
+        presenter.cancelReset()
+        timeSource.advance(by: .seconds(5))
+
+        #expect(!presenter.showResetDialog)
+        #expect(presenter.whiteClock.state == .toMove)
+        #expect(presenter.whiteClock.time == "2:45")
+    }
+
+    @Test
+    func resettingAFinishedGameNeedsNoConfirmation() {
+        let presenter = makePresenter(baseMinutes: 1)
+
+        presenter.press(.black)
+        timeSource.advance(by: .seconds(60))
+        presenter.reset()
+
+        #expect(!presenter.showResetDialog)
+        #expect(presenter.whiteClock.time == "1:00")
+        #expect(presenter.whiteClock.state == .awaitingStart)
+    }
+
     private func makePresenter(
         category: String = "Blitz",
         baseMinutes: Int = 3,

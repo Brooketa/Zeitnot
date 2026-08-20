@@ -21,6 +21,8 @@ public final class ClockPresenter {
         makeClockModel(for: .black)
     }
 
+    private(set) var showResetDialog = false
+
     var showPauseDialog: Bool {
         if case .paused = state.phase { true } else { false }
     }
@@ -38,6 +40,13 @@ public final class ClockPresenter {
 
     private var state: GameState {
         gameService.state
+    }
+
+    private var isGameInProgress: Bool {
+        switch state.phase {
+        case .running, .paused: true
+        case .notStarted, .finished: false
+        }
     }
 
     private var playerToMove: Player {
@@ -79,7 +88,21 @@ public final class ClockPresenter {
     }
 
     func reset() {
+        guard isGameInProgress else {
+            gameService.reset()
+            return
+        }
+
+        showResetDialog = true
+    }
+
+    func confirmReset() {
         gameService.reset()
+        showResetDialog = false
+    }
+
+    func cancelReset() {
+        showResetDialog = false
     }
 
 }
