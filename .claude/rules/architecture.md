@@ -76,6 +76,26 @@ Example:
         }
     }
 
+### Exception: services UIKit owns the lifetime of
+
+A small number of shared services cannot be injected, because nothing in the app constructs the
+object that reads them. `OrientationService` in `CoreUI` is the standing example: it is reached as
+`OrientationService.shared` from both the app delegate and the view modifier that drives it.
+
+The reason is structural rather than convenient. `UIApplicationDelegate` is instantiated by UIKit,
+so it cannot be handed dependencies, and the modifier has to reach *the same instance the delegate
+reads* or the two disagree about what the app supports. There is no seam to inject through.
+
+The exception is about **lifetime, not coupling**. Such a service is still declared behind a
+protocol (`OrientationServiceProtocol`), still exposes intent-named methods, and its `shared` is
+still typed as the protocol rather than the concrete class. What is given up is the ability to
+substitute it per call site — nothing else.
+
+This does not generalise. A shared instance is permitted only where the consumer is constructed by
+the system and cannot be reached any other way. Anything the app itself builds — every Presenter,
+UseCase, Repository, DataSource and Client — takes its dependencies through the constructor,
+without exception.
+
 ---
 
 ## Presentation Layer
@@ -258,6 +278,8 @@ Example:
 
 - Every cross-layer dependency must go through a protocol. Never depend on a concrete type across layers.
 - All dependencies are injected through the constructor. No component creates its own dependencies.
+  The one exception is a service whose consumer UIKit constructs -- see Exception: services UIKit owns
+  the lifetime of.
 - Never skip layers. A View cannot talk to a UseCase directly; a UseCase cannot talk to a DataSource directly, etc.
 - Never leak models across layer boundaries. Each layer owns its models and maps at the boundary.
 - Single source of truth at every layer. Each layer has one designated source it trusts -- it never
