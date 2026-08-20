@@ -1,0 +1,198 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "backButton": {
+      "comment": "Accessibility label for the clock screen's back control.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "blackPlayer": {
+      "comment": "Name above the time on the black player's clock face. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Black"
+          }
+        }
+      }
+    },
+    "cancelButton": {
+      "comment": "Button on the reset dialog that dismisses it and keeps the game. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "confirmResetButton": {
+      "comment": "Button on the reset dialog that confirms the reset. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
+    "flagFell": {
+      "comment": "Caption on a clock face whose time ran out. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flag fell"
+          }
+        }
+      }
+    },
+    "moveNumber": {
+      "comment": "Clock screen navigation bar trailing item: the move the game is on. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move %lld"
+          }
+        }
+      }
+    },
+    "pauseButton": {
+      "comment": "Control bar button that pauses a running game. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "pausedTitle": {
+      "comment": "Title of the dialog shown over a paused game. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused"
+          }
+        }
+      }
+    },
+    "playerToMove": {
+      "comment": "Names the player whose turn resumes, shown on the pause dialog. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ to move"
+          }
+        }
+      }
+    },
+    "pressToStart": {
+      "comment": "Prompt on the black player's clock face before the game starts, naming the half to press. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press to start"
+          }
+        }
+      }
+    },
+    "resetButton": {
+      "comment": "Control bar button that returns the game to a fresh start. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
+    "resetDialogMessage": {
+      "comment": "Body of the dialog asking to confirm resetting a game in progress.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both clocks go back to full time and the game starts over."
+          }
+        }
+      }
+    },
+    "resetDialogTitle": {
+      "comment": "Title of the dialog asking to confirm resetting a game in progress. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset game?"
+          }
+        }
+      }
+    },
+    "resumeButton": {
+      "comment": "Button on the pause dialog that resumes the paused turn. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
+          }
+        }
+      }
+    },
+    "rulesetTitle": {
+      "comment": "Clock screen header: ruleset category, base minutes and increment seconds, e.g. BLITZ · 3 | 2. The status dot beside it is a view, not part of this string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · %2$lld | %3$lld"
+          }
+        }
+      }
+    },
+    "whitePlayer": {
+      "comment": "Name above the time on the white player's clock face. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "White"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

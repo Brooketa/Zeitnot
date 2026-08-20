@@ -34,17 +34,17 @@ device, from the smallest supported iPhone up to iPad.
 ### Section header
 
 The small, letter-spaced, uppercase label that introduces a section's card. It is a single reusable
-component, built here and reused by every section that follows — `CUSTOM` (ZN-18) and `PREFERENCES`
-(ZN-19).
+component. It has one caller today; it stays a component because `CUSTOM` (ZN-18) and `PREFERENCES`
+(ZN-19) reuse it if they are ever built.
 
 Like the cell's category, the title is **supplied in natural casing** (`Preset Rulesets`) and
 uppercased for display, so it is spoken as words rather than letters.
 
 ### Sections that exist
 
-Only **PRESET RULESETS**. `CUSTOM` and `PREFERENCES` arrive with their own tickets, and no empty
-header stands in for them in the meantime — a section appears when it has something to show. The
-START GAME bar is pinned below them all.
+Only **PRESET RULESETS**. `CUSTOM` and `PREFERENCES` are **deferred** (ZN-18, ZN-19) and no empty
+header stands in for them — a section appears when it has something to show. The START GAME bar is
+pinned below.
 
 ### Appearance
 
@@ -55,16 +55,23 @@ deliberate later pass; until the palette carries dark values, the app asks for l
 
 ### Orientation
 
-The screen is portrait, and the app is portrait-only on iPhone. The clock screen is the app's one
-landscape screen; it re-introduces landscape support together with the per-screen orientation
-control it needs (ZN-23). iPad currently still rotates.
+The screen is portrait on iPhone, and stays portrait because it does not ask for anything else.
+
+Since ZN-68 the app is no longer portrait-only at the target level: the build settings permit
+landscape, and an app delegate answers the system with whatever the orientation service currently
+reports. A screen opts into landscape with a single modifier, and this screen does not apply it — so
+the answer stays portrait for as long as it is on screen.
+
+The clock screen is the only screen that does apply it (ZN-66), and leaving it puts the app back to
+portrait. iPad allows every orientation on every screen, this one included, by decision rather than
+omission.
 
 ---
 
 ## Ruleset Cell
 
-One row representing a single ruleset. Used for every preset, and in an adapted form for the custom
-ruleset.
+One row representing a single ruleset. Used for every preset. The custom ruleset it was also
+designed to serve is deferred (ZN-18), so today it renders the six presets only.
 
 ### What it shows
 
@@ -98,7 +105,7 @@ point sizes on purpose. Robustness therefore means the layout absorbs longer con
 wrap, rows grow vertically, and nothing truncates or clips.
 
 The cell has **no VoiceOver support**, by decision rather than oversight. It reads as whatever
-SwiftUI produces by default. See ZN-59.
+SwiftUI produces by default. This is tracked nowhere — see the Deferred section.
 
 ---
 
@@ -276,33 +283,83 @@ guarantee is structural rather than a rule the clock has to honour.
 
 The screen does not navigate. It reports the intent and whoever presents it decides where that goes,
 which is what keeps this module free of any dependency on the clock. Starting a game leaves the
-selection, the custom values and the preferences untouched, so returning to the screen finds it
-exactly as it was left.
-
-**Nothing is wired to that report yet.** The tap reaches the Presenter and stops there, so START
-GAME is a working button that currently goes nowhere. The destination and the navigation that
-reaches it are deferred until the clock screen exists — **ZN-62**.
+selection untouched, so returning to the screen finds it exactly as it was left.
 
 The seam is in the Presenter rather than in the view's interface. The screen takes no callback and
-exposes no hook; a tap is simply a Presenter action, the same as selecting a ruleset. That keeps the
-view's public surface to `init()` and leaves the routing decision entirely to the layer that will
-make it.
+exposes no hook; a tap is simply a Presenter action, the same as selecting a ruleset. That is what
+leaves the routing decision entirely to the layer that makes it.
 
 ---
 
-## Not Built Yet
+## Navigation
 
-- Navigation from START GAME to the clock screen (**ZN-62**). The Presenter can build the
-  configuration a game needs; nothing consumes it yet, and the app deliberately holds no routing
-  layer in the meantime.
-- The `CUSTOM` section and its steppers (ZN-18)
-- The `PREFERENCES` section and the sound preference (ZN-19)
-- Selection, custom values and preferences surviving a relaunch (ZN-20)
-- VoiceOver support for this screen's controls (ZN-59)
+START GAME opens the clock screen, and the module reaches it without knowing it exists.
+
+### What this module names
+
+One protocol, declared here, naming the single navigation this screen can trigger and taking the
+game configuration. That is the module's entire vocabulary for navigation: it names no router, no
+destination and no other screen, and it does not depend on the clock module.
+
+The Presenter receives that protocol through its initialiser and calls it when the bar is tapped.
+Routing is a **Presenter dependency, not a view callback** — the view has no `onStartGame` closure
+to hand upwards, so there is no way for a navigation decision to leak into the view layer.
+
+### What the app supplies
+
+The app owns the navigation stack and conforms its router to the protocol, translating the call into
+a push carrying the configuration. Because the Presenter is injected with something, the **app
+builds the Presenter** and hands it to the screen — so the view's public surface is
+`init(presenter:)` rather than `init()`.
+
+The screen holds that Presenter as view state rather than as a plain stored value. Pushing the clock
+re-evaluates the app's root body, which re-runs `SetupView`'s initialiser; holding the Presenter as
+state means the second initialiser's value is discarded and the original is kept. That is what makes
+the selection survive the round trip, and it is a requirement rather than a stylistic choice — a
+plain stored Presenter would be rebuilt on the push and the screen would come back reset to Blitz
+`3 | 2`.
+
+### Two taps, one clock
+
+A double tap on START GAME opens exactly one clock screen. The guard is the **router's**, not this
+module's: the Presenter reports every tap it receives, and the router ignores a push that arrives
+while one is already in flight. This screen therefore has no de-duplication logic of its own, and
+none should be added here.
+
+### Coming back
+
+Back and back-swipe are the system's, from the system navigation bar. Returning finds the screen
+exactly as it was left, because the screen's state lives for the screen's lifetime and starting a
+game does not touch it. That lifetime is the session: nothing is stored, so a relaunch is back to
+Blitz `3 | 2` (ZN-20).
+
+---
+
+## Deferred
+
+Cut on 2026-08-20, not merely unbuilt. **This screen is finished for this pass** — the six presets,
+the cell, selection, the shell and the START GAME bar are all in place, and nothing below is
+expected before the app ships.
+
+- The `CUSTOM` section and its steppers (**ZN-18**)
+- The `PREFERENCES` section and the sound preference (**ZN-19**) — there is no sound anywhere in the
+  app, so there would be nothing for the toggle to govern
+- Selection surviving a relaunch (**ZN-20**). Every launch starts on Blitz `3 | 2`
+
+Picking up `CUSTOM` again means revisiting **ZN-64**, which settled row identity on the assumption
+that a row is a preset; once a custom ruleset joins the selection group a row becomes a two-case
+selection instead. That rework was accepted when ZN-64 was written.
+
+**VoiceOver is not tracked anywhere.** An earlier version of this list named `ZN-59`, which does not
+exist and never did. Accessibility criteria were stripped from ZN-16 and ZN-18 rather than met
+piecemeal; if it is taken up it should be one Epic covering every screen.
 
 ---
 
 ## Acceptance Checklist
+
+`[x]` done · `[~]` deferred, and not expected before the app ships — see Deferred. There are no
+open `[ ]` items: this screen is finished for this pass.
 
 ### Screen shell
 
@@ -339,8 +396,8 @@ make it.
 - [x] Exactly one ruleset is selected at all times.
 - [x] Tapping the already-selected ruleset is a no-op, not a deselect.
 - [x] The START GAME subtitle updates immediately on selection.
-- [ ] The custom ruleset participates in the selection group — deferred; selection currently spans
-      the six presets only (ZN-18).
+- [~] The custom ruleset participates in the selection group — **deferred** (ZN-18). Selection spans
+      the six presets only, and that is the shipped behaviour, not a gap.
 
 ### Card container
 
@@ -354,12 +411,20 @@ make it.
 - [x] The scrolling content carries enough bottom inset that the last ruleset clears the bar.
 - [x] Content passing beneath the bar fades into the background under a gradient.
 - [x] The subtitle names the current selection and updates immediately when it changes.
-- [ ] START GAME opens the clock screen with the selected ruleset's base time and increment — the
-      Presenter can build the configuration, but nothing consumes it yet (ZN-62).
+- [x] START GAME opens the clock screen with the selected ruleset's base time and increment.
 - [x] The configuration is a snapshot taken at the tap, so a later selection change cannot alter a
       game already under way.
-- [ ] Returning from the clock preserves the selection and preferences — cannot be exercised until
-      there is a clock to return from (ZN-62). The screen's state is held for its lifetime, so this
-      follows once the navigation exists.
-- [ ] Starting a game with the custom ruleset uses the current custom values — the custom ruleset
-      does not exist yet (ZN-18).
+- [x] Returning from the clock preserves the selection.
+- [~] Starting a game with the custom ruleset uses the current custom values — **deferred**; the
+      custom ruleset does not exist (ZN-18).
+
+### Navigation
+
+- [x] The module declares one routing protocol and names no router, no destination and no other
+      screen. It does not depend on the clock module.
+- [x] Routing is a Presenter dependency injected through its initialiser, not a view callback.
+- [x] The view is constructed with its Presenter and holds it as state, so a push does not rebuild
+      it and the selection survives the round trip.
+- [x] Two rapid taps on START GAME open exactly one clock screen. The guard belongs to the router;
+      this module reports every tap.
+- [x] Back and back-swipe are the system's, and return to the screen as it was left.

@@ -2,6 +2,10 @@ import SwiftUI
 
 public extension Text {
 
+    func clockDigits(_ color: Color? = nil) -> Text {
+        styled(Typography.clockDigits, color)
+    }
+
     func largeTitle(_ color: Color? = nil) -> Text {
         styled(Typography.largeTitle, color)
     }
@@ -36,6 +40,10 @@ public extension Text {
 
     func label(_ color: Color? = nil) -> Text {
         styled(Typography.label, color)
+    }
+
+    func playerName(_ color: Color? = nil) -> Text {
+        styled(Typography.playerName, color)
     }
 
     func micro(_ color: Color? = nil) -> Text {

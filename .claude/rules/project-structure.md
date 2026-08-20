@@ -84,7 +84,13 @@ Zeitnot/
 ├── CLAUDE.md
 ├── Zeitnot/                            # Main app target
 │   ├── ZeitnotApp.swift                # @main entry point (SwiftUI App struct)
-│   ├── AppRouter.swift                 # Top-level navigation/routing
+│   ├── App/
+│   │   ├── Navigation/
+│   │   │   ├── AppRouter.swift         # Owns the navigation path, conforms to each feature's Routing protocol
+│   │   │   └── NavigationDestination.swift
+│   │   └── DependencyInjection/
+│   │       ├── Dependencies.swift      # Composition root: owns the router, builds presenters
+│   │       └── DependenciesContainer.swift
 │   ├── Services/                       # App-level services
 │   └── Assets.xcassets/                # App-level assets (app icon, accent colour)
 │
@@ -426,7 +432,8 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
    `productName`, plus a `PBXBuildFile` in the target's Frameworks build phase. Confirm
    `packageReferences` still contains no local packages.
 5. Add a `Docs/` folder at the package root for the module's behavioural spec file(s).
-6. Wire the module's entry screen into `AppRouter.swift`.
+6. Wire the module's entry screen in: a `NavigationDestination` case, a presenter factory on
+   `Dependencies`, and the router's conformance to that module's own `Routing` protocol.
 7. Do not import other feature modules — use protocol-based injection if cross-feature communication is needed.
 
 ## Adding a New Screen Checklist

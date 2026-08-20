@@ -3,7 +3,7 @@ import Observation
 import Core
 
 @Observable
-final class SetupPresenter {
+public final class SetupPresenter {
 
     var rulesetModels: [RulesetCell.Model] {
         PresetRuleset.allCases.map { preset in
@@ -19,16 +19,24 @@ final class SetupPresenter {
         GameConfiguration(timeControl: selection.timeControl, category: selectedCategory)
     }
 
+    private let router: SetupRoutingProtocol
+
     private var selection: PresetRuleset = .blitz3plus2
 
     private var selectedCategory: String {
         String(localized: selection.category)
     }
 
+    public init(router: SetupRoutingProtocol) {
+        self.router = router
+    }
+
     func select(_ ruleset: PresetRuleset) {
         selection = ruleset
     }
 
-    func startGame() {}
+    func startGame() {
+        router.navigateToClock(gameConfiguration: gameConfiguration)
+    }
 
 }
