@@ -32,7 +32,7 @@ private extension RulesetCell {
                 Text(model.ruleset.description)
                     .callout()
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .alignLeading()
 
             SelectionIndicator(isSelected: model.isSelected)
         }
