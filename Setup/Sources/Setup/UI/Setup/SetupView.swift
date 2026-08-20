@@ -38,7 +38,7 @@ private extension SetupView {
 
     func onPresetRulesetSectionAction(_ action: PresetRulesetSection.Action) {
         switch action {
-        case let .select(ruleset): presenter.select(ruleset)
+        case let .select(id): presenter.selectRuleset(id: id)
         }
     }
 

@@ -7,7 +7,7 @@ struct PresetRulesetTests {
 
     @Test
     func catalogueIsInDisplayOrder() {
-        #expect(PresetRuleset.allCases == [
+        #expect(PresetRuleset.catalogue == [
             .bullet1plus0,
             .blitz3plus2,
             .blitz5plus0,
@@ -62,7 +62,7 @@ struct PresetRulesetTests {
         (preset: PresetRuleset.classical90plus30, storageKey: "classical-90-30")
     ])
     func everyPresetHasAStableStorageKey(preset: PresetRuleset, storageKey: String) {
-        #expect(preset.rawValue == storageKey)
+        #expect(preset.id == storageKey)
     }
 
 }

@@ -57,7 +57,7 @@ struct StartGameBar: View {
 	}
 
 	var arrow: some View {
-		Image.startGame
+		Image.forward
 			.font(.system(size: Constants.arrowSize, weight: .bold))
 			.foregroundStyle(ColorPalette.inkInverse)
 			.frame(width: Constants.arrowDiameter, height: Constants.arrowDiameter)

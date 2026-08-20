@@ -20,7 +20,7 @@ extension PresetRulesetSection {
 
     enum Action {
 
-        case select(PresetRuleset)
+        case select(id: String)
 
     }
 
@@ -30,7 +30,7 @@ private extension PresetRulesetSection {
 
     func onPresetRulesetListAction(_ action: PresetRulesetList.Action) {
         switch action {
-		case let .select(ruleset): self.action(.select(ruleset))
+        case let .select(id): self.action(.select(id: id))
         }
     }
 

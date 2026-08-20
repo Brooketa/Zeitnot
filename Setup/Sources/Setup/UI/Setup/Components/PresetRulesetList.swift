@@ -25,7 +25,7 @@ extension PresetRulesetList {
 
     enum Action {
 
-        case select(PresetRuleset)
+        case select(id: String)
 
     }
 
@@ -35,7 +35,7 @@ private extension PresetRulesetList {
 
     func onRulesetCellAction(_ action: RulesetCell.Action, for model: RulesetCell.Model) {
         switch action {
-		case .select: self.action(.select(model.ruleset))
+        case .select: self.action(.select(id: model.id))
         }
     }
 

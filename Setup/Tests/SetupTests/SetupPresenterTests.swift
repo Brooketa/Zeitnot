@@ -15,7 +15,7 @@ struct SetupPresenterTests {
     func exactlyOneRulesetIsSelectedAtAllTimes() {
         let presenter = makePresenter()
 
-        for preset in PresetRuleset.allCases {
+        for preset in PresetRuleset.catalogue {
             presenter.select(preset)
 
             #expect(selectedPresets(of: presenter) == [preset])
@@ -45,7 +45,7 @@ struct SetupPresenterTests {
     func modelsFollowTheCatalogueOrder() {
         let presenter = makePresenter()
 
-        #expect(presenter.rulesetModels.map(\.ruleset) == PresetRuleset.allCases)
+        #expect(presenter.rulesetModels.map(\.id) == PresetRuleset.catalogue.map(\.id))
     }
 
     @Test
@@ -133,9 +133,11 @@ struct SetupPresenterTests {
     }
 
     private func selectedPresets(of presenter: SetupPresenter) -> [PresetRuleset] {
-        presenter.rulesetModels
+        let selectedIDs = presenter.rulesetModels
             .filter(\.isSelected)
-            .map(\.ruleset)
+            .map(\.id)
+
+        return PresetRuleset.catalogue.filter { preset in selectedIDs.contains(preset.id) }
     }
 
 }
