@@ -286,22 +286,57 @@ which is what keeps this module free of any dependency on the clock. Starting a 
 selection, the custom values and the preferences untouched, so returning to the screen finds it
 exactly as it was left.
 
-**Nothing is wired to that report yet.** The tap reaches the Presenter and stops there, so START
-GAME is a working button that currently goes nowhere. The destination and the navigation that
-reaches it are deferred until the clock screen exists — **ZN-62**.
-
 The seam is in the Presenter rather than in the view's interface. The screen takes no callback and
-exposes no hook; a tap is simply a Presenter action, the same as selecting a ruleset. That keeps the
-view's public surface to `init()` and leaves the routing decision entirely to the layer that will
-make it.
+exposes no hook; a tap is simply a Presenter action, the same as selecting a ruleset. That is what
+leaves the routing decision entirely to the layer that makes it.
+
+---
+
+## Navigation
+
+START GAME opens the clock screen, and the module reaches it without knowing it exists.
+
+### What this module names
+
+One protocol, declared here, naming the single navigation this screen can trigger and taking the
+game configuration. That is the module's entire vocabulary for navigation: it names no router, no
+destination and no other screen, and it does not depend on the clock module.
+
+The Presenter receives that protocol through its initialiser and calls it when the bar is tapped.
+Routing is a **Presenter dependency, not a view callback** — the view has no `onStartGame` closure
+to hand upwards, so there is no way for a navigation decision to leak into the view layer.
+
+### What the app supplies
+
+The app owns the navigation stack and conforms its router to the protocol, translating the call into
+a push carrying the configuration. Because the Presenter is injected with something, the **app
+builds the Presenter** and hands it to the screen — so the view's public surface is
+`init(presenter:)` rather than `init()`.
+
+The screen holds that Presenter as view state rather than as a plain stored value. Pushing the clock
+re-evaluates the app's root body, which re-runs `SetupView`'s initialiser; holding the Presenter as
+state means the second initialiser's value is discarded and the original is kept. That is what makes
+the selection survive the round trip, and it is a requirement rather than a stylistic choice — a
+plain stored Presenter would be rebuilt on the push and the screen would come back reset to Blitz
+`3 | 2`.
+
+### Two taps, one clock
+
+A double tap on START GAME opens exactly one clock screen. The guard is the **router's**, not this
+module's: the Presenter reports every tap it receives, and the router ignores a push that arrives
+while one is already in flight. This screen therefore has no de-duplication logic of its own, and
+none should be added here.
+
+### Coming back
+
+Back and back-swipe are the system's, from the system navigation bar. Returning finds the screen
+exactly as it was left — selection, and in time the custom values and preferences — because the
+screen's state lives for the screen's lifetime and starting a game does not touch it.
 
 ---
 
 ## Not Built Yet
 
-- Navigation from START GAME to the clock screen (**ZN-62**). The Presenter can build the
-  configuration a game needs; nothing consumes it yet, and the app deliberately holds no routing
-  layer in the meantime.
 - The `CUSTOM` section and its steppers (ZN-18)
 - The `PREFERENCES` section and the sound preference (ZN-19)
 - Selection, custom values and preferences surviving a relaunch (ZN-20)
@@ -361,12 +396,20 @@ make it.
 - [x] The scrolling content carries enough bottom inset that the last ruleset clears the bar.
 - [x] Content passing beneath the bar fades into the background under a gradient.
 - [x] The subtitle names the current selection and updates immediately when it changes.
-- [ ] START GAME opens the clock screen with the selected ruleset's base time and increment — the
-      Presenter can build the configuration, but nothing consumes it yet (ZN-62).
+- [x] START GAME opens the clock screen with the selected ruleset's base time and increment.
 - [x] The configuration is a snapshot taken at the tap, so a later selection change cannot alter a
       game already under way.
-- [ ] Returning from the clock preserves the selection and preferences — cannot be exercised until
-      there is a clock to return from (ZN-62). The screen's state is held for its lifetime, so this
-      follows once the navigation exists.
+- [x] Returning from the clock preserves the selection. Preferences follow once they exist (ZN-19).
 - [ ] Starting a game with the custom ruleset uses the current custom values — the custom ruleset
       does not exist yet (ZN-18).
+
+### Navigation
+
+- [x] The module declares one routing protocol and names no router, no destination and no other
+      screen. It does not depend on the clock module.
+- [x] Routing is a Presenter dependency injected through its initialiser, not a view callback.
+- [x] The view is constructed with its Presenter and holds it as state, so a push does not rebuild
+      it and the selection survives the round trip.
+- [x] Two rapid taps on START GAME open exactly one clock screen. The guard belongs to the router;
+      this module reports every tap.
+- [x] Back and back-swipe are the system's, and return to the screen as it was left.
