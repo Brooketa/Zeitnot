@@ -15,7 +15,7 @@ public struct ClockView: View {
 
             clocks
 
-            ControlBar(action: onControlBarAction)
+            ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
         }
 		.presentFullScreen(if: presenter.showResetDialog) {
 			ResetDialog(action: onResetDialogAction)

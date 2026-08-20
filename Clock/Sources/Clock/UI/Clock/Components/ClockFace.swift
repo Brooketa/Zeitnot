@@ -10,7 +10,7 @@ struct ClockFace: View {
     var body: some View {
         content
             .alignCenter()
-            .background(ColorPalette.surface)
+            .background(model.state.fill)
             .clipShape(cardShape)
             .overlay {
                 turnRing
@@ -41,7 +41,7 @@ struct ClockFace: View {
 
     var caption: some View {
         Text(model.caption ?? Constants.captionPlaceholder)
-            .micro(ColorPalette.accent)
+            .micro(model.state.captionColor)
             .textCase(.uppercase)
             .opacity(model.caption == nil ? 0 : 1)
     }
@@ -102,6 +102,7 @@ extension ClockFace {
         case awaitingStart
         case toMove
         case waiting
+        case flagged
 
     }
 
@@ -109,10 +110,18 @@ extension ClockFace {
 
 private extension ClockFace.State {
 
+    var fill: Color {
+        switch self {
+        case .awaitingStart, .toMove, .waiting: ColorPalette.surface
+        case .flagged: ColorPalette.accent
+        }
+    }
+
     var digitsColor: Color {
         switch self {
         case .awaitingStart, .waiting: ColorPalette.textSecondary
         case .toMove: ColorPalette.ink
+        case .flagged: ColorPalette.inkInverse
         }
     }
 
@@ -120,6 +129,14 @@ private extension ClockFace.State {
         switch self {
         case .awaitingStart, .waiting: ColorPalette.textSecondary
         case .toMove: ColorPalette.accent
+        case .flagged: ColorPalette.inkInverse
+        }
+    }
+
+    var captionColor: Color {
+        switch self {
+        case .awaitingStart, .toMove, .waiting: ColorPalette.accent
+        case .flagged: ColorPalette.inkInverse
         }
     }
 

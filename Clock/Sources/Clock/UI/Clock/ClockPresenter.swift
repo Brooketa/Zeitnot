@@ -24,6 +24,10 @@ public final class ClockPresenter {
 
     private(set) var showResetDialog = false
 
+    var controlBarModel: ControlBar.Model {
+        ControlBar.Model(canPause: !isGameOver)
+    }
+
     var showPauseDialog: Bool {
         if case .paused = state.phase { true } else { false }
     }
@@ -42,6 +46,10 @@ public final class ClockPresenter {
 
     private var state: GameState {
         gameService.state
+    }
+
+    private var isGameOver: Bool {
+        if case .finished = state.phase { true } else { false }
     }
 
     private var isGameInProgress: Bool {
@@ -141,6 +149,10 @@ private extension ClockPresenter {
 	}
 
 	func caption(for player: Player) -> String? {
+		if case let .finished(winner) = state.phase, winner != player {
+			return String(localized: .flagFell)
+		}
+
 		let isPromptingToStart = state.phase == .notStarted && player == .black
 
 		return isPromptingToStart ? String(localized: .pressToStart) : nil
@@ -150,7 +162,7 @@ private extension ClockPresenter {
 		switch state.phase {
 		case .notStarted: .awaitingStart
 		case let .running(active), let .paused(active): active == player ? .toMove : .waiting
-		case .finished: .waiting
+		case let .finished(winner): winner == player ? .waiting : .flagged
 		}
 	}
 

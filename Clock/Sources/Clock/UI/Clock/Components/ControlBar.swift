@@ -3,11 +3,14 @@ import CoreUI
 
 struct ControlBar: View {
 
+    let model: Model
     let action: (Action) -> Void
 
     var body: some View {
         HStack(spacing: .md) {
             button(for: .pause, title: .pauseButton)
+                .enabled(model.canPause)
+                .opacity(model.canPause ? 1 : Constants.disabledOpacity)
 
             button(for: .reset, title: .resetButton)
         }
@@ -37,10 +40,30 @@ struct ControlBar: View {
 
 extension ControlBar {
 
+    struct Model {
+
+        let canPause: Bool
+
+    }
+
+}
+
+extension ControlBar {
+
     enum Action {
 
         case pause
         case reset
+
+    }
+
+}
+
+private extension ControlBar {
+
+    enum Constants {
+
+        static let disabledOpacity: CGFloat = 0.4
 
     }
 
