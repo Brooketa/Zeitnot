@@ -111,6 +111,14 @@ delegate is built by UIKit and cannot be handed dependencies, and the modifier m
 instance the delegate reads. It stays behind `OrientationServiceProtocol`, so the exception is about
 lifetime rather than coupling to a concrete type.
 
+### It needs an active scene
+
+The refresh asks the **active** window scene to update its geometry, so a screen that applies the
+modifier while no scene is foreground-active yet — the app's launch root — stays in the orientation
+it launched in. Every screen that declares landscape is pushed onto a running app, so the app cannot
+reach that case; it is recorded because it is why the clock screen was verified by pushing it rather
+than by launching into it.
+
 ### iPad allows everything
 
 The lock is iPhone-only. An iPad is used in whatever orientation it is held or docked in, and forcing
