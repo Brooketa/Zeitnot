@@ -14,7 +14,7 @@ struct ClockPresenterObservationTests {
 
         withObservationTracking {
             _ = presenter.whiteClock
-            _ = presenter.isRunning
+            _ = presenter.isPaused
         } onChange: {
             observation.fired = true
         }

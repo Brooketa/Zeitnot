@@ -21,6 +21,14 @@ public final class ClockPresenter {
         makeClockModel(for: .black)
     }
 
+    var showPauseDialog: Bool {
+        if case .paused = state.phase { true } else { false }
+    }
+
+    var pauseDialogModel: PauseDialog.Model {
+        PauseDialog.Model(playerName: String(localized: playerToMove.name))
+    }
+
     var isPaused: Bool {
         if case .running = state.phase { false } else { true }
     }
@@ -30,6 +38,13 @@ public final class ClockPresenter {
 
     private var state: GameState {
         gameService.state
+    }
+
+    private var playerToMove: Player {
+        switch state.phase {
+        case let .running(player), let .paused(player): player
+        case .notStarted, .finished: .white
+        }
     }
 
     private var category: String {
@@ -57,6 +72,10 @@ public final class ClockPresenter {
 
     func pause() {
         gameService.pause()
+    }
+
+    func resume() {
+        gameService.resume()
     }
 
     func reset() {

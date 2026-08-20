@@ -37,6 +37,30 @@
         }
       }
     },
+    "pausedTitle": {
+      "comment": "Title of the dialog shown over a paused game. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused"
+          }
+        }
+      }
+    },
+    "playerToMove": {
+      "comment": "Names the player whose turn resumes, shown on the pause dialog. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ to move"
+          }
+        }
+      }
+    },
     "pressToStart": {
       "comment": "Prompt on the black player's clock face before the game starts, naming the half to press. Uppercased for display.",
       "extractionState": "manual",
@@ -57,6 +81,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reset"
+          }
+        }
+      }
+    },
+    "resumeButton": {
+      "comment": "Button on the pause dialog that resumes the paused turn. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume"
           }
         }
       }
