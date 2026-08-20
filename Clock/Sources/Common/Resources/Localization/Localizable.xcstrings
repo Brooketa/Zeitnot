@@ -37,6 +37,18 @@
         }
       }
     },
+    "pressToStart": {
+      "comment": "Prompt on the black player's clock face before the game starts, naming the half to press. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press to start"
+          }
+        }
+      }
+    },
     "resetButton": {
       "comment": "Control bar button that returns the game to a fresh start. Uppercased for display.",
       "extractionState": "manual",

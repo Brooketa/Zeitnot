@@ -13,7 +13,7 @@ public struct ClockView: View {
         VStack(spacing: .lg) {
             clocks
 
-            ControlBar(action: presenter.handle)
+            ControlBar(action: onControlBarAction)
         }
         .padding(.lg)
         .primaryBackground()
@@ -32,9 +32,9 @@ public struct ClockView: View {
 
     var clocks: some View {
         HStack(spacing: .lg) {
-            ClockFace(model: presenter.whiteClock)
+            ClockFace(model: presenter.whiteClock, action: onClockFaceAction)
 
-            ClockFace(model: presenter.blackClock)
+            ClockFace(model: presenter.blackClock, action: onClockFaceAction)
         }
     }
 
@@ -42,6 +42,23 @@ public struct ClockView: View {
         Text(presenter.moveNumber)
             .label(ColorPalette.textSecondary)
             .textCase(.uppercase)
+    }
+
+}
+
+private extension ClockView {
+
+    func onClockFaceAction(_ action: ClockFace.Action) {
+        switch action {
+        case let .press(player): presenter.press(player)
+        }
+    }
+
+    func onControlBarAction(_ action: ControlBar.Action) {
+        switch action {
+        case .pause: presenter.pause()
+        case .reset: presenter.reset()
+        }
     }
 
 }
