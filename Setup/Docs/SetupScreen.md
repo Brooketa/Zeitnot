@@ -55,9 +55,16 @@ deliberate later pass; until the palette carries dark values, the app asks for l
 
 ### Orientation
 
-The screen is portrait, and the app is portrait-only on iPhone. The clock screen is the app's one
-landscape screen; it re-introduces landscape support together with the per-screen orientation
-control it needs (ZN-23). iPad currently still rotates.
+The screen is portrait on iPhone, and stays portrait because it does not ask for anything else.
+
+Since ZN-68 the app is no longer portrait-only at the target level: the build settings permit
+landscape, and an app delegate answers the system with whatever the orientation service currently
+reports. A screen opts into landscape with a single modifier, and this screen does not apply it — so
+the answer stays portrait for as long as it is on screen.
+
+The clock screen is the only screen that does apply it (ZN-66), and leaving it puts the app back to
+portrait. iPad allows every orientation on every screen, this one included, by decision rather than
+omission.
 
 ---
 
