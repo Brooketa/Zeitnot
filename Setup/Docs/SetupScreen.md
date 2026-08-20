@@ -111,19 +111,24 @@ SwiftUI produces by default. This is tracked nowhere — see the Deferred sectio
 
 ## Preset Rulesets
 
-The six options the player picks from, in this display order. The catalogue is an enum, so the order
-is the declaration order and there is no separate list to keep in sync.
+The six options the player picks from, in this display order. The catalogue is **one list of values**,
+so a preset is a single entry stating its id, category, time control and description together, and
+the list's order is the display order.
+
+It was an enum with a switch per property until 2026-08-20. Adding a preset then meant three edits in
+three switches, and a missed one compiled cleanly — the same shape as the clock face's five parallel
+switches, fixed the same way.
 
 | Category | Time control | Description |
 |---|---|---|
 | BULLET | 1 \| 0 | One minute each. Sudden death. |
-| BLITZ | 3 \| 2 | Three minutes, plus 2s on every completed move. |
+| BLITZ | 3 \| 2 | Three minutes, plus 2s per move. |
 | BLITZ | 5 \| 0 | Five minutes each, classic blitz game. |
 | RAPID | 10 \| 0 | Ten minutes each, no increment. |
 | RAPID | 15 \| 10 | Fifteen minutes, plus 10s per move. |
 | CLASSICAL | 90 \| 30 | 90 minutes each, plus 30s per move. |
 
-**Blitz `3 | 2` is what a first launch with nothing stored shows as selected.** That default is not
+**Bullet `1 | 0` is what a first launch with nothing stored shows as selected.** That default is not
 expressed in the catalogue — which option starts selected is screen behaviour, so it belongs with
 whatever resolves a stored selection to a shown one (the Presenter, or the repository reading
 storage once ZN-20 exists). The catalogue lists the six and says nothing about which one wins.
@@ -158,27 +163,34 @@ The copy was rewritten so the app does not describe behaviour it does not have.
 
 ## Selection
 
-Exactly one preset is selected at all times. The Presenter holds a single `PresetRuleset`, so three
-of the rules are structural rather than coded:
+Exactly one preset is selected at all times. The Presenter holds a single `PresetRuleset` — one entry
+of the catalogue, a value carrying an id, a category, a description and a time control — so three of
+the rules are structural rather than coded:
 
 - selecting one **deselects the others** — there is nothing else holding a selection,
 - **exactly one is always selected** — the property cannot be empty,
 - tapping the **already-selected** one is a no-op — assigning the same value changes nothing.
 
-**Blitz `3 | 2` is selected on launch.** The Presenter decides this, not the catalogue.
+**Bullet `1 | 0` is selected on launch.** The Presenter decides this, not the catalogue.
 
 ### How a row is identified
 
-A row is **the preset plus whether it is selected**, and nothing else. The cell reads its category,
-time control and description from the preset directly, because restating them alongside it would be
-two representations of one fact. A tap hands the whole row back, so the Presenter reads the preset it
-already constructed — there is no lookup that can fail and no unknown-identifier case to handle.
+A row is identified by its **id** — the same string that is its storage key, `"blitz-3-2"`. The cell
+is given what it renders (category, description, the two numbers behind `3 | 2`, and whether it is
+selected) and nothing else; a tap reports `select(id:)`, and the Presenter finds that entry in the
+catalogue.
 
-Storage keys stay out of this. `PresetRuleset.rawValue` is used only at the persistence boundary
-(ZN-20), not to move a selection between the view and the Presenter.
+This is a **change from the earlier design**, which handed the whole preset back so no lookup could
+fail. What that cost was a view carrying the catalogue type and reaching through it — the cell had to
+know that a preset *has* a time control in order to draw one. The trade is deliberate: a lookup that
+cannot fail in practice, in exchange for a cell that knows only what it draws.
 
-When the custom ruleset joins the group, the row identity becomes the two-case selection rather than
-a preset — the same change, one type wider.
+The id therefore does double duty as the row identity and the persistence key (ZN-20), rather than
+being confined to the storage boundary.
+
+When the custom ruleset joins the group (ZN-18), it becomes another entry with its own id — its
+category, description and time control are built at runtime rather than listed, which the catalogue
+already allows because an entry is a value rather than a case.
 
 The `3 | 2` reading comes from the module's String Catalog, under the key `timeControlNotation`,
 which takes the two numbers as arguments. **No call site writes the format** — the cell renders
@@ -331,7 +343,7 @@ none should be added here.
 Back and back-swipe are the system's, from the system navigation bar. Returning finds the screen
 exactly as it was left, because the screen's state lives for the screen's lifetime and starting a
 game does not touch it. That lifetime is the session: nothing is stored, so a relaunch is back to
-Blitz `3 | 2` (ZN-20).
+Bullet `1 | 0` (ZN-20).
 
 ---
 
@@ -344,7 +356,7 @@ expected before the app ships.
 - The `CUSTOM` section and its steppers (**ZN-18**)
 - The `PREFERENCES` section and the sound preference (**ZN-19**) — there is no sound anywhere in the
   app, so there would be nothing for the toggle to govern
-- Selection surviving a relaunch (**ZN-20**). Every launch starts on Blitz `3 | 2`
+- Selection surviving a relaunch (**ZN-20**). Every launch starts on Bullet `1 | 0`
 
 Picking up `CUSTOM` again means revisiting **ZN-64**, which settled row identity on the assumption
 that a row is a preset; once a custom ruleset joins the selection group a row becomes a two-case
@@ -386,7 +398,7 @@ open `[ ]` items: this screen is finished for this pass.
 
 - [x] All six presets exist with exactly the copy and order above.
 - [x] Every category and description is a String Catalog entry, not a literal.
-- [x] Blitz `3 | 2` is the selection on launch. Decided by the Presenter, not the catalogue.
+- [x] Bullet `1 | 0` is the selection on launch. Decided by the Presenter, not the catalogue.
       Surviving a relaunch with something stored is still ZN-20.
 - [x] Presets are not editable by the player.
 

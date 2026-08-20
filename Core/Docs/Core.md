@@ -21,6 +21,10 @@ plus time credited to a player each time they complete a move.**
   move. Zero is valid and means no time is ever added.
 
 Both are `Int`, in the units time controls are written in and the units the custom steppers produce.
+The type also exposes them as **durations** — `baseTime` and `increment` — because the two integers
+are only meaningful as time, and whoever runs a clock should not have to know that a minute is sixty
+seconds. That conversion used to be written out in both `GameService` and `ClockPresenter`; it lives
+here now, beside the fields it interprets.
 A time control is configuration, not elapsed time: every value it can hold is a whole number of
 minutes or seconds, so it needs no sub-second precision. The clock's *running* state is a different
 matter — that needs monotonic timing and belongs to ZN-25.
@@ -133,6 +137,7 @@ Moved out of Core on 2026-08-19, during ZN-15.
 
 - [x] A time control expresses a base time and a per-move increment, and zero increment is
       supported.
+- [x] A time control converts its own integers to durations, so no consumer repeats the arithmetic.
 - [x] A game configuration carries a time control and the category name of the ruleset it came from.
 - [x] A game configuration is a value, so a started game is unaffected by later selection changes —
       covered by the Setup module's presenter tests, since that is where a configuration is made.

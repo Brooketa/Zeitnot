@@ -19,10 +19,6 @@ public final class GameService: GameServiceProtocol {
     private var white: PlayerClock
     private var black: PlayerClock
 
-    private var increment: Duration {
-        .seconds(timeControl.incrementSeconds)
-    }
-
     public init(timeControl: TimeControl, timeSource: TimeSourceProtocol) {
         self.timeControl = timeControl
         self.timeSource = timeSource
@@ -44,7 +40,7 @@ public final class GameService: GameServiceProtocol {
 
         guard remaining > .zero else { return }
 
-        self[player].remaining = remaining + increment
+        self[player].remaining = remaining + timeControl.increment
         self[player].moveCount += 1
         countdownState = .running(player: player.opponent, since: now)
     }
@@ -84,12 +80,6 @@ private extension GameService {
 
     }
 
-    enum Constants {
-
-        static let secondsPerMinute = 60
-
-    }
-
     subscript(player: Player) -> PlayerClock {
         get {
             switch player {
@@ -106,9 +96,7 @@ private extension GameService {
     }
 
     static func makeClock(for timeControl: TimeControl) -> PlayerClock {
-        PlayerClock(
-            remaining: .seconds(timeControl.baseMinutes * Constants.secondsPerMinute),
-            moveCount: 0)
+        PlayerClock(remaining: timeControl.baseTime, moveCount: 0)
     }
 
     func makeState(phase: GameState.Phase) -> GameState {

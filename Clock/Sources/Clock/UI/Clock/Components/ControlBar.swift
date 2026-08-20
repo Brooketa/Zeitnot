@@ -7,7 +7,7 @@ struct ControlBar: View {
     let action: (Action) -> Void
 
     var body: some View {
-        HStack(spacing: .md) {
+        HStack(spacing: .medium) {
             button(for: .pause, title: .pauseButton)
                 .enabled(model.canPause)
                 .opacity(model.canPause ? 1 : Constants.disabledOpacity)
@@ -24,8 +24,8 @@ struct ControlBar: View {
             Text(title)
                 .buttonLabel(ColorPalette.ink)
                 .textCase(.uppercase)
-                .padding(.horizontal, .xl)
-                .padding(.vertical, .md)
+                .padding(.horizontal, .extraLarge)
+                .padding(.vertical, .medium)
                 .background(ColorPalette.surface)
                 .clipShape(.capsule)
                 .overlay {

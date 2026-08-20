@@ -56,4 +56,16 @@ struct TimeControlTests {
         #expect(json.contains("\"incrementSeconds\":2"))
     }
 
+    @Test
+    func theBaseTimeIsTheBaseMinutesAsADuration() {
+        #expect(TimeControl(baseMinutes: 90, incrementSeconds: 30).baseTime == .seconds(5_400))
+        #expect(TimeControl(baseMinutes: 1, incrementSeconds: 0).baseTime == .seconds(60))
+    }
+
+    @Test
+    func theIncrementIsTheIncrementSecondsAsADuration() {
+        #expect(TimeControl(baseMinutes: 3, incrementSeconds: 2).increment == .seconds(2))
+        #expect(TimeControl(baseMinutes: 5, incrementSeconds: 0).increment == .zero)
+    }
+
 }

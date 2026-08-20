@@ -5,17 +5,17 @@ import Core
 struct SetupPresenterTests {
 
     @Test
-    func blitzThreePlusTwoIsSelectedInitially() {
+    func bulletOnePlusZeroIsSelectedInitially() {
         let presenter = makePresenter()
 
-        #expect(selectedPresets(of: presenter) == [.blitz3plus2])
+        #expect(selectedPresets(of: presenter) == [.bullet1plus0])
     }
 
     @Test
     func exactlyOneRulesetIsSelectedAtAllTimes() {
         let presenter = makePresenter()
 
-        for preset in PresetRuleset.allCases {
+        for preset in PresetRuleset.catalogue {
             presenter.select(preset)
 
             #expect(selectedPresets(of: presenter) == [preset])
@@ -45,15 +45,16 @@ struct SetupPresenterTests {
     func modelsFollowTheCatalogueOrder() {
         let presenter = makePresenter()
 
-        #expect(presenter.rulesetModels.map(\.ruleset) == PresetRuleset.allCases)
+        #expect(presenter.rulesetModels.map(\.id) == PresetRuleset.catalogue.map(\.id))
     }
 
     @Test
     func startGameModelCarriesTheSelectedRuleset() {
         let presenter = makePresenter()
 
-        #expect(presenter.startGameModel.category == "Blitz")
-        #expect(presenter.startGameModel.timeControl == TimeControl(baseMinutes: 3, incrementSeconds: 2))
+        #expect(presenter.startGameModel.category == "Bullet")
+        #expect(presenter.startGameModel.baseMinutes == 1)
+        #expect(presenter.startGameModel.incrementSeconds == 0)
     }
 
     @Test
@@ -63,7 +64,8 @@ struct SetupPresenterTests {
         presenter.select(.classical90plus30)
 
         #expect(presenter.startGameModel.category == "Classical")
-        #expect(presenter.startGameModel.timeControl == TimeControl(baseMinutes: 90, incrementSeconds: 30))
+        #expect(presenter.startGameModel.baseMinutes == 90)
+        #expect(presenter.startGameModel.incrementSeconds == 30)
     }
 
     @Test
@@ -133,9 +135,11 @@ struct SetupPresenterTests {
     }
 
     private func selectedPresets(of presenter: SetupPresenter) -> [PresetRuleset] {
-        presenter.rulesetModels
+        let selectedIDs = presenter.rulesetModels
             .filter(\.isSelected)
-            .map(\.ruleset)
+            .map(\.id)
+
+        return PresetRuleset.catalogue.filter { preset in selectedIDs.contains(preset.id) }
     }
 
 }

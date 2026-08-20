@@ -9,3 +9,25 @@ public struct TimeControl: Hashable, Codable, Sendable {
     }
 
 }
+
+public extension TimeControl {
+
+    var baseTime: Duration {
+        .seconds(baseMinutes * Constants.secondsPerMinute)
+    }
+
+    var increment: Duration {
+        .seconds(incrementSeconds)
+    }
+
+}
+
+private extension TimeControl {
+
+    enum Constants {
+
+        static let secondsPerMinute = 60
+
+    }
+
+}

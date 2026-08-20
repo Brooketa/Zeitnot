@@ -138,7 +138,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Three minutes, plus 2s on every completed move."
+            "value": "Three minutes, plus 2s per move."
           }
         }
       }

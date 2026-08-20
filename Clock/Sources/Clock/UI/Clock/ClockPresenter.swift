@@ -11,7 +11,7 @@ public final class ClockPresenter {
             baseMinutes: timeControl.baseMinutes,
             incrementSeconds: timeControl.incrementSeconds,
             moveNumber: state.black.moveCount + 1,
-            isRunning: !isPaused)
+            isRunning: isCountingDown)
     }
 
     var whiteClock: ClockFace.Model {
@@ -36,8 +36,8 @@ public final class ClockPresenter {
         PauseDialog.Model(playerName: String(localized: playerToMove.name))
     }
 
-    var isPaused: Bool {
-        if case .running = state.phase { false } else { true }
+    var isCountingDown: Bool {
+        if case .running = state.phase { true } else { false }
     }
 
     private let gameConfiguration: GameConfiguration
@@ -60,11 +60,7 @@ public final class ClockPresenter {
     }
 
     private var warningThreshold: Duration {
-        min(Constants.warningThreshold, baseTime / Constants.warningShareOfBaseTime)
-    }
-
-    private var baseTime: Duration {
-        .seconds(timeControl.baseMinutes * Constants.secondsPerMinute)
+        min(Constants.warningThreshold, timeControl.baseTime / Constants.warningShareOfBaseTime)
     }
 
     private var playerToMove: Player {
@@ -138,7 +134,6 @@ private extension ClockPresenter {
 
 		static let warningThreshold: Duration = .seconds(10)
 		static let warningShareOfBaseTime = 10
-		static let secondsPerMinute = 60
 
 	}
 

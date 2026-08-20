@@ -11,13 +11,13 @@ public struct SetupView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: .xxl) {
+            VStack(alignment: .leading, spacing: .jumbo) {
                 subtitle
 
-                PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSelected)
+                PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSectionAction)
             }
-            .padding(.horizontal, .lg)
-            .padding(.bottom, .xxl)
+            .padding(.horizontal, .large)
+            .padding(.bottom, .jumbo)
         }
         .background(ColorPalette.background)
         .navigationTitle(Text(.setTheClocks))
@@ -36,8 +36,10 @@ public struct SetupView: View {
 
 private extension SetupView {
 
-    func onPresetRulesetSelected(_ ruleset: PresetRuleset) {
-        presenter.select(ruleset)
+    func onPresetRulesetSectionAction(_ action: PresetRulesetSection.Action) {
+        switch action {
+        case let .select(id): presenter.selectRuleset(id: id)
+        }
     }
 
     func onStartGameBarAction(_ action: StartGameBar.Action) {

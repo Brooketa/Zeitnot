@@ -7,7 +7,7 @@ struct PauseDialog: View {
     let action: (Action) -> Void
 
     var body: some View {
-        VStack(spacing: .lg) {
+        VStack(spacing: .large) {
             title
 
             playerToMove
@@ -36,14 +36,14 @@ struct PauseDialog: View {
             Text(.resumeButton)
                 .buttonLabel(ColorPalette.inkInverse)
                 .textCase(.uppercase)
-                .padding(.horizontal, .xxl)
-                .padding(.vertical, .md)
+                .padding(.horizontal, .jumbo)
+                .padding(.vertical, .medium)
                 .background(ColorPalette.accent)
                 .clipShape(.capsule)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-		.padding(.top, .sm)
+		.padding(.top, .small)
     }
 
 }

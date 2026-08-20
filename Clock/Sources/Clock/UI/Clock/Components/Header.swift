@@ -23,7 +23,7 @@ struct Header: View {
         Button {
             action(.back)
         } label: {
-            Image(systemName: Constants.backSymbol)
+            Image.back
                 .font(.system(size: Constants.chevronSize, weight: .semibold))
                 .foregroundStyle(ColorPalette.ink)
                 .frame(width: Constants.backDiameter, height: Constants.backDiameter)
@@ -35,7 +35,7 @@ struct Header: View {
     }
 
     var ruleset: some View {
-        HStack(spacing: .sm) {
+        HStack(spacing: .small) {
             Circle()
                 .fill(model.isRunning ? ColorPalette.accent : ColorPalette.textTertiary)
                 .frame(width: Constants.dotDiameter, height: Constants.dotDiameter)
@@ -82,8 +82,6 @@ extension Header {
 private extension Header {
 
     enum Constants {
-
-        static var backSymbol: String { "chevron.left" }
 
         static let height: CGFloat = 44
         static let backDiameter: CGFloat = 44
