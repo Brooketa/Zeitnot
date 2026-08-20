@@ -1,3 +1,4 @@
+import Foundation
 import Observation
 import Core
 
@@ -11,14 +12,18 @@ final class SetupPresenter {
     }
 
     var startGameModel: StartGameBar.Model {
-        StartGameBar.Model(category: selection.category, timeControl: selection.timeControl)
+        StartGameBar.Model(category: selectedCategory, timeControl: selection.timeControl)
     }
 
     var gameConfiguration: GameConfiguration {
-        GameConfiguration(timeControl: selection.timeControl, category: selection.category)
+        GameConfiguration(timeControl: selection.timeControl, category: selectedCategory)
     }
 
     private var selection: PresetRuleset = .blitz3plus2
+
+    private var selectedCategory: String {
+        String(localized: selection.category)
+    }
 
     func select(_ ruleset: PresetRuleset) {
         selection = ruleset

@@ -3,7 +3,7 @@ import CoreUI
 
 struct SectionHeader: View {
 
-    let title: String
+    let title: LocalizedStringResource
 
     var body: some View {
         Text(title)

@@ -24,10 +24,8 @@ Top to bottom:
   directly beneath the title.
 - **Sections** — each one a section header above a card.
 
-The title and the subtitle are **held in the module's String Catalog**, alongside the `3 | 2`
-notation key — see Copy And Localisation. Everything else on the screen — the section header, the
-button label, the six categories and the six descriptions — is still a plain literal, so the screen
-is deliberately part-localized and finishing it belongs to ZN-60.
+Every word on the screen is **held in the module's String Catalog** — see Copy And Localisation.
+Nothing user-facing remains as a Swift literal.
 
 **Everything below the navigation bar scrolls as one list**, subtitle included, so the copy moves out
 of the way as the player works down the list. Content is full width with the same margins on every
@@ -127,11 +125,16 @@ storage once ZN-20 exists). The catalogue lists the six and says nothing about w
 structural. Only the custom ruleset is editable, and it is a separate thing entirely.
 
 A preset exposes exactly what its consumers need — `category`, `timeControl` and `description`.
-Category is a plain string, because nothing branches on it: its only use is the label at the top of
-a cell. There is no wrapping ruleset type either — the cell is handed display strings by its
-Presenter, and a started game is handed a `TimeControl`.
+Category and description are **catalog resources**, because nothing branches on them: their only use
+is as labels in a cell. There is no wrapping ruleset type either — the cell is handed display copy by
+its Presenter, and a started game is handed a `TimeControl`.
 
 `TimeControl` is the only real model here. Everything else a preset carries is display copy.
+
+Two consumers need the category as **resolved text** rather than as a resource: the START GAME
+subtitle, which formats it into a wider catalog entry, and the game configuration, which carries it
+to the clock screen. Both are built by the Presenter, so that is where the resource is resolved —
+the view never sees an unresolved one, and the domain never sees a resource at all.
 
 Each preset carries a **stable storage key** (`"blitz-3-2"`) that is deliberately not derived from
 its time control values. ZN-20 persists the key, so changing a preset's values in a later release
@@ -209,6 +212,11 @@ literals. Two things follow from it:
   string can be edited in one place and silently diverge from another.
 - **A missing key is a compile error**, not a silent fallback to the key text. With the format as
   the key, a typo would have rendered plausible-looking English and hidden itself.
+
+**A key is not always its own symbol.** The generator capitalises the letter following a digit, so
+`bullet1plus0Description` produces `.bullet1Plus0Description` and a call site naming the key verbatim
+does not compile. The keys here are written in the form the generator emits, so the two read the
+same; anything added later that mixes digits and letters needs the same care.
 
 The catalog belongs to this module rather than to the app so the symbols are visible here — Xcode
 generates them per target, and a catalog in the app target produces symbols the packages cannot see.
@@ -299,6 +307,7 @@ make it.
 ### Screen shell
 
 - [x] Background, subtitle and the `PRESET RULESETS` section header match the design.
+- [x] No user-facing string remains a Swift literal anywhere in the module.
 - [x] `Set the clocks` is the navigation bar's large title, not a custom one, with the navigation
       container owned by the app rather than the screen.
 - [x] The section header is a reusable component, not styling applied inline once.
@@ -319,6 +328,7 @@ make it.
 ### Preset rulesets
 
 - [x] All six presets exist with exactly the copy and order above.
+- [x] Every category and description is a String Catalog entry, not a literal.
 - [x] Blitz `3 | 2` is the selection on launch. Decided by the Presenter, not the catalogue.
       Surviving a relaunch with something stored is still ZN-20.
 - [x] Presets are not editable by the player.

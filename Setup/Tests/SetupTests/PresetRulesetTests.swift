@@ -1,5 +1,6 @@
-import Core
+import Foundation
 import Testing
+import Core
 @testable import Setup
 
 struct PresetRulesetTests {
@@ -25,7 +26,7 @@ struct PresetRulesetTests {
         (preset: PresetRuleset.classical90plus30, category: "Classical")
     ])
     func everyPresetHasItsCategory(preset: PresetRuleset, category: String) {
-        #expect(preset.category == category)
+        #expect(String(localized: preset.category) == category)
     }
 
     @Test(arguments: [
@@ -49,7 +50,7 @@ struct PresetRulesetTests {
         (preset: PresetRuleset.classical90plus30, description: "90 minutes each, plus 30s per move.")
     ])
     func everyPresetHasItsDescription(preset: PresetRuleset, description: String) {
-        #expect(preset.description == description)
+        #expect(String(localized: preset.description) == description)
     }
 
     @Test(arguments: [
