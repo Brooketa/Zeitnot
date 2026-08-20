@@ -5,6 +5,7 @@ import CoreUI
 struct ClockFace: View {
 
     let model: Model
+    let action: (Action) -> Void
 
     var body: some View {
         content
@@ -18,31 +19,44 @@ struct ClockFace: View {
                 color: ColorPalette.ink.opacity(Constants.shadowOpacity),
                 radius: Constants.shadowRadius,
                 y: Constants.shadowOffset)
+            .contentShape(.rect)
+            .onTapGesture {
+                action(.press(model.side))
+            }
             .animation(.easeOut(duration: Constants.stateChangeDuration), value: model.state)
     }
 
-	var content: some View {
-		VStack(spacing: .sm) {
-			Text(model.player)
-				.playerName(model.state.nameColor)
-				.textCase(.uppercase)
+    var content: some View {
+        VStack(spacing: .sm) {
+            Text(model.name)
+                .playerName(model.state.nameColor)
+                .textCase(.uppercase)
 
-			Text(model.time)
-				.clockDigits(model.state.digitsColor)
-		}
-	}
+            Text(model.time)
+                .clockDigits(model.state.digitsColor)
 
-	var cardShape: RoundedRectangle {
-		.rect(cornerRadius: Constants.cornerRadius, style: .continuous)
-	}
+            caption
+        }
+    }
 
-	@ViewBuilder
-	var turnRing: some View {
-		if model.state.showsTurnRing {
-			cardShape
-				.strokeBorder(ColorPalette.accent, lineWidth: Constants.turnRingWidth)
-		}
-	}
+    var caption: some View {
+        Text(model.caption ?? Constants.captionPlaceholder)
+            .micro(ColorPalette.accent)
+            .textCase(.uppercase)
+            .opacity(model.caption == nil ? 0 : 1)
+    }
+
+    var cardShape: RoundedRectangle {
+        .rect(cornerRadius: Constants.cornerRadius, style: .continuous)
+    }
+
+    @ViewBuilder
+    var turnRing: some View {
+        if model.state.showsTurnRing {
+            cardShape
+                .strokeBorder(ColorPalette.accent, lineWidth: Constants.turnRingWidth)
+        }
+    }
 
 }
 
@@ -50,9 +64,32 @@ extension ClockFace {
 
     struct Model {
 
-        let player: String
+        let side: Side
+        let name: String
         let time: String
+        let caption: String?
         let state: State
+
+    }
+
+}
+
+extension ClockFace {
+
+    enum Side {
+
+        case white
+        case black
+
+    }
+
+}
+
+extension ClockFace {
+
+    enum Action {
+
+        case press(Side)
 
     }
 
@@ -95,6 +132,8 @@ private extension ClockFace.State {
 private extension ClockFace {
 
     enum Constants {
+
+        static let captionPlaceholder = " "
 
         static let cornerRadius: CGFloat = 26
         static let turnRingWidth: CGFloat = 3

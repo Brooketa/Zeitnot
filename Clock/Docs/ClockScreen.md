@@ -14,14 +14,13 @@ describe intent only — nothing in them is on screen today.
 
 ## What Exists Today
 
-The screen shell: a navigation bar naming the ruleset, over the app's background. Below it, nothing
-yet — but the module now owns the **clock face**, the card one player reads their time from. It is
-built; placing two of them side by side is the layout ticket's job.
+The screen is playable. Two cards side by side, the ruleset and the move number in the navigation
+bar, `PAUSE` and `RESET` beneath — and pressing a half switches the turn, so a game runs from the
+first press until a clock reaches zero.
 
-The screen stays deliberately empty below the bar until then. The **game itself** now runs behind it
-— the clocks, the turns and the transitions described below — but nothing on screen reads it yet.
-The tap handling, the control bar, the move number and the game-over banner each arrive with their
-own ticket, and until they do nothing on screen promises behaviour that is not there.
+What is still missing is what happens *around* a game: the pause overlay, the reset confirmation,
+the low-time warning, the game-over banner, and correct behaviour across backgrounding. Each has its
+own ticket, and until they land nothing on screen promises them.
 
 The screen is reachable. START GAME on the setup screen pushes it with the configuration of the
 ruleset that was selected at the moment of the tap (ZN-62), and the system back button returns to
@@ -118,10 +117,9 @@ clock's bar is chrome above a fixed layout.
 
 The **back button** is the system's, and appears because the screen is pushed rather than presented.
 
-### Not built yet
-
-- The **move number** (`MOVE 1`) as a trailing item (ZN-28), reading the per-player move count the
-  game state carries (ZN-24).
+The **move number** is the trailing item, reading `MOVE 1` from the start. It counts *chess* moves,
+not turns: a move is White's turn together with Black's reply, so it advances when **Black** presses,
+not when White does.
 
 ---
 
@@ -131,8 +129,9 @@ One player's card: their name above their remaining time, centred on white, 26pt
 shadow. Nothing else — the mockup's `0 MOVES · +30S` line is dropped, since the increment already
 reads from the navigation bar.
 
-The card is passive. It renders what it is given and owns no timing and no tap handling. The layout
-places it (ZN-28); what a tap means is ZN-29.
+The card is passive in the sense that matters: it renders what it is given, reports that it was
+pressed, and decides nothing. It owns no timing and no rules — what a press means is settled above
+it.
 
 **The time** comes from the reading in `Core`: `h:mm:ss` from an hour up, `m:ss` below it, whole
 seconds throughout, truncating towards zero. It lives in `Core` rather than here so that any screen
@@ -154,13 +153,47 @@ reading the app can produce (`1:30:00`) on the smallest supported iPhone, so not
 The turn is shown by the ring and the accent name, never by a dark fill: both players read the
 screen from opposite sides of a table.
 
-Awaiting start and waiting look identical today and are still two states, because ZN-29 must make
-the not-started screen show *which half to press*. Only that case changes when it does.
+Awaiting start and waiting share their colours, and are told apart by the **caption**: before the
+game starts, Black's card reads `PRESS TO START`, which is how the screen says which half to press.
+
+The caption sits below the digits and **its height is reserved whether or not there is text**, so
+nothing moves when one appears or goes. Flag fall reuses the same slot for `FLAG FELL`.
 
 Ring and name cross-fade over 200ms. The digits never animate — a time that eases into place is
 wrong for the length of the animation.
 
 Two more states arrive with the low-time warning, one with flag fall. See **Not Built Yet**.
+
+---
+
+## Pressing
+
+A press is a tap anywhere on a half. Each card fills its side of the screen, so there are no dead
+zones and nothing to aim at.
+
+**You may only press your own half**, exactly as you may only press your own lever on a physical
+clock:
+
+| | Press on White's half | Press on Black's half |
+|---|---|---|
+| **Not started** | ignored | starts **White's** clock |
+| **White to move** | ends White's turn | ignored |
+| **Black to move** | ignored | ends Black's turn |
+| **Paused or finished** | ignored | ignored |
+
+Black pressing to begin is the physical convention — pressing your own side ends your turn, and the
+game opens with Black handing the move to White. Because that is not guessable on a screen, the
+not-started state says so: Black's card reads `PRESS TO START`.
+
+**A double press switches once**, and nothing debounces it. The moment White presses, White's half
+belongs to the player *not* to move, so the second press of a rapid pair is refused by the same rule
+that refuses an opponent's press.
+
+A press is a **view event**, not a domain one. The card reports it, the screen turns it into the
+transition it means — start or end turn — and the game itself knows nothing about halves being
+tapped. The switch
+is applied and published on the press rather than at the next display tick, so there is no lag
+between the tap and the opponent's clock running.
 
 ---
 
@@ -188,15 +221,11 @@ The list immediately below belongs to the Epic's remaining tickets and **is** co
 here so the screen's intended behaviour is legible while the shell is empty, not because any of it is
 on screen. **Deliberately absent** afterwards is the opposite: things that were cut and are not.
 
-- **Two player cards** — equal halves, White left and Black right, both reading upright, each a
-  full-height tap target.
 - **Backgrounding** — a running game must come back paused and still correct after the app has been
   suspended or interrupted, and the screen must not sleep through a long think.
-- **Tap handling** — tapping the active player's half ends their turn and starts the opponent's.
-  Black presses to start White's clock, and the not-started state has to show which half to press.
-- **Control bar** — `PAUSE` and `RESET`, centred below the cards. No time is consumed while paused,
-  and reset returns both clocks to full base time with the move counts zeroed, asking for
-  confirmation only when there is a game in progress to lose.
+- **The pause overlay and the reset confirmation** — the two buttons are built and work, but pausing
+  shows no overlay naming the player to move, and reset does not yet ask before throwing away a game
+  in progress.
 - **Low-time warning** — a pulsing accent border on the running half below ten seconds. The clock
   face gains two more states with it: the running half keeps its fill and gains the border, and the
   *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
@@ -254,7 +283,7 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] The digits are monospaced and unscaled, so they do not shift as they count.
 - [x] `1:30:00` fits a half card on the smallest supported iPhone without truncating.
 - [x] To move and waiting are distinguishable at a glance, by ring and name colour rather than fill.
-- [x] The face owns no timing and no tap handling.
+- [x] The face reports a press and owns no timing and no rules about what a press means.
 - [x] A game is not started, running, paused or finished, and a finished game names its winner.
 - [x] Only one clock can ever be counting down.
 - [x] Ending a turn banks the mover's time, credits their increment, raises their move count and
@@ -267,3 +296,11 @@ Covering what exists today. Items for behaviour that is not built yet are not li
       never reads negative.
 - [x] Remaining time is computed from elapsed real time, so a 90 minute game accumulates no drift.
 - [x] The behaviour is covered by tests that play out a long game without waiting in real time.
+- [x] The two cards are equal, fill the screen, and each is a tap target with no dead zones.
+- [x] The move number reads `MOVE 1` at the start and advances when Black presses, not White.
+- [x] Pressing the half of the player to move switches the turn; every other press is ignored.
+- [x] From not started, only a press on Black's half begins the game, and it starts White's clock.
+- [x] The not-started state shows which half to press, and the prompt goes once the game is running.
+- [x] A double press switches once, without a debounce.
+- [x] The caption slot holds its height whether or not it has text, so the digits never jump.
+- [x] The press rules are covered by presenter tests that advance time without waiting.
