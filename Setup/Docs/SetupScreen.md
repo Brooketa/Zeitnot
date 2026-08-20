@@ -34,17 +34,17 @@ device, from the smallest supported iPhone up to iPad.
 ### Section header
 
 The small, letter-spaced, uppercase label that introduces a section's card. It is a single reusable
-component, built here and reused by every section that follows — `CUSTOM` (ZN-18) and `PREFERENCES`
-(ZN-19).
+component. It has one caller today; it stays a component because `CUSTOM` (ZN-18) and `PREFERENCES`
+(ZN-19) reuse it if they are ever built.
 
 Like the cell's category, the title is **supplied in natural casing** (`Preset Rulesets`) and
 uppercased for display, so it is spoken as words rather than letters.
 
 ### Sections that exist
 
-Only **PRESET RULESETS**. `CUSTOM` and `PREFERENCES` arrive with their own tickets, and no empty
-header stands in for them in the meantime — a section appears when it has something to show. The
-START GAME bar is pinned below them all.
+Only **PRESET RULESETS**. `CUSTOM` and `PREFERENCES` are **deferred** (ZN-18, ZN-19) and no empty
+header stands in for them — a section appears when it has something to show. The START GAME bar is
+pinned below.
 
 ### Appearance
 
@@ -70,8 +70,8 @@ omission.
 
 ## Ruleset Cell
 
-One row representing a single ruleset. Used for every preset, and in an adapted form for the custom
-ruleset.
+One row representing a single ruleset. Used for every preset. The custom ruleset it was also
+designed to serve is deferred (ZN-18), so today it renders the six presets only.
 
 ### What it shows
 
@@ -105,7 +105,7 @@ point sizes on purpose. Robustness therefore means the layout absorbs longer con
 wrap, rows grow vertically, and nothing truncates or clips.
 
 The cell has **no VoiceOver support**, by decision rather than oversight. It reads as whatever
-SwiftUI produces by default. See ZN-59.
+SwiftUI produces by default. This is tracked nowhere — see the Deferred section.
 
 ---
 
@@ -283,8 +283,7 @@ guarantee is structural rather than a rule the clock has to honour.
 
 The screen does not navigate. It reports the intent and whoever presents it decides where that goes,
 which is what keeps this module free of any dependency on the clock. Starting a game leaves the
-selection, the custom values and the preferences untouched, so returning to the screen finds it
-exactly as it was left.
+selection untouched, so returning to the screen finds it exactly as it was left.
 
 The seam is in the Presenter rather than in the view's interface. The screen takes no callback and
 exposes no hook; a tap is simply a Presenter action, the same as selecting a ruleset. That is what
@@ -330,21 +329,37 @@ none should be added here.
 ### Coming back
 
 Back and back-swipe are the system's, from the system navigation bar. Returning finds the screen
-exactly as it was left — selection, and in time the custom values and preferences — because the
-screen's state lives for the screen's lifetime and starting a game does not touch it.
+exactly as it was left, because the screen's state lives for the screen's lifetime and starting a
+game does not touch it. That lifetime is the session: nothing is stored, so a relaunch is back to
+Blitz `3 | 2` (ZN-20).
 
 ---
 
-## Not Built Yet
+## Deferred
 
-- The `CUSTOM` section and its steppers (ZN-18)
-- The `PREFERENCES` section and the sound preference (ZN-19)
-- Selection, custom values and preferences surviving a relaunch (ZN-20)
-- VoiceOver support for this screen's controls (ZN-59)
+Cut on 2026-08-20, not merely unbuilt. **This screen is finished for this pass** — the six presets,
+the cell, selection, the shell and the START GAME bar are all in place, and nothing below is
+expected before the app ships.
+
+- The `CUSTOM` section and its steppers (**ZN-18**)
+- The `PREFERENCES` section and the sound preference (**ZN-19**) — there is no sound anywhere in the
+  app, so there would be nothing for the toggle to govern
+- Selection surviving a relaunch (**ZN-20**). Every launch starts on Blitz `3 | 2`
+
+Picking up `CUSTOM` again means revisiting **ZN-64**, which settled row identity on the assumption
+that a row is a preset; once a custom ruleset joins the selection group a row becomes a two-case
+selection instead. That rework was accepted when ZN-64 was written.
+
+**VoiceOver is not tracked anywhere.** An earlier version of this list named `ZN-59`, which does not
+exist and never did. Accessibility criteria were stripped from ZN-16 and ZN-18 rather than met
+piecemeal; if it is taken up it should be one Epic covering every screen.
 
 ---
 
 ## Acceptance Checklist
+
+`[x]` done · `[~]` deferred, and not expected before the app ships — see Deferred. There are no
+open `[ ]` items: this screen is finished for this pass.
 
 ### Screen shell
 
@@ -381,8 +396,8 @@ screen's state lives for the screen's lifetime and starting a game does not touc
 - [x] Exactly one ruleset is selected at all times.
 - [x] Tapping the already-selected ruleset is a no-op, not a deselect.
 - [x] The START GAME subtitle updates immediately on selection.
-- [ ] The custom ruleset participates in the selection group — deferred; selection currently spans
-      the six presets only (ZN-18).
+- [~] The custom ruleset participates in the selection group — **deferred** (ZN-18). Selection spans
+      the six presets only, and that is the shipped behaviour, not a gap.
 
 ### Card container
 
@@ -399,9 +414,9 @@ screen's state lives for the screen's lifetime and starting a game does not touc
 - [x] START GAME opens the clock screen with the selected ruleset's base time and increment.
 - [x] The configuration is a snapshot taken at the tap, so a later selection change cannot alter a
       game already under way.
-- [x] Returning from the clock preserves the selection. Preferences follow once they exist (ZN-19).
-- [ ] Starting a game with the custom ruleset uses the current custom values — the custom ruleset
-      does not exist yet (ZN-18).
+- [x] Returning from the clock preserves the selection.
+- [~] Starting a game with the custom ruleset uses the current custom values — **deferred**; the
+      custom ruleset does not exist (ZN-18).
 
 ### Navigation
 
