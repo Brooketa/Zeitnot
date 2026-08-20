@@ -25,11 +25,19 @@ struct ClockPresenterTests {
         #expect(presenter.title == "● BULLET · 1 | 0")
     }
 
+    @Test
+    func theMoveNumberStartsAtMoveOne() {
+        let presenter = makePresenter(category: "Blitz", baseMinutes: 3, incrementSeconds: 2)
+
+        #expect(String(localized: presenter.moveNumber) == "Move 1")
+    }
+
     private func makePresenter(category: String, baseMinutes: Int, incrementSeconds: Int) -> ClockPresenter {
         let timeControl = TimeControl(baseMinutes: baseMinutes, incrementSeconds: incrementSeconds)
 
         return ClockPresenter(
-            gameConfiguration: GameConfiguration(timeControl: timeControl, category: category))
+            gameConfiguration: GameConfiguration(timeControl: timeControl, category: category),
+            gameService: GameService(timeControl: timeControl, timeSource: FakeTimeSource()))
     }
 
 }

@@ -1,4 +1,4 @@
-protocol GameServiceProtocol {
+public protocol GameServiceProtocol {
 
     var state: GameState { get }
 

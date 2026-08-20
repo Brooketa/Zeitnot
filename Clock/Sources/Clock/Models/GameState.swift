@@ -1,4 +1,4 @@
-struct GameState: Equatable {
+public struct GameState: Equatable {
 
     let phase: Phase
     let white: PlayerClock
@@ -15,6 +15,17 @@ extension GameState {
         case paused(player: Player)
         case finished(winner: Player)
 
+    }
+
+}
+
+extension GameState {
+
+    subscript(player: Player) -> PlayerClock {
+        switch player {
+        case .white: white
+        case .black: black
+        }
     }
 
 }
