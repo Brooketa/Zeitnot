@@ -38,6 +38,7 @@ struct ClockPresenterObservationTests {
         }
 
         presenter.reset()
+        presenter.confirmReset()
 
         #expect(observation.fired)
     }

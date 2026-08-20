@@ -15,10 +15,13 @@ public struct ClockView: View {
 
             ControlBar(action: onControlBarAction)
         }
+		.presentFullScreen(if: presenter.showResetDialog) {
+			ResetDialog(action: onResetDialogAction)
+		}
+		.presentFullScreen(if: presenter.showPauseDialog) {
+			PauseDialog(model: presenter.pauseDialogModel, action: onPauseDialogAction)
+		}
         .padding(.lg)
-        .presentFullScreen(if: presenter.showPauseDialog) {
-            PauseDialog(model: presenter.pauseDialogModel, action: onPauseDialogAction)
-        }
         .primaryBackground()
         .navigationTitle(presenter.title)
         .navigationBarTitleDisplayMode(.inline)
@@ -59,6 +62,13 @@ private extension ClockView {
     func onPauseDialogAction(_ action: PauseDialog.Action) {
         switch action {
         case .resume: presenter.resume()
+        }
+    }
+
+    func onResetDialogAction(_ action: ResetDialog.Action) {
+        switch action {
+        case .confirm: presenter.confirmReset()
+        case .cancel: presenter.cancelReset()
         }
     }
 

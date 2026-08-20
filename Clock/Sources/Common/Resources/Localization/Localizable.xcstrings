@@ -13,6 +13,30 @@
         }
       }
     },
+    "cancelButton": {
+      "comment": "Button on the reset dialog that dismisses it and keeps the game. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "confirmResetButton": {
+      "comment": "Button on the reset dialog that confirms the reset. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
     "moveNumber": {
       "comment": "Clock screen navigation bar trailing item: the move the game is on. Uppercased for display.",
       "extractionState": "manual",
@@ -81,6 +105,30 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reset"
+          }
+        }
+      }
+    },
+    "resetDialogMessage": {
+      "comment": "Body of the dialog asking to confirm resetting a game in progress.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both clocks go back to full time and the game starts over."
+          }
+        }
+      }
+    },
+    "resetDialogTitle": {
+      "comment": "Title of the dialog asking to confirm resetting a game in progress. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset game?"
           }
         }
       }
