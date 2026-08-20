@@ -18,10 +18,10 @@ The screen shell: a navigation bar naming the ruleset, over the app's background
 yet — but the module now owns the **clock face**, the card one player reads their time from. It is
 built; placing two of them side by side is the layout ticket's job.
 
-The screen stays deliberately empty below the bar until then. Everything else the clock does — the
-timing, the tap handling, the control bar, the move number and the game-over banner — arrives with
-its own ticket, and each one fills in part of this shell. Until then nothing on screen promises
-behaviour that is not there.
+The screen stays deliberately empty below the bar until then. The **game itself** now runs behind it
+— the clocks, the turns and the transitions described below — but nothing on screen reads it yet.
+The tap handling, the control bar, the move number and the game-over banner each arrive with their
+own ticket, and until they do nothing on screen promises behaviour that is not there.
 
 The screen is reachable. START GAME on the setup screen pushes it with the configuration of the
 ruleset that was selected at the moment of the tap (ZN-62), and the system back button returns to
@@ -41,6 +41,55 @@ on the setup screen afterwards cannot reach a game already under way.
 The presenter is constructed with the configuration and the view is constructed with the presenter.
 The view never builds its own presenter, so whoever routes to the screen decides what game is being
 played.
+
+---
+
+## The Game
+
+The screen owns a **game**: two clocks, whose turn it is, and how many moves each player has
+completed. Nothing more is kept — the per-turn record was cut to ZN-71 with the review screens.
+
+### States
+
+| State | What it means |
+|---|---|
+| **Not started** | Both clocks full, nothing counting |
+| **Running** | Exactly one clock counting down |
+| **Paused** | Neither counting; the player to move is remembered |
+| **Finished** | A clock reached zero; the opponent won on time |
+
+Only one clock can be running, because the running state carries a single player and a single
+instant. Two clocks counting at once is not guarded against — it cannot be written down.
+
+### Transitions
+
+| Transition | What happens |
+|---|---|
+| **Start** | White's clock begins. No move is recorded — pressing to begin is not a turn |
+| **End turn** | The mover's time is banked and increment credited, their move count rises, the opponent starts |
+| **Pause** | The running clock's time is banked where it stands |
+| **Resume** | The same turn continues — no move recorded, no time consumed by the pause |
+| **Reset** | Both clocks to full base time, move counts to zero, game not started |
+
+The increment goes to the player **who just moved**, and only on a completed move. A player whose
+clock reaches zero mid-turn never completes it, so they are credited nothing. A finished game
+ignores every transition but reset.
+
+### Time is elapsed, never accumulated
+
+A running clock's remaining time is **computed on read**: what it held when the turn began, less the
+real time since. Nothing sums ticks, so there is no drift to accumulate over a 90 minute game, and
+accuracy does not depend on how often the display refreshes or on a timer firing on schedule.
+
+**Flag fall is derived, not detected.** A game whose running clock has reached zero *is* finished at
+that instant, whether or not anything looked. Zero is therefore exact, and a clock never reads
+negative.
+
+Time comes from a monotonic source that **keeps counting while the app is suspended**, rather than
+from the wall clock. A system clock change therefore cannot move a game's remaining time, and a
+player cannot gain any by backgrounding the app mid-turn — which is most of what ZN-36 needs. The
+source is injected, which is what lets a 90 minute game be played out in milliseconds under test
+instead of in real time.
 
 ---
 
@@ -141,8 +190,8 @@ on screen. **Deliberately absent** afterwards is the opposite: things that were 
 
 - **Two player cards** — equal halves, White left and Black right, both reading upright, each a
   full-height tap target.
-- **Timing** — start, turn switching, the increment credited to the player who just moved, and a
-  clock that does not drift and survives backgrounding.
+- **Backgrounding** — a running game must come back paused and still correct after the app has been
+  suspended or interrupted, and the screen must not sleep through a long think.
 - **Tap handling** — tapping the active player's half ends their turn and starts the opponent's.
   Black presses to start White's clock, and the not-started state has to show which half to press.
 - **Control bar** — `PAUSE` and `RESET`, centred below the cards. No time is consumed while paused,
@@ -206,3 +255,15 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] `1:30:00` fits a half card on the smallest supported iPhone without truncating.
 - [x] To move and waiting are distinguishable at a glance, by ring and name colour rather than fill.
 - [x] The face owns no timing and no tap handling.
+- [x] A game is not started, running, paused or finished, and a finished game names its winner.
+- [x] Only one clock can ever be counting down.
+- [x] Ending a turn banks the mover's time, credits their increment, raises their move count and
+      starts the opponent.
+- [x] The increment is credited only on a completed move, and never to a player who ran out of time
+      mid-turn.
+- [x] No time is consumed while paused, however long the pause, and resuming continues the same turn.
+- [x] Reset returns full base time, zero move counts and a not-started game.
+- [x] A clock reaching zero finishes the game exactly at zero, with the opponent the winner, and
+      never reads negative.
+- [x] Remaining time is computed from elapsed real time, so a 90 minute game accumulates no drift.
+- [x] The behaviour is covered by tests that play out a long game without waiting in real time.

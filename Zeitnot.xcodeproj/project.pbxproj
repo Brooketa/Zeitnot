@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3C13035A9A700ED9FBC /* CoreUI */; };
-		7026E3D23035A9A700ED9FBC /* Setup in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3D13035A9A700ED9FBC /* Setup */; };
 		7026E3E23035A9A700ED9FBC /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3E13035A9A700ED9FBC /* Core */; };
 		7026E3F23035A9A700ED9FBC /* Clock in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3F13035A9A700ED9FBC /* Clock */; };
+		70EA1D093037427E002F205B /* Setup in Frameworks */ = {isa = PBXBuildFile; productRef = 70EA1D083037427E002F205B /* Setup */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,8 +35,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */,
-				7026E3D23035A9A700ED9FBC /* Setup in Frameworks */,
 				7026E3E23035A9A700ED9FBC /* Core in Frameworks */,
+				70EA1D093037427E002F205B /* Setup in Frameworks */,
 				7026E3F23035A9A700ED9FBC /* Clock in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,6 +53,7 @@
 				7026E3E03035A9A700ED9FBC /* Core */,
 				7026E3C43035A9A700ED9FBC /* CoreUI */,
 				7026E3D03035A9A700ED9FBC /* Setup */,
+				70EA1D073037427E002F205B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -62,6 +63,13 @@
 				7026E3A43035A9A700ED9FBC /* Zeitnot.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		70EA1D073037427E002F205B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -85,9 +93,9 @@
 			name = Zeitnot;
 			packageProductDependencies = (
 				7026E3C13035A9A700ED9FBC /* CoreUI */,
-				7026E3D13035A9A700ED9FBC /* Setup */,
 				7026E3E13035A9A700ED9FBC /* Core */,
 				7026E3F13035A9A700ED9FBC /* Clock */,
+				70EA1D083037427E002F205B /* Setup */,
 			);
 			productName = Zeitnot;
 			productReference = 7026E3A43035A9A700ED9FBC /* Zeitnot.app */;
@@ -386,10 +394,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = CoreUI;
 		};
-		7026E3D13035A9A700ED9FBC /* Setup */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Setup;
-		};
 		7026E3E13035A9A700ED9FBC /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Core;
@@ -397,6 +401,10 @@
 		7026E3F13035A9A700ED9FBC /* Clock */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Clock;
+		};
+		70EA1D083037427E002F205B /* Setup */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Setup;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
