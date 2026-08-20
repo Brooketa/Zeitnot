@@ -24,6 +24,11 @@ Top to bottom:
   directly beneath the title.
 - **Sections** — each one a section header above a card.
 
+The title and the subtitle are **held in the module's String Catalog**, alongside the `3 | 2`
+notation key — see Copy And Localisation. Everything else on the screen — the section header, the
+button label, the six categories and the six descriptions — is still a plain literal, so the screen
+is deliberately part-localized and finishing it belongs to ZN-60.
+
 **Everything below the navigation bar scrolls as one list**, subtitle included, so the copy moves out
 of the way as the player works down the list. Content is full width with the same margins on every
 device, from the smallest supported iPhone up to iPad.
@@ -165,9 +170,53 @@ Storage keys stay out of this. `PresetRuleset.rawValue` is used only at the pers
 When the custom ruleset joins the group, the row identity becomes the two-case selection rather than
 a preset — the same change, one type wider.
 
-The `3 | 2` reading is built in the cell, from the time control's two numbers — the first place that
-format appears in the app. ZN-60 replaces it with a shared String Catalog key, which views reference
-directly, so the format stays where it is read.
+The `3 | 2` reading comes from the module's String Catalog, under the key `timeControlNotation`,
+which takes the two numbers as arguments. **No call site writes the format** — the cell renders
+`Text(.timeControlNotation(base, increment))` and nothing else in the module contains a `|`.
+
+The bar's subtitle is a **separate key**, `selectedRuleset`, taking the category and both numbers
+(`Blitz 3 | 2`). It is one phrase rather than a category glued to a notation, which is what lets a
+translation reorder it — a composed string could only ever put the category first. It also means no
+layer assembles display text: the Presenter hands the bar a category and a time control, and the
+view resolves the key.
+
+---
+
+## Copy And Localisation
+
+The module owns a String Catalog at `Sources/Common/Resources/Localization/Localizable.xcstrings`,
+a sibling of `Sources/Setup/` rather than a folder inside it, so localisation sits alongside the
+module's code rather than within it. The package's default localisation is English.
+
+Because `Common/` is beside the code rather than under it, **the target's root is `Sources/`** and the
+resource declaration names the containing folder:
+
+    path: "Sources",
+    resources: [.process("Common/Resources/Localization")]
+
+The raised root is what makes the folder-level declaration work: a resource path that reaches
+*outside* the target root has its files copied into the bundle verbatim instead of being compiled,
+which produces no generated symbols and a `codesign` failure about an unrecognised bundle format —
+never a diagnostic naming the catalog. Keeping `Common/` within the root avoids that entirely, and
+another catalog dropped into `Localization/` needs no manifest change.
+
+Keys are **named** (`setTheClocks`, `chooseARuleset`, `timeControlNotation`) rather than being the
+English text itself. That is what lets Xcode generate a typed symbol per key, so the screen reads
+`Text(.chooseARuleset)` and `Text(.timeControlNotation(base, increment))` instead of repeating
+literals. Two things follow from it:
+
+- **The English text lives only in the catalog.** A call site names a key and nothing else, so no
+  string can be edited in one place and silently diverge from another.
+- **A missing key is a compile error**, not a silent fallback to the key text. With the format as
+  the key, a typo would have rendered plausible-looking English and hidden itself.
+
+The catalog belongs to this module rather than to the app so the symbols are visible here — Xcode
+generates them per target, and a catalog in the app target produces symbols the packages cannot see.
+
+The consequence to know about: **the clock module will not be able to use
+`timeControlNotation`.** It renders the same `3 | 2` in its navigation title, and per-module symbols
+mean it needs its own key. Whether the two share one entry somewhere both can reach, or simply carry
+one each, is a question for ZN-60.
 
 ---
 
@@ -202,9 +251,11 @@ the trailing side.
   uses at the top of this screen and it works there, but at the bottom it had nothing to show:
   scrolled to the end, the content stops above the bar, so there is nothing left underneath to blur.
   A painted gradient reads consistently at every scroll position, which is what the design wants.
-- **The subtitle names the current selection and nothing else.** It is derived from the selection
-  rather than stored, so it cannot fall out of step with the list — including the moment a different
-  preset is tapped, and later when the custom steppers move (ZN-18).
+- **The subtitle names the current selection and nothing else.** The bar is handed the selected
+  ruleset's category and time control, and renders them through one localised key. Both are derived
+  from the selection rather than stored, so the subtitle cannot fall out of step with the list —
+  including the moment a different preset is tapped, and later when the custom steppers move
+  (ZN-18).
 
 ### Starting a game
 

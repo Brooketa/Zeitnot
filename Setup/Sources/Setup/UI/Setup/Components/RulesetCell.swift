@@ -43,7 +43,7 @@ private extension RulesetCell {
     var timeControlNotation: Text {
         let timeControl = model.ruleset.timeControl
 
-        return Text("\(timeControl.baseMinutes) | \(timeControl.incrementSeconds)")
+        return Text(.timeControlNotation(timeControl.baseMinutes, timeControl.incrementSeconds))
             .title()
     }
 

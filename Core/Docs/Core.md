@@ -33,11 +33,15 @@ Core exposes the two values and deliberately does not render them. The `3 | 2` r
 ruleset cells, under the START GAME button and in the clock's navigation title is built by the
 screen that shows it, from those two values.
 
-This keeps presentation out of the domain type. The trade-off accepted with it: the same
-`"\(baseMinutes) | \(incrementSeconds)"` format is written in Setup and Clock, which are separate
-modules that cannot import one another, so nothing structurally prevents the two from drifting
-apart. The planned resolution is a single String Catalog entry taking both numbers as arguments
-(**ZN-60**), which single-sources the format without putting a computed property back on the model.
+Presentation therefore stays out of the domain type. Within a module the format no longer repeats:
+since ZN-22 the Setup module keeps it in its own String Catalog under a named key, so its cell and
+its Presenter both render the reading without either one writing a `|`.
+
+That does **not** make the format shared across modules. String Catalog symbols are generated per
+target, so the catalog has to live in the module that reads it, and the clock screen will need its
+own key for the same `3 | 2`. Two modules, two entries, nothing structural keeping them identical —
+the original risk, moved rather than removed. Whether they end up sharing one entry somewhere both
+can reach is a question for **ZN-60**, along with the rest of the app's copy.
 
 ---
 
@@ -89,7 +93,9 @@ Moved out of Core on 2026-08-19, during ZN-15.
 ## Not Built Yet
 
 - Duration formatting for the clock, turns and statistics screens (ZN-23 onwards)
-- A String Catalog for user-facing copy, including the `3 | 2` notation key (ZN-60)
+- A String Catalog for the rest of the user-facing copy (ZN-60), and a decision on whether modules
+  that render the same string share an entry — see Reading A Time Control. The Setup module carries
+  its own catalog already.
 - Multi-stage time controls (ZN-53) — deliberately absent; a stage needs a move-number trigger that
   fires per player, which a bare extra duration cannot express
 

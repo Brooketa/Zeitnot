@@ -4,21 +4,21 @@ import Core
 @Observable
 final class SetupPresenter {
 
-    private var selection: PresetRuleset = .blitz3plus2
-
     var rulesetModels: [RulesetCell.Model] {
         PresetRuleset.allCases.map { preset in
             RulesetCell.Model(ruleset: preset, isSelected: preset == selection)
         }
     }
 
-    var selectedRulesetName: String {
-        "\(selection.category) \(selection.timeControl.baseMinutes) | \(selection.timeControl.incrementSeconds)"
+    var startGameModel: StartGameBar.Model {
+        StartGameBar.Model(category: selection.category, timeControl: selection.timeControl)
     }
 
     var gameConfiguration: GameConfiguration {
         GameConfiguration(timeControl: selection.timeControl, category: selection.category)
     }
+
+    private var selection: PresetRuleset = .blitz3plus2
 
     func select(_ ruleset: PresetRuleset) {
         selection = ruleset

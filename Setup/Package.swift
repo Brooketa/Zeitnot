@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "Setup",
+    defaultLocalization: "en",
     platforms: [
         .iOS("26.5")
     ],
@@ -20,6 +21,8 @@ let package = Package(
         .target(
             name: "Setup",
             dependencies: ["Core", "CoreUI"],
+            path: "Sources",
+            resources: [.process("Common/Resources/Localization")],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
                 .defaultIsolation(MainActor.self)

@@ -1,0 +1,64 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "setTheClocks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set the clocks"
+          }
+        }
+      }
+    },
+    "chooseARuleset": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a ruleset."
+          }
+        }
+      }
+    },
+    "timeControlNotation": {
+      "comment": "Time control notation: base minutes and increment seconds, e.g. 3 | 2.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld | %2$lld"
+          }
+        }
+      }
+    },
+    "startGame": {
+      "comment": "Setup screen bottom bar button. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Game"
+          }
+        }
+      }
+    },
+    "selectedRuleset": {
+      "comment": "Setup screen bottom bar subtitle: ruleset category, base minutes and increment seconds, e.g. Blitz 3 | 2.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$lld | %3$lld"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

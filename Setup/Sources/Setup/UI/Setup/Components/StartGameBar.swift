@@ -1,9 +1,10 @@
 import SwiftUI
+import Core
 import CoreUI
 
 struct StartGameBar: View {
 
-    let rulesetName: String
+    let model: Model
     let action: (Action) -> Void
 
     var body: some View {
@@ -47,11 +48,11 @@ struct StartGameBar: View {
 
 	var label: some View {
 		VStack(alignment: .leading, spacing: .xs) {
-			Text(Constants.title)
+			Text(.startGame)
 				.buttonLabel()
 				.textCase(.uppercase)
 
-			Text(rulesetName)
+			Text(.selectedRuleset(model.category, model.timeControl.baseMinutes, model.timeControl.incrementSeconds))
 				.footnote(ColorPalette.inkInverse)
 		}
 	}
@@ -63,6 +64,17 @@ struct StartGameBar: View {
 			.frame(width: Constants.arrowDiameter, height: Constants.arrowDiameter)
 			.background(Circle().fill(ColorPalette.accentRaised))
 	}
+
+}
+
+extension StartGameBar {
+
+    struct Model {
+
+        let category: String
+        let timeControl: TimeControl
+
+    }
 
 }
 
@@ -80,7 +92,6 @@ private extension StartGameBar {
 
     enum Constants {
 
-        static var title: String { "Start Game" }
         static var arrowSymbol: String { "arrow.right" }
 
         static let arrowSize: CGFloat = 14

@@ -49,19 +49,21 @@ struct SetupPresenterTests {
     }
 
     @Test
-    func selectedRulesetNameReadsCategoryAndNotation() {
+    func startGameModelCarriesTheSelectedRuleset() {
         let presenter = SetupPresenter()
 
-        #expect(presenter.selectedRulesetName == "Blitz 3 | 2")
+        #expect(presenter.startGameModel.category == "Blitz")
+        #expect(presenter.startGameModel.timeControl == TimeControl(baseMinutes: 3, incrementSeconds: 2))
     }
 
     @Test
-    func selectedRulesetNameFollowsTheSelection() {
+    func startGameModelFollowsTheSelection() {
         let presenter = SetupPresenter()
 
         presenter.select(.classical90plus30)
 
-        #expect(presenter.selectedRulesetName == "Classical 90 | 30")
+        #expect(presenter.startGameModel.category == "Classical")
+        #expect(presenter.startGameModel.timeControl == TimeControl(baseMinutes: 90, incrementSeconds: 30))
     }
 
     @Test
