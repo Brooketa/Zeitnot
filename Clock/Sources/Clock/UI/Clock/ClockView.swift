@@ -25,16 +25,15 @@ public struct ClockView: View {
             }
         }
         .supportsLandscape()
-        .task {
-            await presenter.startTicking()
-        }
     }
 
     var clocks: some View {
-        HStack(spacing: .lg) {
-            ClockFace(model: presenter.whiteClock, action: onClockFaceAction)
+        TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: presenter.isPaused)) { _ in
+            HStack(spacing: .lg) {
+                ClockFace(model: presenter.whiteClock, action: onClockFaceAction)
 
-            ClockFace(model: presenter.blackClock, action: onClockFaceAction)
+                ClockFace(model: presenter.blackClock, action: onClockFaceAction)
+            }
         }
     }
 
@@ -59,6 +58,16 @@ private extension ClockView {
         case .pause: presenter.pause()
         case .reset: presenter.reset()
         }
+    }
+
+}
+
+private extension ClockView {
+
+    enum Constants {
+
+        static let tickInterval: TimeInterval = 0.1
+
     }
 
 }
