@@ -10,6 +10,7 @@
 		7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3C13035A9A700ED9FBC /* CoreUI */; };
 		7026E3D23035A9A700ED9FBC /* Setup in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3D13035A9A700ED9FBC /* Setup */; };
 		7026E3E23035A9A700ED9FBC /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3E13035A9A700ED9FBC /* Core */; };
+		7026E3F23035A9A700ED9FBC /* Clock in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3F13035A9A700ED9FBC /* Clock */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,6 +18,7 @@
 		7026E3C43035A9A700ED9FBC /* CoreUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CoreUI; sourceTree = "<group>"; };
 		7026E3D03035A9A700ED9FBC /* Setup */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Setup; sourceTree = "<group>"; };
 		7026E3E03035A9A700ED9FBC /* Core */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Core; sourceTree = "<group>"; };
+		7026E3F43035A9A700ED9FBC /* Clock */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Clock; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -35,6 +37,7 @@
 				7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */,
 				7026E3D23035A9A700ED9FBC /* Setup in Frameworks */,
 				7026E3E23035A9A700ED9FBC /* Core in Frameworks */,
+				7026E3F23035A9A700ED9FBC /* Clock in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +49,7 @@
 			children = (
 				7026E3A63035A9A700ED9FBC /* Zeitnot */,
 				7026E3A53035A9A700ED9FBC /* Products */,
+				7026E3F43035A9A700ED9FBC /* Clock */,
 				7026E3E03035A9A700ED9FBC /* Core */,
 				7026E3C43035A9A700ED9FBC /* CoreUI */,
 				7026E3D03035A9A700ED9FBC /* Setup */,
@@ -83,6 +87,7 @@
 				7026E3C13035A9A700ED9FBC /* CoreUI */,
 				7026E3D13035A9A700ED9FBC /* Setup */,
 				7026E3E13035A9A700ED9FBC /* Core */,
+				7026E3F13035A9A700ED9FBC /* Clock */,
 			);
 			productName = Zeitnot;
 			productReference = 7026E3A43035A9A700ED9FBC /* Zeitnot.app */;
@@ -388,6 +393,10 @@
 		7026E3E13035A9A700ED9FBC /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Core;
+		};
+		7026E3F13035A9A700ED9FBC /* Clock */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Clock;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

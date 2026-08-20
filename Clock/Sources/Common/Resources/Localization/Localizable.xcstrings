@@ -1,0 +1,18 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "rulesetTitle" : {
+      "comment" : "Clock screen navigation bar title: ruleset category, base minutes and increment seconds, e.g. ● BLITZ · 3 | 2.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "● %1$@ · %2$lld | %3$lld"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
