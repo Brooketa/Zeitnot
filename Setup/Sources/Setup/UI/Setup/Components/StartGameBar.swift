@@ -1,5 +1,4 @@
 import SwiftUI
-import Core
 import CoreUI
 
 struct StartGameBar: View {
@@ -51,7 +50,7 @@ struct StartGameBar: View {
 				.buttonLabel()
 				.textCase(.uppercase)
 
-			Text(.selectedRuleset(model.category, model.timeControl.baseMinutes, model.timeControl.incrementSeconds))
+			Text(.selectedRuleset(model.category, model.baseMinutes, model.incrementSeconds))
 				.footnote(ColorPalette.inkInverse)
 		}
 	}
@@ -71,7 +70,8 @@ extension StartGameBar {
     struct Model {
 
         let category: String
-        let timeControl: TimeControl
+        let baseMinutes: Int
+        let incrementSeconds: Int
 
     }
 

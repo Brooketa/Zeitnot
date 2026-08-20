@@ -1,4 +1,3 @@
-import Foundation
 import Observation
 import Core
 
@@ -18,7 +17,10 @@ public final class SetupPresenter {
     }
 
     var startGameModel: StartGameBar.Model {
-        StartGameBar.Model(category: selectedCategory, timeControl: selection.timeControl)
+        StartGameBar.Model(
+            category: selectedCategory,
+            baseMinutes: selection.timeControl.baseMinutes,
+            incrementSeconds: selection.timeControl.incrementSeconds)
     }
 
     var gameConfiguration: GameConfiguration {

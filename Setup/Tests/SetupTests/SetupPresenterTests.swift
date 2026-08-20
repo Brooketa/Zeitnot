@@ -53,7 +53,8 @@ struct SetupPresenterTests {
         let presenter = makePresenter()
 
         #expect(presenter.startGameModel.category == "Blitz")
-        #expect(presenter.startGameModel.timeControl == TimeControl(baseMinutes: 3, incrementSeconds: 2))
+        #expect(presenter.startGameModel.baseMinutes == 3)
+        #expect(presenter.startGameModel.incrementSeconds == 2)
     }
 
     @Test
@@ -63,7 +64,8 @@ struct SetupPresenterTests {
         presenter.select(.classical90plus30)
 
         #expect(presenter.startGameModel.category == "Classical")
-        #expect(presenter.startGameModel.timeControl == TimeControl(baseMinutes: 90, incrementSeconds: 30))
+        #expect(presenter.startGameModel.baseMinutes == 90)
+        #expect(presenter.startGameModel.incrementSeconds == 30)
     }
 
     @Test
