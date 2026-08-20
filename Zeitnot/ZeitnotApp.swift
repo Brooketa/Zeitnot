@@ -26,7 +26,7 @@ struct ZeitnotApp: App {
             @Bindable var router = router
 
             NavigationStack(path: $router.navigationPath) {
-                SetupView()
+                SetupView(presenter: dependencies.makeSetupPresenter())
                     .onDisappear { router.navigationDidComplete() }
                     .navigationDestination(for: NavigationDestination.self) { destination in
                         screen(for: destination)

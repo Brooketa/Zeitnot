@@ -3,9 +3,11 @@ import CoreUI
 
 public struct SetupView: View {
 
-    @State private var presenter = SetupPresenter()
+    @State private var presenter: SetupPresenter
 
-    public init() {}
+    public init(presenter: SetupPresenter) {
+		self.presenter = presenter
+    }
 
     public var body: some View {
         ScrollView {
@@ -26,7 +28,7 @@ public struct SetupView: View {
     }
 
     var subtitle: some View {
-		Text(.chooseARuleset)
+        Text(.chooseARuleset)
             .callout()
     }
 

@@ -17,9 +17,9 @@ the timing, the tap handling, the control bar, the move number and the game-over
 with its own ticket, and each one fills in part of this shell. Until then nothing on screen promises
 behaviour that is not there.
 
-The screen is also not reachable yet. The app can push it — the router, the destination carrying a
-game configuration and the navigation stack all exist (ZN-67) — but the setup screen's START GAME
-bar still goes nowhere. Connecting the two is ZN-62.
+The screen is reachable. START GAME on the setup screen pushes it with the configuration of the
+ruleset that was selected at the moment of the tap (ZN-62), and the system back button returns to
+setup with that screen exactly as it was left.
 
 ---
 
@@ -60,10 +60,10 @@ offer.
 The title is displayed **inline**. The large title belongs to a screen being read top to bottom; the
 clock's bar is chrome above a fixed layout.
 
+The **back button** is the system's, and appears because the screen is pushed rather than presented.
+
 ### Not built yet
 
-- The **back button** is the system's. It appears as soon as the screen is pushed, which needs the
-  setup-side wiring (ZN-62).
 - The **move number** (`MOVE 1`) as a trailing item (ZN-25).
 
 ---
@@ -117,6 +117,8 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 
 - [x] The `Clock` module depends on `Core` and `CoreUI`, and on no other feature module.
 - [x] The view is constructed with a presenter, and the presenter with a game configuration.
+- [x] The screen is reached by a push from the setup screen, carrying the ruleset selected at the
+      moment START GAME was tapped, and is left by the system back button or back-swipe.
 - [x] The navigation bar names the ruleset that was passed in, in the form `● CLASSICAL · 90 | 30`.
 - [x] The bullet, the middle dot and the casing are composed by this module, from a category name
       and two integers.

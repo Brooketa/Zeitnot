@@ -1,4 +1,6 @@
 import Observation
+import Core
+import Setup
 
 @Observable
 final class AppRouter {
@@ -22,6 +24,16 @@ final class AppRouter {
         guard !navigationPath.isEmpty else { return }
 
         navigationPath.removeLast()
+    }
+
+}
+
+// MARK: - SetupRoutingProtocol
+
+extension AppRouter: SetupRoutingProtocol {
+
+    func navigateToClock(gameConfiguration: GameConfiguration) {
+        append(.clock(gameConfiguration))
     }
 
 }

@@ -3,7 +3,7 @@ import CoreUI
 
 public struct ClockView: View {
 
-    private let presenter: ClockPresenter
+    @State private var presenter: ClockPresenter
 
     public init(presenter: ClockPresenter) {
         self.presenter = presenter
