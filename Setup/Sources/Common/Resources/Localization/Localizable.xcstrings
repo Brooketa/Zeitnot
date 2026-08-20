@@ -58,6 +58,138 @@
           }
         }
       }
+    },
+    "presetRulesets": {
+      "comment": "Setup screen section header above the list of preset rulesets. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preset Rulesets"
+          }
+        }
+      }
+    },
+    "bulletCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bullet"
+          }
+        }
+      }
+    },
+    "blitzCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blitz"
+          }
+        }
+      }
+    },
+    "rapidCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rapid"
+          }
+        }
+      }
+    },
+    "classicalCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classical"
+          }
+        }
+      }
+    },
+    "bullet1Plus0Description": {
+      "comment": "Description of the 1 | 0 bullet preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One minute each. Sudden death."
+          }
+        }
+      }
+    },
+    "blitz3Plus2Description": {
+      "comment": "Description of the 3 | 2 blitz preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three minutes, plus 2s on every completed move."
+          }
+        }
+      }
+    },
+    "blitz5Plus0Description": {
+      "comment": "Description of the 5 | 0 blitz preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Five minutes each, classic blitz game."
+          }
+        }
+      }
+    },
+    "rapid10Plus0Description": {
+      "comment": "Description of the 10 | 0 rapid preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten minutes each, no increment."
+          }
+        }
+      }
+    },
+    "rapid15Plus10Description": {
+      "comment": "Description of the 15 | 10 rapid preset.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fifteen minutes, plus 10s per move."
+          }
+        }
+      }
+    },
+    "classical90Plus30Description": {
+      "comment": "Description of the 90 | 30 classical preset. Not the standard Classical format until multi-stage time controls land (ZN-53).",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "90 minutes each, plus 30s per move."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

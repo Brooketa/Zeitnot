@@ -8,20 +8,10 @@ struct PresetRulesetSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: .md) {
-            SectionHeader(title: Constants.title)
+            SectionHeader(title: .presetRulesets)
 
             PresetRulesetList(models: models, action: action)
         }
-    }
-
-}
-
-private extension PresetRulesetSection {
-
-    enum Constants {
-
-        static var title: String { "Preset Rulesets" }
-
     }
 
 }

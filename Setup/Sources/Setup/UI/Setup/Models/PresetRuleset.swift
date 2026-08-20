@@ -1,3 +1,4 @@
+import Foundation
 import Core
 
 enum PresetRuleset: String, CaseIterable, Sendable {
@@ -9,12 +10,12 @@ enum PresetRuleset: String, CaseIterable, Sendable {
     case rapid15plus10 = "rapid-15-10"
     case classical90plus30 = "classical-90-30"
 
-    var category: String {
+    var category: LocalizedStringResource {
         switch self {
-        case .bullet1plus0: "Bullet"
-        case .blitz3plus2, .blitz5plus0: "Blitz"
-        case .rapid10plus0, .rapid15plus10: "Rapid"
-        case .classical90plus30: "Classical"
+        case .bullet1plus0: .bulletCategory
+        case .blitz3plus2, .blitz5plus0: .blitzCategory
+        case .rapid10plus0, .rapid15plus10: .rapidCategory
+        case .classical90plus30: .classicalCategory
         }
     }
 
@@ -29,14 +30,14 @@ enum PresetRuleset: String, CaseIterable, Sendable {
         }
     }
 
-    var description: String {
+    var description: LocalizedStringResource {
         switch self {
-        case .bullet1plus0: "One minute each. Sudden death."
-        case .blitz3plus2: "Three minutes, plus 2s on every completed move."
-        case .blitz5plus0: "Five minutes each, classic blitz game."
-        case .rapid10plus0: "Ten minutes each, no increment."
-        case .rapid15plus10: "Fifteen minutes, plus 10s per move."
-        case .classical90plus30: "90 minutes each, plus 30s per move."
+        case .bullet1plus0: .bullet1Plus0Description
+        case .blitz3plus2: .blitz3Plus2Description
+        case .blitz5plus0: .blitz5Plus0Description
+        case .rapid10plus0: .rapid10Plus0Description
+        case .rapid15plus10: .rapid15Plus10Description
+        case .classical90plus30: .classical90Plus30Description
         }
     }
 
