@@ -16,11 +16,11 @@ Top to bottom:
 
 - **Background** — the screen's surface colour behind everything, extending under the status bar and
   the home indicator.
-- **Title** — `Chess Clock`, carried by the navigation bar as its **large title**. It is the system's
+- **Title** — `Set the clocks`, carried by the navigation bar as its **large title**. It is the system's
   title, not a custom one, so it collapses into the inline bar title on scroll for free. The
   navigation container itself belongs to the app, not to this screen — the screen only names its
   title, which is what lets a pushed screen carry its own.
-- **Subtitle** — `Choose how long you want to play.`, the first thing in the scrolling content,
+- **Subtitle** — `Choose a ruleset.`, the first thing in the scrolling content,
   directly beneath the title.
 - **Sections** — each one a section header above a card.
 
@@ -41,7 +41,7 @@ uppercased for display, so it is spoken as words rather than letters.
 
 Only **PRESET RULESETS**. `CUSTOM` and `PREFERENCES` arrive with their own tickets, and no empty
 header stands in for them in the meantime — a section appears when it has something to show. The
-screen has no bottom bar yet either, so the content scrolls to its natural end (ZN-22).
+START GAME bar is pinned below them all.
 
 ### Appearance
 
@@ -182,12 +182,63 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 
 ---
 
+## Start Game Bar
+
+Pinned to the bottom of the screen, below the scrolling content: a full-width red **capsule** button
+reading `START GAME`, the selected ruleset named beneath it (`Blitz 3 | 2`), and a circular arrow on
+the trailing side.
+
+### How it behaves
+
+- **The bar stays put while the content scrolls behind it.** It is attached as a bottom safe-area
+  inset, which both pins it and pushes the scroll content's own bottom inset down — so the last
+  ruleset can be scrolled clear of the bar instead of living underneath it. One mechanism does both
+  jobs; there is no hand-maintained bottom padding that has to match the bar's height.
+- **Content passing beneath fades out rather than sliding under the button cleanly.** The bar paints
+  a gradient behind itself — clear at the top, the screen's background colour at the bottom — so a
+  row scrolling past dissolves into the background instead of being cut off by a hard edge.
+
+  This is deliberately *not* the system's scroll edge effect. That effect is what the navigation bar
+  uses at the top of this screen and it works there, but at the bottom it had nothing to show:
+  scrolled to the end, the content stops above the bar, so there is nothing left underneath to blur.
+  A painted gradient reads consistently at every scroll position, which is what the design wants.
+- **The subtitle names the current selection and nothing else.** It is derived from the selection
+  rather than stored, so it cannot fall out of step with the list — including the moment a different
+  preset is tapped, and later when the custom steppers move (ZN-18).
+
+### Starting a game
+
+Tapping the bar reports that a game should start, handing out the selected ruleset's **time control
+and category**.
+
+The hand-off is a **value taken at the moment of the tap**, not a live reference to the screen's
+state. Changing the selection afterwards therefore cannot reach into a game already under way — that
+guarantee is structural rather than a rule the clock has to honour.
+
+The screen does not navigate. It reports the intent and whoever presents it decides where that goes,
+which is what keeps this module free of any dependency on the clock. Starting a game leaves the
+selection, the custom values and the preferences untouched, so returning to the screen finds it
+exactly as it was left.
+
+**Nothing is wired to that report yet.** The tap reaches the Presenter and stops there, so START
+GAME is a working button that currently goes nowhere. The destination and the navigation that
+reaches it are deferred until the clock screen exists — **ZN-62**.
+
+The seam is in the Presenter rather than in the view's interface. The screen takes no callback and
+exposes no hook; a tap is simply a Presenter action, the same as selecting a ruleset. That keeps the
+view's public surface to `init()` and leaves the routing decision entirely to the layer that will
+make it.
+
+---
+
 ## Not Built Yet
 
+- Navigation from START GAME to the clock screen (**ZN-62**). The Presenter can build the
+  configuration a game needs; nothing consumes it yet, and the app deliberately holds no routing
+  layer in the meantime.
 - The `CUSTOM` section and its steppers (ZN-18)
 - The `PREFERENCES` section and the sound preference (ZN-19)
 - Selection, custom values and preferences surviving a relaunch (ZN-20)
-- The sticky `START GAME` bar and navigation to the clock (ZN-22)
 - VoiceOver support for this screen's controls (ZN-59)
 
 ---
@@ -197,7 +248,7 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 ### Screen shell
 
 - [x] Background, subtitle and the `PRESET RULESETS` section header match the design.
-- [x] `Chess Clock` is the navigation bar's large title, not a custom one, with the navigation
+- [x] `Set the clocks` is the navigation bar's large title, not a custom one, with the navigation
       container owned by the app rather than the screen.
 - [x] The section header is a reusable component, not styling applied inline once.
 - [x] Everything below the navigation bar scrolls as one list, subtitle included.
@@ -226,8 +277,7 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 - [x] Selecting a ruleset deselects all others.
 - [x] Exactly one ruleset is selected at all times.
 - [x] Tapping the already-selected ruleset is a no-op, not a deselect.
-- [ ] The START GAME subtitle updates immediately on selection — the bar does not exist yet
-      (ZN-22).
+- [x] The START GAME subtitle updates immediately on selection.
 - [ ] The custom ruleset participates in the selection group — deferred; selection currently spans
       the six presets only (ZN-18).
 
@@ -236,3 +286,19 @@ The card takes arbitrary content rather than a list of rulesets, because the scr
 - [x] Cells sit inside a rounded surface card that clips them.
 - [x] Cells are separated by dividers.
 - [x] First and last cells are tucked into the card's rounded corners.
+
+### Start game bar
+
+- [x] The bar is pinned to the bottom and always visible.
+- [x] The scrolling content carries enough bottom inset that the last ruleset clears the bar.
+- [x] Content passing beneath the bar fades into the background under a gradient.
+- [x] The subtitle names the current selection and updates immediately when it changes.
+- [ ] START GAME opens the clock screen with the selected ruleset's base time and increment — the
+      Presenter can build the configuration, but nothing consumes it yet (ZN-62).
+- [x] The configuration is a snapshot taken at the tap, so a later selection change cannot alter a
+      game already under way.
+- [ ] Returning from the clock preserves the selection and preferences — cannot be exercised until
+      there is a clock to return from (ZN-62). The screen's state is held for its lifetime, so this
+      follows once the navigation exists.
+- [ ] Starting a game with the custom ruleset uses the current custom values — the custom ruleset
+      does not exist yet (ZN-18).

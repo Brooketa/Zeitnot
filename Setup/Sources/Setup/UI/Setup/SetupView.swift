@@ -20,12 +20,15 @@ public struct SetupView: View {
         .background(ColorPalette.background)
         .navigationTitle(Constants.title)
         .navigationBarTitleDisplayMode(.large)
+        .safeAreaBar(edge: .bottom) {
+            StartGameBar(rulesetName: presenter.selectedRulesetName, action: onStartGameBarAction)
+        }
     }
 
-	var subtitle: some View {
+    var subtitle: some View {
 		Text(Constants.subtitle)
-			.callout()
-	}
+            .callout()
+    }
 
 }
 
@@ -35,14 +38,21 @@ private extension SetupView {
         presenter.select(ruleset)
     }
 
+    func onStartGameBarAction(_ action: StartGameBar.Action) {
+        switch action {
+        case .start:
+            presenter.startGame()
+        }
+    }
+
 }
 
 private extension SetupView {
 
     enum Constants {
 
-        static var title: String { "Chess Clock" }
-        static var subtitle: String { "Choose how long you want to play." }
+        static var title: String { "Set the clocks" }
+        static var subtitle: String { "Choose a ruleset." }
 
     }
 

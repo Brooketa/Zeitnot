@@ -1,4 +1,5 @@
 import Observation
+import Core
 
 @Observable
 final class SetupPresenter {
@@ -11,8 +12,18 @@ final class SetupPresenter {
         }
     }
 
+    var selectedRulesetName: String {
+        "\(selection.category) \(selection.timeControl.baseMinutes) | \(selection.timeControl.incrementSeconds)"
+    }
+
+    var gameConfiguration: GameConfiguration {
+        GameConfiguration(timeControl: selection.timeControl, category: selection.category)
+    }
+
     func select(_ ruleset: PresetRuleset) {
         selection = ruleset
     }
+
+    func startGame() {}
 
 }
