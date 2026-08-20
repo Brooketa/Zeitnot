@@ -48,7 +48,8 @@ struct ClockPresenterObservationTests {
 
         return ClockPresenter(
             gameConfiguration: GameConfiguration(timeControl: timeControl, category: "Blitz"),
-            gameService: GameService(timeControl: timeControl, timeSource: timeSource))
+            gameService: GameService(timeControl: timeControl, timeSource: timeSource),
+            router: FakeClockRouter())
     }
 
 }

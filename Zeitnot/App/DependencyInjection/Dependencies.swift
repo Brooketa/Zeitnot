@@ -13,7 +13,7 @@ struct Dependencies {
     func makeClockPresenter(gameConfiguration: GameConfiguration) -> ClockPresenter {
 		let gameService = GameService(timeControl: gameConfiguration.timeControl, timeSource: ContinuousClock())
 
-		return ClockPresenter(gameConfiguration: gameConfiguration, gameService: gameService)
+		return ClockPresenter(gameConfiguration: gameConfiguration, gameService: gameService, router: router)
     }
 
 }

@@ -5,33 +5,37 @@ import Core
 struct ClockPresenterTests {
 
     private let timeSource = FakeTimeSource()
+    private let router = FakeClockRouter()
 
     @Test
-    func titleNamesTheRulesetItWasConstructedWith() {
+    func theHeaderCarriesTheRulesetItWasConstructedWith() {
         let presenter = makePresenter(category: "Classical", baseMinutes: 90, incrementSeconds: 30)
 
-        #expect(presenter.title == "● CLASSICAL · 90 | 30")
+        #expect(presenter.headerModel.category == "Classical")
+        #expect(presenter.headerModel.baseMinutes == 90)
+        #expect(presenter.headerModel.incrementSeconds == 30)
     }
 
     @Test
-    func titleUppercasesTheCategory() {
+    func theHeaderCarriesTheCategoryInNaturalCasing() {
         let presenter = makePresenter(category: "Blitz", baseMinutes: 3, incrementSeconds: 2)
 
-        #expect(presenter.title == "● BLITZ · 3 | 2")
+        #expect(presenter.headerModel.category == "Blitz")
     }
 
     @Test
-    func titleKeepsAZeroIncrement() {
+    func theHeaderKeepsAZeroIncrement() {
         let presenter = makePresenter(category: "Bullet", baseMinutes: 1, incrementSeconds: 0)
 
-        #expect(presenter.title == "● BULLET · 1 | 0")
+        #expect(presenter.headerModel.category == "Bullet")
+        #expect(presenter.headerModel.incrementSeconds == 0)
     }
 
     @Test
     func theMoveNumberStartsAtMoveOne() {
         let presenter = makePresenter()
 
-        #expect(String(localized: presenter.moveNumber) == "Move 1")
+        #expect(presenter.headerModel.moveNumber == 1)
     }
 
     @Test
@@ -42,7 +46,7 @@ struct ClockPresenterTests {
         presenter.press(.white)
         presenter.press(.black)
 
-        #expect(String(localized: presenter.moveNumber) == "Move 2")
+        #expect(presenter.headerModel.moveNumber == 2)
     }
 
     @Test
@@ -119,7 +123,7 @@ struct ClockPresenterTests {
         presenter.press(.white)
 
         #expect(presenter.blackClock.state == .toMove)
-        #expect(String(localized: presenter.moveNumber) == "Move 1")
+        #expect(presenter.headerModel.moveNumber == 1)
     }
 
     @Test
@@ -237,7 +241,7 @@ struct ClockPresenterTests {
         #expect(presenter.blackClock.time == "3:00")
         #expect(presenter.whiteClock.state == .awaitingStart)
         #expect(presenter.blackClock.caption == "Press to start")
-        #expect(String(localized: presenter.moveNumber) == "Move 1")
+        #expect(presenter.headerModel.moveNumber == 1)
     }
 
     @Test
@@ -268,6 +272,35 @@ struct ClockPresenterTests {
         #expect(presenter.whiteClock.state == .awaitingStart)
     }
 
+    @Test
+    func theHeaderDotIsLitOnlyWhileTheClockCountsDown() {
+        let presenter = makePresenter(baseMinutes: 1)
+
+        #expect(!presenter.headerModel.isRunning)
+
+        presenter.press(.black)
+
+        #expect(presenter.headerModel.isRunning)
+
+        presenter.pause()
+
+        #expect(!presenter.headerModel.isRunning)
+
+        presenter.resume()
+        timeSource.advance(by: .seconds(60))
+
+        #expect(!presenter.headerModel.isRunning)
+    }
+
+    @Test
+    func theBackControlRoutesBack() {
+        let presenter = makePresenter()
+
+        presenter.navigateBack()
+
+        #expect(router.didNavigateBack)
+    }
+
     private func makePresenter(
         category: String = "Blitz",
         baseMinutes: Int = 3,
@@ -277,7 +310,8 @@ struct ClockPresenterTests {
 
         return ClockPresenter(
             gameConfiguration: GameConfiguration(timeControl: timeControl, category: category),
-            gameService: GameService(timeControl: timeControl, timeSource: timeSource))
+            gameService: GameService(timeControl: timeControl, timeSource: timeSource),
+            router: router)
     }
 
 }

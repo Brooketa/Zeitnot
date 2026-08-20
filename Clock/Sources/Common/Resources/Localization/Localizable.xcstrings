@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "backButton": {
+      "comment": "Accessibility label for the clock screen's back control.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
     "blackPlayer": {
       "comment": "Name above the time on the black player's clock face. Uppercased for display.",
       "extractionState": "manual",
@@ -146,13 +158,13 @@
       }
     },
     "rulesetTitle": {
-      "comment": "Clock screen navigation bar title: ruleset category, base minutes and increment seconds, e.g. ● BLITZ · 3 | 2.",
+      "comment": "Clock screen header: ruleset category, base minutes and increment seconds, e.g. BLITZ · 3 | 2. The status dot beside it is a view, not part of this string.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "● %1$@ · %2$lld | %3$lld"
+            "value": "%1$@ · %2$lld | %3$lld"
           }
         }
       }
