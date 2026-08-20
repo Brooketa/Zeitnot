@@ -6,6 +6,10 @@ tapping their own half.
 This document is the source of truth for how the screen behaves. Sections marked **Not built yet**
 describe intent only — nothing in them is on screen today.
 
+> **Scope was cut on 2026-08-20.** This screen and the setup screen are the whole app. The turns and
+> statistics screens, all sound, and persistence are deferred with tickets — see the project
+> overview. Nothing below promises them.
+
 ---
 
 ## What Exists Today
@@ -53,7 +57,8 @@ rest, so the setup module has no say in how the clock names a ruleset.
 The reading is held in the module's String Catalog under a named key, so neither the presenter nor
 any view writes a `|` or a `·` as a Swift literal. The Setup module keeps its own entry for the same
 `90 | 30` reading — String Catalog symbols are generated per target, so the two cannot share one
-until ZN-60 decides where shared copy lives.
+until ZN-60 decides where shared copy lives. That duplication is the reason ZN-60 exists and is the
+one place the two modules can drift.
 
 Because a navigation title is a string rather than a view, the **presenter** uppercases the
 category. The setup screen does the same thing with a text-case modifier, which a title bar does not
@@ -66,7 +71,8 @@ The **back button** is the system's, and appears because the screen is pushed ra
 
 ### Not built yet
 
-- The **move number** (`MOVE 1`) as a trailing item (ZN-25).
+- The **move number** (`MOVE 1`) as a trailing item (ZN-28), reading the per-player move count the
+  game state carries (ZN-24).
 
 ---
 
@@ -79,8 +85,10 @@ reads from the navigation bar.
 The card is passive. It renders what it is given and owns no timing and no tap handling. The layout
 places it (ZN-28); what a tap means is ZN-29.
 
-**The time** comes from the reading in `Core`, shared with the turns and statistics screens:
-`h:mm:ss` from an hour up, `m:ss` below it, whole seconds throughout.
+**The time** comes from the reading in `Core`: `h:mm:ss` from an hour up, `m:ss` below it, whole
+seconds throughout, truncating towards zero. It lives in `Core` rather than here so that any screen
+which later shows a time reads the same one — the turns and statistics screens are deferred, so the
+clock is its only caller today.
 
 **The digits never move as they count.** Monospaced, and one fixed size on every device with no
 scaling — so a shorter reading cannot render larger than a longer one. The size fits the longest
@@ -127,8 +135,9 @@ screen was verified by pushing it rather than by launching into it.
 
 ## Not Built Yet
 
-Everything below belongs to the Epic's remaining tickets. It is recorded here so the screen's
-intended behaviour is legible while the shell is empty, not because any of it is on screen.
+The list immediately below belongs to the Epic's remaining tickets and **is** coming. It is recorded
+here so the screen's intended behaviour is legible while the shell is empty, not because any of it is
+on screen. **Deliberately absent** afterwards is the opposite: things that were cut and are not.
 
 - **Two player cards** — equal halves, White left and Black right, both reading upright, each a
   full-height tap target.
@@ -136,22 +145,40 @@ intended behaviour is legible while the shell is empty, not because any of it is
   clock that does not drift and survives backgrounding.
 - **Tap handling** — tapping the active player's half ends their turn and starts the opponent's.
   Black presses to start White's clock, and the not-started state has to show which half to press.
-- **Control bar** — `PAUSE`, `RESET` and a sound button, centred below the cards. No time is
-  consumed while paused.
+- **Control bar** — `PAUSE` and `RESET`, centred below the cards. No time is consumed while paused,
+  and reset returns both clocks to full base time with the move counts zeroed, asking for
+  confirmation only when there is a game in progress to lose.
 - **Low-time warning** — a pulsing accent border on the running half below ten seconds. The clock
   face gains two more states with it: the running half keeps its fill and gains the border, and the
   *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
   only the running side ever animates.
 - **Flagging and the game-over banner** — a clock reaching zero ends the game and the opponent wins
-  on time. The banner appears over this screen, offering `REMATCH`, `TURNS` and `STATISTICS`; there
-  is no automatic navigation away. The flagged half fills solid accent with inverse type, and a
-  caption below the digits reads `FLAG FELL` — that caption slot has to be **reserved at full height
-  from the start**, or the digits will jump the moment it appears.
-- **The turn record** — every completed turn and how long it took, produced here and read by the
-  turns and statistics screens.
+  on time. The banner appears over this screen offering **`REMATCH` alone**; there is no automatic
+  navigation away, and reset dismisses it. The flagged half fills solid accent with inverse type,
+  and a caption below the digits reads `FLAG FELL` — that caption slot has to be **reserved at full
+  height from the start**, or the digits will jump the moment it appears.
+
+Zero must be reached **exactly**, at the correct instant, regardless of how often the display
+refreshes. A clock that only notices it has flagged on the next redraw ends the game late and shows
+a negative time on the way there.
+
+### Deliberately absent
+
+Not "not built yet" — cut on 2026-08-20 and tracked elsewhere. Do not add them back because a
+mockup shows them.
+
+- **A sound button in the control bar**, a tick on every switch and a distinct flag sound (ZN-33),
+  and the preference governing them (ZN-19). The clock is silent and the bar holds two buttons.
+- **`TURNS` and `STATISTICS` on the banner** (ZN-37, ZN-43). A button that opens nothing is worse
+  than no button; whichever screen is built restores its own action.
+- **The turn record** — every completed turn and how long it took (ZN-71). It existed only to feed
+  those two screens. This screen keeps **per-player move counts** and nothing more, which is all the
+  move number and the increment need.
+- **The `DIGITAL | ANALOG` toggle and the dial** (ZN-48).
 
 No haptics anywhere on this screen: the device lies flat between the players, and a vibration on
-every clock switch risks shifting it. Sound only.
+every clock switch risks shifting it. That is rejected outright rather than deferred — and with
+sound deferred too, the clock gives no feedback beyond what is on screen.
 
 ---
 
@@ -172,8 +199,9 @@ Covering what exists today. Items for behaviour that is not built yet are not li
       orientation mask.
 - [x] The title composition is covered by unit tests.
 - [x] The clock face shows a player name over a time, and nothing else.
-- [x] Its time reading comes from `Core`, so the clock, turns and statistics screens cannot diverge.
-- [x] The reading switches format at the hour and the minute, and carries whole seconds only.
+- [x] Its time reading comes from `Core`, so any screen that later shows a time reads the same one.
+- [x] The reading switches format at the hour and the minute, carries whole seconds only, and
+      truncates towards zero rather than rounding up.
 - [x] The digits are monospaced and unscaled, so they do not shift as they count.
 - [x] `1:30:00` fits a half card on the smallest supported iPhone without truncating.
 - [x] To move and waiting are distinguishable at a glance, by ring and name colour rather than fill.

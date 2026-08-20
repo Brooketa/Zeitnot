@@ -23,7 +23,7 @@ plus time credited to a player each time they complete a move.**
 Both are `Int`, in the units time controls are written in and the units the custom steppers produce.
 A time control is configuration, not elapsed time: every value it can hold is a whole number of
 minutes or seconds, so it needs no sub-second precision. The clock's *running* state is a different
-matter — that needs monotonic timing and tenths in the last ten seconds, and belongs to ZN-23.
+matter — that needs monotonic timing and belongs to ZN-25.
 
 Storing plain integers also keeps the persisted form legible for ZN-20: `{"baseMinutes":3,
 "incrementSeconds":2}` rather than an opaque attosecond pair.
@@ -74,8 +74,9 @@ the boundary it describes is between two feature modules, which cannot import on
 
 ## Time Reading
 
-How a time is written for a player to read. One accessor on `Duration`, serving the clock, turns and
-statistics screens.
+How a time is written for a player to read. One accessor on `Duration`. It lives here rather than in
+the clock module so that any screen which shows a time reads the same one; with the turns and
+statistics screens deferred (ZN-37, ZN-43), the clock is its only caller today.
 
     1:30:00 · 59:59 · 3:07 · 0:08 · 0:00
 
@@ -135,7 +136,7 @@ Moved out of Core on 2026-08-19, during ZN-15.
 - [x] A game configuration carries a time control and the category name of the ruleset it came from.
 - [x] A game configuration is a value, so a started game is unaffected by later selection changes —
       covered by the Setup module's presenter tests, since that is where a configuration is made.
-- [x] One time reading serves the clock, turns and statistics screens.
+- [x] One time reading is defined once, where every module can reach it.
 - [x] The reading switches format at the hour and at the minute, truncates towards zero and clamps
       negatives to `0:00`.
 - [x] The reading is locale-independent and holds no user-facing copy.
