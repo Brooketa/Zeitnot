@@ -56,6 +56,51 @@ Remove all unused or dead code without exception:
 - Functions that only call `super`
 - Incomplete `// TODO:` stubs
 
+#### Exception: complete helper sets in `CoreUI`
+
+A `CoreUI` helper set that covers a **closed set of cases** ships whole, including variants that have
+no caller yet. The alignment helpers are the standing example: every edge, corner and axis exists
+because a developer must be able to guess the name without checking which ones were needed so far.
+
+This is the only exemption. It does not license speculative API in general:
+
+- The set must be **closed and obvious** — an enumeration of positions, states or directions the
+  platform already defines, not a guess at what a future screen might want.
+- It must live in `CoreUI` (or `Core`) as shared vocabulary, never in a feature module.
+- A partially-populated set is worse than none, because the gaps get filled one-off per screen,
+  which is exactly what the set exists to prevent.
+
+Anything outside that shape is still dead code and still gets deleted.
+
+### Layout
+
+Do not use `Spacer` to push content around. Expand the element that should take the room and give it
+an alignment, using the `CoreUI` view helpers.
+
+A `Spacer` states the layout as a side effect of an invisible sibling: the reader has to work out
+which neighbour it is pushing and in which direction. Expanding the element that actually claims the
+space says the same thing directly, survives reordering, and leaves the stack holding only things
+that are really on screen.
+
+```swift
+// ✅
+HStack {
+    label
+        .alignLeading()
+
+    icon
+}
+
+// ❌
+HStack {
+    label
+
+    Spacer()
+
+    icon
+}
+```
+
 ### Imports
 
 - Import only modules that are actively used. Remove unused imports.

@@ -8,11 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3C13035A9A700ED9FBC /* CoreUI */; };
+		7026E3D23035A9A700ED9FBC /* Setup in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3D13035A9A700ED9FBC /* Setup */; };
+		7026E3E23035A9A700ED9FBC /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3E13035A9A700ED9FBC /* Core */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7026E3A43035A9A700ED9FBC /* Zeitnot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zeitnot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7026E3C43035A9A700ED9FBC /* CoreUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CoreUI; sourceTree = "<group>"; };
+		7026E3D03035A9A700ED9FBC /* Setup */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Setup; sourceTree = "<group>"; };
+		7026E3E03035A9A700ED9FBC /* Core */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Core; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -29,6 +33,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */,
+				7026E3D23035A9A700ED9FBC /* Setup in Frameworks */,
+				7026E3E23035A9A700ED9FBC /* Core in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,7 +46,9 @@
 			children = (
 				7026E3A63035A9A700ED9FBC /* Zeitnot */,
 				7026E3A53035A9A700ED9FBC /* Products */,
+				7026E3E03035A9A700ED9FBC /* Core */,
 				7026E3C43035A9A700ED9FBC /* CoreUI */,
+				7026E3D03035A9A700ED9FBC /* Setup */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +81,8 @@
 			name = Zeitnot;
 			packageProductDependencies = (
 				7026E3C13035A9A700ED9FBC /* CoreUI */,
+				7026E3D13035A9A700ED9FBC /* Setup */,
+				7026E3E13035A9A700ED9FBC /* Core */,
 			);
 			productName = Zeitnot;
 			productReference = 7026E3A43035A9A700ED9FBC /* Zeitnot.app */;
@@ -274,7 +284,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -320,7 +330,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -370,6 +380,14 @@
 		7026E3C13035A9A700ED9FBC /* CoreUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CoreUI;
+		};
+		7026E3D13035A9A700ED9FBC /* Setup */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Setup;
+		};
+		7026E3E13035A9A700ED9FBC /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
