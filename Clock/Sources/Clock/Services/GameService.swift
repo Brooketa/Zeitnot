@@ -1,8 +1,8 @@
 import Core
 
-final class GameService: GameServiceProtocol {
+public final class GameService: GameServiceProtocol {
 
-    var state: GameState {
+    public var state: GameState {
         switch countdownState {
         case .notStarted: makeState(phase: .notStarted)
         case let .running(player, since): makeRunningState(player: player, since: since)
@@ -21,20 +21,20 @@ final class GameService: GameServiceProtocol {
         .seconds(timeControl.incrementSeconds)
     }
 
-    init(timeControl: TimeControl, timeSource: TimeSourceProtocol) {
+    public init(timeControl: TimeControl, timeSource: TimeSourceProtocol) {
         self.timeControl = timeControl
         self.timeSource = timeSource
         white = Self.makeClock(for: timeControl)
         black = Self.makeClock(for: timeControl)
     }
 
-    func start() {
+    public func start() {
         guard case .notStarted = countdownState else { return }
 
         countdownState = .running(player: .white, since: timeSource.now)
     }
 
-    func endTurn() {
+    public func endTurn() {
         guard case let .running(player, since) = countdownState else { return }
 
         let now = timeSource.now
@@ -47,7 +47,7 @@ final class GameService: GameServiceProtocol {
         countdownState = .running(player: player.opponent, since: now)
     }
 
-    func pause() {
+    public func pause() {
         guard case let .running(player, since) = countdownState else { return }
 
         let remaining = remaining(for: player, since: since, at: timeSource.now)
@@ -58,13 +58,13 @@ final class GameService: GameServiceProtocol {
         countdownState = .paused(player: player)
     }
 
-    func resume() {
+    public func resume() {
         guard case let .paused(player) = countdownState else { return }
 
         countdownState = .running(player: player, since: timeSource.now)
     }
 
-    func reset() {
+    public func reset() {
         white = Self.makeClock(for: timeControl)
         black = Self.makeClock(for: timeControl)
         countdownState = .notStarted

@@ -13,6 +13,42 @@
         }
       }
     },
+    "moveNumber": {
+      "comment": "Clock screen navigation bar trailing item: the move the game is on. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move %lld"
+          }
+        }
+      }
+    },
+    "pauseButton": {
+      "comment": "Control bar button that pauses a running game. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "resetButton": {
+      "comment": "Control bar button that returns the game to a fresh start. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
     "rulesetTitle": {
       "comment": "Clock screen navigation bar title: ruleset category, base minutes and increment seconds, e.g. ● BLITZ · 3 | 2.",
       "extractionState": "manual",
