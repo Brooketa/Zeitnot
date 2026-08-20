@@ -157,6 +157,7 @@ reading the app can produce (`1:30:00`) on the smallest supported iPhone, so not
 | **Awaiting start** — before the first tap, nothing running | white | grey | grey | none |
 | **To move** — the half counting down, only ever one | white | accent | ink | 3pt accent, inset |
 | **Waiting** — frozen where its player passed the turn | white | grey | grey | none |
+| **Flagged** — this player's time ran out | accent | inverse | inverse | none |
 
 The turn is shown by the ring and the accent name, never by a dark fill: both players read the
 screen from opposite sides of a table.
@@ -241,6 +242,30 @@ Opening a dialog is not a way to stop your own clock; only `PAUSE` does that.
 
 ---
 
+## Flagging
+
+A clock reaching zero ends the game, and the opponent wins on time. There is **no banner** and no
+navigation away: the result is a state of the card itself, so both final times stay readable and the
+players keep looking at the position they finished in.
+
+The flagged half fills solid accent with inverse type, and `FLAG FELL` appears in the caption slot
+under the digits — the same slot `PRESS TO START` uses, whose height is reserved from the start, so
+nothing moves when the flag falls. The winner's card is left exactly as it was, showing what they had
+left.
+
+Afterwards the screen offers one thing:
+
+| | While over |
+|---|---|
+| Pressing either half | ignored |
+| `PAUSE` | unavailable — visibly disabled, so the bar keeps its shape |
+| `RESET` | works, without confirmation — a finished game has nothing left to lose |
+
+The winner is conveyed by **which half went red**, so there is no result sentence to write or
+translate.
+
+---
+
 ## Orientation
 
 This is the **only landscape screen in the app**. It declares that with the single modifier CoreUI
@@ -271,12 +296,6 @@ on screen. **Deliberately absent** afterwards is the opposite: things that were 
   face gains two more states with it: the running half keeps its fill and gains the border, and the
   *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
   only the running side ever animates.
-- **Flagging and the game-over banner** — a clock reaching zero ends the game and the opponent wins
-  on time. The banner appears over this screen offering **`REMATCH` alone**; there is no automatic
-  navigation away, and reset dismisses it. The flagged half fills solid accent with inverse type,
-  and a caption below the digits reads `FLAG FELL` — that caption slot has to be **reserved at full
-  height from the start**, or the digits will jump the moment it appears.
-
 Zero must be reached **exactly**, at the correct instant, regardless of how often the display
 refreshes. A clock that only notices it has flagged on the next redraw ends the game late and shows
 a negative time on the way there.
@@ -316,7 +335,6 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] The screen presents in landscape on iPhone, and the app is portrait again once it is left.
 - [x] The screen declares landscape with one modifier and never names a window scene or an
       orientation mask.
-- [x] The title composition is covered by unit tests.
 - [x] The clock face shows a player name over a time, and nothing else.
 - [x] Its time reading comes from `Core`, so any screen that later shows a time reads the same one.
 - [x] The reading switches format at the hour and the minute, carries whole seconds only, and
@@ -359,3 +377,7 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] The status dot is accent only while a clock counts down, and grey in every other state.
 - [x] No user-facing string in the module contains a `●`.
 - [x] Back-swipe does nothing; leaving is a deliberate tap.
+- [x] A clock reaching zero flags: its card fills accent with inverse type and reads `FLAG FELL`.
+- [x] The winner's card is untouched, and neither final time is covered by anything.
+- [x] Presses do nothing once the game is over, and `PAUSE` is disabled.
+- [x] `RESET` clears the flagged card and returns a fresh game without asking.

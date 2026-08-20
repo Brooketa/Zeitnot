@@ -49,6 +49,18 @@
         }
       }
     },
+    "flagFell": {
+      "comment": "Caption on a clock face whose time ran out. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flag fell"
+          }
+        }
+      }
+    },
     "moveNumber": {
       "comment": "Clock screen navigation bar trailing item: the move the game is on. Uppercased for display.",
       "extractionState": "manual",
