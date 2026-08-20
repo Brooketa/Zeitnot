@@ -61,9 +61,75 @@ so there is one place a background colour is defined and the dark-mode pass has 
 
 ---
 
+## Orientation
+
+The app is portrait throughout except the clock screen, which is landscape — the device lies flat
+between the two players. SwiftUI has no way to state that per screen, so CoreUI provides one.
+
+A screen declares what it needs with a single modifier and nothing else:
+
+    ClockView(presenter: presenter)
+        .supportsLandscape()
+
+That is the only orientation word any feature module ever writes. No screen names a window scene, an
+interface orientation mask, or the app delegate.
+
+### Why it takes three pieces
+
+iOS answers "what orientations does this app support?" by **asking the app delegate**, once, when it
+decides it needs to know — and then caching the answer. Nothing observes app state. So changing a
+flag in memory does nothing on its own: the system already has an answer and no reason to ask again.
+
+- **The service** holds whether landscape is currently enabled and reports the mask that follows. It
+  is the single source of truth for the answer.
+- **The app delegate**, added to the SwiftUI app through the delegate adaptor, implements the
+  supported-orientations callback by returning what the service reports. It holds no state and makes
+  no decision — it only forwards the question.
+- **The modifier** enables landscape on appear and disables it on disappear.
+
+### The flag and the refresh are one operation
+
+Making the system re-read its answer takes two further calls — invalidating the cached answer on the
+root view controller, and asking the active window scene to update its geometry. Both live **inside**
+the service's `enableLandscape()` and `disableLandscape()`, not at the call site.
+
+That is deliberate. If a caller had to change the flag and then separately prompt the refresh, the
+two could be written apart, and the state where the service reports landscape while the screen sits
+in portrait would be reachable — a bug that looks correct in a debugger and is wrong on the device.
+Folding the refresh in makes that state unreachable rather than merely discouraged, and it is why the
+modifier needs no UIKit at all.
+
+The cost, recorded honestly: the service both answers a question and performs a side effect, and it
+touches `UIApplication.shared`, so it cannot be exercised in isolation. At the iOS level the two
+genuinely are one operation, and splitting them would move half of it into every caller.
+
+### The service is a shared instance
+
+`OrientationService.shared`, not an injected dependency — a stated exception to the
+constructor-injection rule, recorded in the architecture rules where that rule lives. The app
+delegate is built by UIKit and cannot be handed dependencies, and the modifier must reach the same
+instance the delegate reads. It stays behind `OrientationServiceProtocol`, so the exception is about
+lifetime rather than coupling to a concrete type.
+
+### iPad allows everything
+
+The lock is iPhone-only. An iPad is used in whatever orientation it is held or docked in, and forcing
+it into portrait for the setup screen is hostile in a way it is not on a phone; the clock screen reads
+correctly either way on a large display. This is a product decision, not a technical one.
+
+### The build settings do not decide
+
+The app target permits portrait and both landscapes on iPhone, so the delegate is the thing that
+decides. Upside-down is deliberately absent — the delegate never returns it on a phone.
+
+---
+
 ## What Does Not Belong Here
 
-- Business logic or state of any kind. CoreUI is presentation vocabulary; it never decides anything.
+- Business logic. CoreUI is presentation vocabulary; it never decides anything about a game.
+- State, with **one** exception: the orientation service holds whether landscape is currently
+  enabled. It is here because it must import UIKit and so cannot live in `Core`, and because the
+  thing it serves — the modifier — is a view concern. It holds a device capability, not app data.
 - UI used by only one feature. That stays in the feature until a second one needs it, at which point
   it is promoted here.
 - Anything a feature module would have to reach *around* — CoreUI is depended upon, never depends
@@ -79,3 +145,12 @@ so there is one place a background colour is defined and the dark-mode pass has 
 - [x] The alignment set is complete, and its exemption from the unused-code rule is written down
       where that rule lives.
 - [x] The screen background helper resolves through the colour palette.
+- [x] A screen declares landscape with one modifier and never names a window scene or an
+      orientation mask.
+- [x] The orientation service is reached through a protocol, and its exemption from constructor
+      injection is written down where that rule lives.
+- [x] Changing the orientation flag always prompts the system to re-read it, because the two are a
+      single call.
+- [x] iPhone locks to the declaring screen's orientation; iPad allows all orientations everywhere.
+- [x] The app target's supported-orientation build settings permit every orientation the delegate
+      may return.
