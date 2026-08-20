@@ -35,7 +35,7 @@ struct Header: View {
     }
 
     var ruleset: some View {
-        HStack(spacing: .sm) {
+        HStack(spacing: .small) {
             Circle()
                 .fill(model.isRunning ? ColorPalette.accent : ColorPalette.textTertiary)
                 .frame(width: Constants.dotDiameter, height: Constants.dotDiameter)

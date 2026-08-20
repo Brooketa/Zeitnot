@@ -7,7 +7,7 @@ struct PresetRulesetSection: View {
     let action: (Action) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: .md) {
+        VStack(alignment: .leading, spacing: .medium) {
             SectionHeader(title: .presetRulesets)
 
             PresetRulesetList(models: models, action: onPresetRulesetListAction)

@@ -6,14 +6,14 @@ struct ResetDialog: View {
     let action: (Action) -> Void
 
     var body: some View {
-        VStack(spacing: .lg) {
+        VStack(spacing: .large) {
             title
 
             message
 
             buttons
         }
-        .padding(.horizontal, .xxl)
+        .padding(.horizontal, .jumbo)
         .alignCenter()
     }
 
@@ -29,7 +29,7 @@ struct ResetDialog: View {
     }
 
     var buttons: some View {
-        HStack(spacing: .md) {
+        HStack(spacing: .medium) {
             button(for: .cancel, title: .cancelButton, background: ColorPalette.surface, label: ColorPalette.ink)
 
             button(
@@ -52,14 +52,14 @@ struct ResetDialog: View {
             Text(title)
                 .buttonLabel(label)
                 .textCase(.uppercase)
-                .padding(.horizontal, .xl)
-                .padding(.vertical, .md)
+                .padding(.horizontal, .extraLarge)
+                .padding(.vertical, .medium)
                 .background(background)
                 .clipShape(.capsule)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
-		.padding(.top, .sm)
+		.padding(.top, .small)
     }
 
 }

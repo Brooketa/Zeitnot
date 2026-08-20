@@ -20,7 +20,7 @@ governs everything the clock does. A ruleset is **a base time plus a per-move in
 Classical `90 | 30` — 90 minutes each, plus 30 seconds per move).
 
 Rulesets come from **one** place: a grouped list of six **presets**, each showing its category, time
-control, description and selection state. Exactly one is selected at all times, and Blitz `3 | 2` is
+control, description and selection state. Exactly one is selected at all times, and Bullet `1 | 0` is
 selected on every launch.
 
 Building your own ruleset is deferred (**ZN-18**), and so is remembering the selection between
@@ -114,7 +114,7 @@ Nothing here is cancelled. Each item has a ticket carrying its full specificatio
 
 | What | Ticket | Consequence |
 |------|--------|-------------|
-| Persistence | **ZN-20** | Nothing survives a relaunch; every launch starts on Blitz `3 \| 2` |
+| Persistence | **ZN-20** | Nothing survives a relaunch; every launch starts on Bullet `1 \| 0` |
 | Custom ruleset | **ZN-18** | Six presets, no `CUSTOM` section |
 | Sound preference | **ZN-19** | No `PREFERENCES` section on the setup screen |
 | Clock sounds and speaker button | **ZN-33** | The clock is silent; the control bar is `PAUSE` and `RESET` |

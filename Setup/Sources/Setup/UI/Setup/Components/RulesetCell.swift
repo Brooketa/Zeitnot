@@ -20,8 +20,8 @@ struct RulesetCell: View {
 private extension RulesetCell {
 
     var content: some View {
-        HStack(spacing: .lg) {
-            VStack(alignment: .leading, spacing: .xs) {
+        HStack(spacing: .large) {
+            VStack(alignment: .leading, spacing: .extraSmall) {
                 Text(model.category)
                     .micro()
                     .textCase(.uppercase)
@@ -35,7 +35,7 @@ private extension RulesetCell {
 
             SelectionIndicator(isSelected: model.isSelected)
         }
-        .padding(.lg)
+        .padding(.large)
         .contentShape(.rect)
     }
 

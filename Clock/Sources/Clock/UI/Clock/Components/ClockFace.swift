@@ -38,7 +38,7 @@ struct ClockFace: View {
     }
 
     var content: some View {
-        VStack(spacing: .sm) {
+        VStack(spacing: .small) {
             Text(model.name)
                 .playerName(appearance.name)
                 .textCase(.uppercase)

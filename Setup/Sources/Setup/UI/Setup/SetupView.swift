@@ -11,13 +11,13 @@ public struct SetupView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: .xxl) {
+            VStack(alignment: .leading, spacing: .jumbo) {
                 subtitle
 
                 PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSectionAction)
             }
-            .padding(.horizontal, .lg)
-            .padding(.bottom, .xxl)
+            .padding(.horizontal, .large)
+            .padding(.bottom, .jumbo)
         }
         .background(ColorPalette.background)
         .navigationTitle(Text(.setTheClocks))

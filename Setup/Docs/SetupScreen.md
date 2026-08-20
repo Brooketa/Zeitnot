@@ -122,13 +122,13 @@ switches, fixed the same way.
 | Category | Time control | Description |
 |---|---|---|
 | BULLET | 1 \| 0 | One minute each. Sudden death. |
-| BLITZ | 3 \| 2 | Three minutes, plus 2s on every completed move. |
+| BLITZ | 3 \| 2 | Three minutes, plus 2s per move. |
 | BLITZ | 5 \| 0 | Five minutes each, classic blitz game. |
 | RAPID | 10 \| 0 | Ten minutes each, no increment. |
 | RAPID | 15 \| 10 | Fifteen minutes, plus 10s per move. |
 | CLASSICAL | 90 \| 30 | 90 minutes each, plus 30s per move. |
 
-**Blitz `3 | 2` is what a first launch with nothing stored shows as selected.** That default is not
+**Bullet `1 | 0` is what a first launch with nothing stored shows as selected.** That default is not
 expressed in the catalogue — which option starts selected is screen behaviour, so it belongs with
 whatever resolves a stored selection to a shown one (the Presenter, or the repository reading
 storage once ZN-20 exists). The catalogue lists the six and says nothing about which one wins.
@@ -171,7 +171,7 @@ the rules are structural rather than coded:
 - **exactly one is always selected** — the property cannot be empty,
 - tapping the **already-selected** one is a no-op — assigning the same value changes nothing.
 
-**Blitz `3 | 2` is selected on launch.** The Presenter decides this, not the catalogue.
+**Bullet `1 | 0` is selected on launch.** The Presenter decides this, not the catalogue.
 
 ### How a row is identified
 
@@ -343,7 +343,7 @@ none should be added here.
 Back and back-swipe are the system's, from the system navigation bar. Returning finds the screen
 exactly as it was left, because the screen's state lives for the screen's lifetime and starting a
 game does not touch it. That lifetime is the session: nothing is stored, so a relaunch is back to
-Blitz `3 | 2` (ZN-20).
+Bullet `1 | 0` (ZN-20).
 
 ---
 
@@ -356,7 +356,7 @@ expected before the app ships.
 - The `CUSTOM` section and its steppers (**ZN-18**)
 - The `PREFERENCES` section and the sound preference (**ZN-19**) — there is no sound anywhere in the
   app, so there would be nothing for the toggle to govern
-- Selection surviving a relaunch (**ZN-20**). Every launch starts on Blitz `3 | 2`
+- Selection surviving a relaunch (**ZN-20**). Every launch starts on Bullet `1 | 0`
 
 Picking up `CUSTOM` again means revisiting **ZN-64**, which settled row identity on the assumption
 that a row is a preset; once a custom ruleset joins the selection group a row becomes a two-case
@@ -398,7 +398,7 @@ open `[ ]` items: this screen is finished for this pass.
 
 - [x] All six presets exist with exactly the copy and order above.
 - [x] Every category and description is a String Catalog entry, not a literal.
-- [x] Blitz `3 | 2` is the selection on launch. Decided by the Presenter, not the catalogue.
+- [x] Bullet `1 | 0` is the selection on launch. Decided by the Presenter, not the catalogue.
       Surviving a relaunch with something stored is still ZN-20.
 - [x] Presets are not editable by the player.
 

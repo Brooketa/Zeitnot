@@ -10,14 +10,14 @@ public struct ClockView: View {
     }
 
     public var body: some View {
-        VStack(spacing: .lg) {
+        VStack(spacing: .large) {
             Header(model: presenter.headerModel, action: onHeaderAction)
 
             clocks
 
             ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
         }
-        .padding(.lg)
+        .padding(.large)
         .primaryBackground()
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
@@ -32,7 +32,7 @@ public struct ClockView: View {
 
     var clocks: some View {
         TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: !presenter.isCountingDown)) { _ in
-            HStack(spacing: .lg) {
+            HStack(spacing: .large) {
                 ClockFace(model: presenter.whiteClock, action: onClockFaceAction)
 
                 ClockFace(model: presenter.blackClock, action: onClockFaceAction)

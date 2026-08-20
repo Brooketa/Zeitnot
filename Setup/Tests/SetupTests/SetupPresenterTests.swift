@@ -5,10 +5,10 @@ import Core
 struct SetupPresenterTests {
 
     @Test
-    func blitzThreePlusTwoIsSelectedInitially() {
+    func bulletOnePlusZeroIsSelectedInitially() {
         let presenter = makePresenter()
 
-        #expect(selectedPresets(of: presenter) == [.blitz3plus2])
+        #expect(selectedPresets(of: presenter) == [.bullet1plus0])
     }
 
     @Test
@@ -52,9 +52,9 @@ struct SetupPresenterTests {
     func startGameModelCarriesTheSelectedRuleset() {
         let presenter = makePresenter()
 
-        #expect(presenter.startGameModel.category == "Blitz")
-        #expect(presenter.startGameModel.baseMinutes == 3)
-        #expect(presenter.startGameModel.incrementSeconds == 2)
+        #expect(presenter.startGameModel.category == "Bullet")
+        #expect(presenter.startGameModel.baseMinutes == 1)
+        #expect(presenter.startGameModel.incrementSeconds == 0)
     }
 
     @Test
