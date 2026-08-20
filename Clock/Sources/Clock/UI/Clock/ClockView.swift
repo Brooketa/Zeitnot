@@ -17,17 +17,17 @@ public struct ClockView: View {
 
             ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
         }
+        .padding(.lg)
+        .primaryBackground()
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden()
+        .supportsLandscape()
 		.presentFullScreen(if: presenter.showResetDialog) {
 			ResetDialog(action: onResetDialogAction)
 		}
 		.presentFullScreen(if: presenter.showPauseDialog) {
 			PauseDialog(model: presenter.pauseDialogModel, action: onPauseDialogAction)
 		}
-        .padding(.lg)
-        .primaryBackground()
-        .toolbar(.hidden, for: .navigationBar)
-        .navigationBarBackButtonHidden()
-        .supportsLandscape()
     }
 
     var clocks: some View {

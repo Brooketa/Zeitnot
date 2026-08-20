@@ -9,14 +9,15 @@ public extension View {
                     if isPresented {
                         ColorPalette.background
                             .opacity(Constants.scrimOpacity)
-                            .ignoresSafeArea()
                             .transition(.opacity)
 
                         view()
                             .maxSize()
+                            .safeAreaPadding()
                             .transition(.opacity)
                     }
                 }
+                .ignoresSafeArea()
                 .animation(.easeInOut(duration: Constants.duration), value: isPresented)
             }
     }
