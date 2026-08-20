@@ -1,18 +1,42 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "rulesetTitle" : {
-      "comment" : "Clock screen navigation bar title: ruleset category, base minutes and increment seconds, e.g. ● BLITZ · 3 | 2.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "● %1$@ · %2$lld | %3$lld"
+  "sourceLanguage": "en",
+  "strings": {
+    "blackPlayer": {
+      "comment": "Name above the time on the black player's clock face. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Black"
+          }
+        }
+      }
+    },
+    "rulesetTitle": {
+      "comment": "Clock screen navigation bar title: ruleset category, base minutes and increment seconds, e.g. ● BLITZ · 3 | 2.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "● %1$@ · %2$lld | %3$lld"
+          }
+        }
+      }
+    },
+    "whitePlayer": {
+      "comment": "Name above the time on the white player's clock face. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "White"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

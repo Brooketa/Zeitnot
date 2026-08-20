@@ -17,9 +17,25 @@ Three families, each in its own folder under `Design/`.
   to the catalogue changes every screen at once without any screen being touched.
 - **Typography** — a fixed set of styles, applied through text helpers so a view says which style it
   wants rather than restating a size, a weight and a tracking. Type is **deliberately fixed** and
-  does not respond to Dynamic Type; robustness means layouts absorb longer content instead.
+  does not respond to Dynamic Type; robustness means layouts absorb longer content instead. A style also
+  carries whether its digits are **monospaced**, so that travels with the token rather than being
+  reapplied at each call site.
 - **Spacing** — a named scale, so padding and stack spacing come from a small vocabulary rather than
   arbitrary numbers.
+
+### The clock's two styles
+
+`clockDigits` is the app's only monospaced-digit style, so a running clock's digits never shuffle
+as they change. The setting lives on the token, so no view can forget it.
+
+It is one fixed size on every device, with no size-class variant and no minimum scale factor. The
+longest reading the app can produce (`1:30:00`) fits half of the smallest supported iPhone in
+landscape, so nothing truncates — and since nothing can shrink the text, string length can never
+change how large it renders. That makes "the digits do not move" a property of the type, not the
+layout.
+
+`playerName` carries the widest tracking in the app: it must read as a label rather than as a word,
+at a glance, from across a table.
 
 ---
 
@@ -148,6 +164,9 @@ decides. Upside-down is deliberately absent — the delegate never returns it on
 ## Acceptance Checklist
 
 - [x] Colour, typography and spacing tokens exist and are the only way screens name those values.
+- [x] A typography style carries its monospaced-digit setting, so a view never has to reapply it.
+- [x] The clock digits are one fixed size on every device, and the longest reading the app can
+      produce fits the smallest supported iPhone without scaling.
 - [x] Colours are backed by an asset catalogue so dark values can be added without touching screens.
 - [x] View helpers exist for sizing, alignment, screen background and availability.
 - [x] The alignment set is complete, and its exemption from the unused-code rule is written down

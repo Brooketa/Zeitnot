@@ -10,11 +10,13 @@ describe intent only — nothing in them is on screen today.
 
 ## What Exists Today
 
-The screen shell: a navigation bar naming the ruleset, over the app's background. Nothing else.
+The screen shell: a navigation bar naming the ruleset, over the app's background. Below it, nothing
+yet — but the module now owns the **clock face**, the card one player reads their time from. It is
+built; placing two of them side by side is the layout ticket's job.
 
-The screen is deliberately empty below the bar. Everything the clock does — the two player cards,
-the timing, the tap handling, the control bar, the move number and the game-over banner — arrives
-with its own ticket, and each one fills in part of this shell. Until then nothing on screen promises
+The screen stays deliberately empty below the bar until then. Everything else the clock does — the
+timing, the tap handling, the control bar, the move number and the game-over banner — arrives with
+its own ticket, and each one fills in part of this shell. Until then nothing on screen promises
 behaviour that is not there.
 
 The screen is reachable. START GAME on the setup screen pushes it with the configuration of the
@@ -68,6 +70,43 @@ The **back button** is the system's, and appears because the screen is pushed ra
 
 ---
 
+## Clock Face
+
+One player's card: their name above their remaining time, centred on white, 26pt radius, soft
+shadow. Nothing else — the mockup's `0 MOVES · +30S` line is dropped, since the increment already
+reads from the navigation bar.
+
+The card is passive. It renders what it is given and owns no timing and no tap handling. The layout
+places it (ZN-28); what a tap means is ZN-29.
+
+**The time** comes from the reading in `Core`, shared with the turns and statistics screens:
+`h:mm:ss` from an hour up, `m:ss` below it, whole seconds throughout.
+
+**The digits never move as they count.** Monospaced, and one fixed size on every device with no
+scaling — so a shorter reading cannot render larger than a longer one. The size fits the longest
+reading the app can produce (`1:30:00`) on the smallest supported iPhone, so nothing truncates.
+
+### States
+
+| State | Fill | Name | Digits | Ring |
+|---|---|---|---|---|
+| **Awaiting start** — before the first tap, nothing running | white | grey | grey | none |
+| **To move** — the half counting down, only ever one | white | accent | ink | 3pt accent, inset |
+| **Waiting** — frozen where its player passed the turn | white | grey | grey | none |
+
+The turn is shown by the ring and the accent name, never by a dark fill: both players read the
+screen from opposite sides of a table.
+
+Awaiting start and waiting look identical today and are still two states, because ZN-29 must make
+the not-started screen show *which half to press*. Only that case changes when it does.
+
+Ring and name cross-fade over 200ms. The digits never animate — a time that eases into place is
+wrong for the length of the animation.
+
+Two more states arrive with the low-time warning, one with flag fall. See **Not Built Yet**.
+
+---
+
 ## Orientation
 
 This is the **only landscape screen in the app**. It declares that with the single modifier CoreUI
@@ -99,10 +138,15 @@ intended behaviour is legible while the shell is empty, not because any of it is
   Black presses to start White's clock, and the not-started state has to show which half to press.
 - **Control bar** — `PAUSE`, `RESET` and a sound button, centred below the cards. No time is
   consumed while paused.
-- **Low-time warning**, and tenths in the last ten seconds.
+- **Low-time warning** — a pulsing accent border on the running half below ten seconds. The clock
+  face gains two more states with it: the running half keeps its fill and gains the border, and the
+  *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
+  only the running side ever animates.
 - **Flagging and the game-over banner** — a clock reaching zero ends the game and the opponent wins
   on time. The banner appears over this screen, offering `REMATCH`, `TURNS` and `STATISTICS`; there
-  is no automatic navigation away.
+  is no automatic navigation away. The flagged half fills solid accent with inverse type, and a
+  caption below the digits reads `FLAG FELL` — that caption slot has to be **reserved at full height
+  from the start**, or the digits will jump the moment it appears.
 - **The turn record** — every completed turn and how long it took, produced here and read by the
   turns and statistics screens.
 
@@ -127,3 +171,10 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] The screen declares landscape with one modifier and never names a window scene or an
       orientation mask.
 - [x] The title composition is covered by unit tests.
+- [x] The clock face shows a player name over a time, and nothing else.
+- [x] Its time reading comes from `Core`, so the clock, turns and statistics screens cannot diverge.
+- [x] The reading switches format at the hour and the minute, and carries whole seconds only.
+- [x] The digits are monospaced and unscaled, so they do not shift as they count.
+- [x] `1:30:00` fits a half card on the smallest supported iPhone without truncating.
+- [x] To move and waiting are distinguishable at a glance, by ring and name colour rather than fill.
+- [x] The face owns no timing and no tap handling.

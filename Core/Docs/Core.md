@@ -4,7 +4,8 @@ Zero-dependency foundation module. Holds the app's domain value types, plus non-
 extensions shared across features. Nothing here imports SwiftUI or UIKit.
 
 Feature modules cannot import each other, so anything more than one screen needs lives here — and
-nothing that doesn't. `TimeControl` and `GameConfiguration` are currently the whole module.
+nothing that doesn't. `TimeControl`, `GameConfiguration` and the time reading are currently the
+whole module.
 
 ---
 
@@ -71,6 +72,32 @@ the boundary it describes is between two feature modules, which cannot import on
 
 ---
 
+## Time Reading
+
+How a time is written for a player to read. One accessor on `Duration`, serving the clock, turns and
+statistics screens.
+
+    1:30:00 · 59:59 · 3:07 · 0:08 · 0:00
+
+`h:mm:ss` from an hour up, `m:ss` below it. The leading unit is unpadded, everything after it padded
+to two digits. Under a minute it keeps its `0:` — a bare `8` does not read as a time.
+
+**Whole seconds only.** No tenths anywhere. The handoff shows tenths below twenty seconds and the
+ticket asked for them under a minute; both were dropped for the first pass. Adding them later
+changes this accessor and no screen.
+
+**Truncates towards zero, never rounds.** 1.9 seconds left reads `0:01` — rounding up would show a
+player time they do not have, the one direction a clock must not err in. Negatives clamp to `0:00`.
+
+Integer arithmetic on the duration's components, no date formatter and no locale — which is also why
+it holds no String Catalog entry.
+
+One accessor rather than a family: with tenths gone, turn durations, totals and the running clock
+all want the same string. `Duration` rather than `TimeInterval` because the clock's timing is
+monotonic (ZN-25) and produces durations naturally.
+
+---
+
 ## What Deliberately Is Not Here
 
 The preset catalogue lives in the **Setup** module. There is no `Ruleset` type and no category type
@@ -92,7 +119,7 @@ Moved out of Core on 2026-08-19, during ZN-15.
 
 ## Not Built Yet
 
-- Duration formatting for the clock, turns and statistics screens (ZN-23 onwards)
+- Tenths of a second in the time reading — deliberately out of the first pass, see Time Reading
 - A String Catalog for the rest of the user-facing copy (ZN-60), and a decision on whether modules
   that render the same string share an entry — see Reading A Time Control. The Setup module carries
   its own catalog already.
@@ -108,4 +135,8 @@ Moved out of Core on 2026-08-19, during ZN-15.
 - [x] A game configuration carries a time control and the category name of the ruleset it came from.
 - [x] A game configuration is a value, so a started game is unaffected by later selection changes —
       covered by the Setup module's presenter tests, since that is where a configuration is made.
-- [x] Time control is covered by unit tests.
+- [x] One time reading serves the clock, turns and statistics screens.
+- [x] The reading switches format at the hour and at the minute, truncates towards zero and clamps
+      negatives to `0:00`.
+- [x] The reading is locale-independent and holds no user-facing copy.
+- [x] Time control and the time reading are covered by unit tests.
