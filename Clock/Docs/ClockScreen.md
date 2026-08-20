@@ -17,8 +17,9 @@ the timing, the tap handling, the control bar, the move number and the game-over
 with its own ticket, and each one fills in part of this shell. Until then nothing on screen promises
 behaviour that is not there.
 
-The screen is also not reachable yet. The setup screen's START GAME bar goes nowhere; the routing
-that connects them is ZN-67 and ZN-62.
+The screen is also not reachable yet. The app can push it — the router, the destination carrying a
+game configuration and the navigation stack all exist (ZN-67) — but the setup screen's START GAME
+bar still goes nowhere. Connecting the two is ZN-62.
 
 ---
 
@@ -61,7 +62,8 @@ clock's bar is chrome above a fixed layout.
 
 ### Not built yet
 
-- The **back button** is the system's, and arrives with the routing that pushes this screen (ZN-67).
+- The **back button** is the system's. It appears as soon as the screen is pushed, which needs the
+  setup-side wiring (ZN-62).
 - The **move number** (`MOVE 1`) as a trailing item (ZN-25).
 
 ---
