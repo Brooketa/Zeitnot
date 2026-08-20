@@ -11,6 +11,8 @@ public struct ClockView: View {
 
     public var body: some View {
         VStack(spacing: .lg) {
+            Header(model: presenter.headerModel, action: onHeaderAction)
+
             clocks
 
             ControlBar(action: onControlBarAction)
@@ -23,13 +25,8 @@ public struct ClockView: View {
 		}
         .padding(.lg)
         .primaryBackground()
-        .navigationTitle(presenter.title)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                moveNumber
-            }
-        }
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden()
         .supportsLandscape()
     }
 
@@ -43,15 +40,15 @@ public struct ClockView: View {
         }
     }
 
-    var moveNumber: some View {
-        Text(presenter.moveNumber)
-            .label(ColorPalette.textSecondary)
-            .textCase(.uppercase)
-    }
-
 }
 
 private extension ClockView {
+
+    func onHeaderAction(_ action: Header.Action) {
+        switch action {
+        case .back: presenter.navigateBack()
+        }
+    }
 
     func onClockFaceAction(_ action: ClockFace.Action) {
         switch action {

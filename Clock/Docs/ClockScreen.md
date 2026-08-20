@@ -92,34 +92,42 @@ instead of in real time.
 
 ---
 
-## Navigation Bar
+## Header
 
-The system navigation bar, not a custom one, carrying the ruleset as its title:
+A **custom header**, not the system navigation bar, which this screen hides:
 
-    ● CLASSICAL · 90 | 30
+    ‹  ● CLASSICAL · 90 | 30                                    MOVE 1
 
-The bullet, the middle dot and the uppercasing are the **clock's** presentation. The configuration
-supplies the category in natural casing (`Classical`) and two integers; this screen composes the
-rest, so the setup module has no say in how the clock names a ruleset.
+**The back control** is a circular Liquid Glass button with an ink chevron and no tint. It carries
+an accessibility label, since a glyph alone says nothing to VoiceOver.
 
-The reading is held in the module's String Catalog under a named key, so neither the presenter nor
-any view writes a `|` or a `·` as a Swift literal. The Setup module keeps its own entry for the same
-`90 | 30` reading — String Catalog symbols are generated per target, so the two cannot share one
-until ZN-60 decides where shared copy lives. That duplication is the reason ZN-60 exists and is the
-one place the two modules can drift.
+**The dot is a running indicator**, not decoration: accent while a clock is counting down, grey
+before the first press, while paused and once the game is over. It cross-fades over 200ms.
 
-Because a navigation title is a string rather than a view, the **presenter** uppercases the
-category. The setup screen does the same thing with a text-case modifier, which a title bar does not
-offer.
+**The ruleset** reads `CLASSICAL · 90 | 30`. The middle dot and the uppercasing are the clock's
+presentation — the configuration supplies a category in natural casing and two integers. The reading
+lives in the module's String Catalog under a named key, so no view writes a `|` or a `·` as a Swift
+literal. Setup keeps its own entry for the same reading until ZN-60 decides where shared copy lives.
 
-The title is displayed **inline**. The large title belongs to a screen being read top to bottom; the
-clock's bar is chrome above a fixed layout.
+**The move number** reads `MOVE 1` from the start and counts *chess* moves rather than turns: a move
+is White's turn together with Black's reply, so it advances when **Black** presses, not White.
 
-The **back button** is the system's, and appears because the screen is pushed rather than presented.
+### Why it is not the system bar
 
-The **move number** is the trailing item, reading `MOVE 1` from the start. It counts *chess* moves,
-not turns: a move is White's turn together with Black's reply, so it advances when **Black** presses,
-not when White does.
+Two reasons, either of which would be enough.
+
+A navigation title is a **string**, so the status dot could not be a coloured view — it was a literal
+`●` inside the copy, rendering in one colour and unable to say anything. Presentation had been baked
+into a translatable string.
+
+And the screen's dialogs are presented **inside** the view, which is what lets them fade and blur
+rather than slide. A system bar draws above that, so the back button stayed live over a paused game.
+
+Hiding the bar also **disables back-swipe**, which this screen wants: the device lies flat between
+two players tapping for a whole game, and a stray edge swipe would abandon it with no confirmation
+and nothing to return to. Leaving is a deliberate tap on the back control.
+
+Both are reversals of `project-overview.md`'s "native navigation everywhere", recorded there too.
 
 ---
 
@@ -127,7 +135,7 @@ not when White does.
 
 One player's card: their name above their remaining time, centred on white, 26pt radius, soft
 shadow. Nothing else — the mockup's `0 MOVES · +30S` line is dropped, since the increment already
-reads from the navigation bar.
+reads from the header.
 
 The card is passive in the sense that matters: it renders what it is given, reports that it was
 pressed, and decides nothing. It owns no timing and no rules — what a press means is settled above
@@ -346,3 +354,8 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] Cancelling a reset leaves the game exactly as it was, clock still counting.
 - [x] After a reset the game behaves like a fresh one, Black pressing first.
 - [x] Reset is reachable while running, while paused, and once finished.
+- [x] The screen carries a custom header and hides the system navigation bar.
+- [x] The back control is Liquid Glass with an ink chevron, no tint, and a VoiceOver label.
+- [x] The status dot is accent only while a clock counts down, and grey in every other state.
+- [x] No user-facing string in the module contains a `●`.
+- [x] Back-swipe does nothing; leaving is a deliberate tap.

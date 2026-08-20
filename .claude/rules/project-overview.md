@@ -91,11 +91,17 @@ Cross-cutting product decisions, not implementation details:
 - **Portrait throughout, except the clock screen, which is landscape.** A screen declares this with
   the single modifier `CoreUI` provides and never names a window scene or an orientation mask. On
   iPad every orientation is allowed everywhere.
-- **Native navigation everywhere** — the system navigation bar and its back button on every screen.
-  This is a deliberate override of the mockups, which draw a custom circular chevron on the clock
-  screen. It buys correct back-swipe, large-title transitions and accessibility for free. More
-  broadly: **reuse as much as possible from Apple, and build custom only where the design genuinely
-  requires it.**
+- **Native navigation everywhere except the clock screen**, which carries a custom header (ZN-76).
+  The setup screen uses the system bar and its back button. More broadly the rule still holds:
+  **reuse as much as possible from Apple, and build custom only where the design genuinely requires
+  it** — the clock screen is where it genuinely does, for two reasons. Its dialogs are presented
+  inside the view so they can fade and blur, and a system bar would always draw on top of them; and
+  its title carries a **live status dot**, which a navigation title cannot express because it is a
+  plain string.
+- **Back-swipe is disabled on the clock screen.** The device lies flat between two players tapping
+  for a whole game, so an edge swipe is far too easy to make by accident — and it would abandon a
+  game with no confirmation and no history to return to. This is the one place the app gives up a
+  system gesture on purpose.
 - The clock **must not drift**, and must survive backgrounding
 - **Nothing persists.** No saved configuration and no saved game history
 - Colours are defined as colorsets so adding **dark mode** later does not mean touching every screen

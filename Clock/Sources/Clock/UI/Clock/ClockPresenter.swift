@@ -5,12 +5,13 @@ import Core
 @Observable
 public final class ClockPresenter {
 
-    public var title: String {
-        String(localized: .rulesetTitle(category, timeControl.baseMinutes, timeControl.incrementSeconds))
-    }
-
-    var moveNumber: LocalizedStringResource {
-        .moveNumber(state.black.moveCount + 1)
+    var headerModel: Header.Model {
+        Header.Model(
+            category: gameConfiguration.category,
+            baseMinutes: timeControl.baseMinutes,
+            incrementSeconds: timeControl.incrementSeconds,
+            moveNumber: state.black.moveCount + 1,
+            isRunning: !isPaused)
     }
 
     var whiteClock: ClockFace.Model {
@@ -37,6 +38,7 @@ public final class ClockPresenter {
 
     private let gameConfiguration: GameConfiguration
     private let gameService: GameServiceProtocol
+    private let router: ClockRoutingProtocol
 
     private var state: GameState {
         gameService.state
@@ -56,17 +58,22 @@ public final class ClockPresenter {
         }
     }
 
-    private var category: String {
-        gameConfiguration.category.uppercased()
-    }
-
     private var timeControl: TimeControl {
         gameConfiguration.timeControl
     }
 
-    public init(gameConfiguration: GameConfiguration, gameService: GameServiceProtocol) {
+    public init(
+        gameConfiguration: GameConfiguration,
+        gameService: GameServiceProtocol,
+        router: ClockRoutingProtocol
+    ) {
         self.gameConfiguration = gameConfiguration
         self.gameService = gameService
+        self.router = router
+    }
+
+    func navigateBack() {
+        router.navigateBack()
     }
 
     func press(_ side: ClockFace.Side) {
