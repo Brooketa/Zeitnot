@@ -1,18 +1,27 @@
 import SwiftUI
-import Core
 import CoreUI
 
 struct ClockFace: View {
 
-    @SwiftUI.State private var isPulsing = false
-
     let model: Model
     let action: (Action) -> Void
+
+	private var appearance: State.Appearance {
+		model.state.appearance
+	}
+
+	private var pulseAnimation: Animation? {
+		guard isPulsing else { return nil }
+
+		return .easeInOut(duration: Constants.pulseDuration).repeatForever(autoreverses: true)
+	}
+
+    @SwiftUI.State private var isPulsing = false
 
     var body: some View {
         content
             .alignCenter()
-            .background(model.state.fill)
+            .background(appearance.fill)
             .clipShape(cardShape)
             .overlay {
                 turnRing
@@ -31,21 +40,17 @@ struct ClockFace: View {
     var content: some View {
         VStack(spacing: .sm) {
             Text(model.name)
-                .playerName(model.state.nameColor)
+                .playerName(appearance.name)
                 .textCase(.uppercase)
 
             Text(model.time)
-                .clockDigits(model.state.digitsColor)
+                .clockDigits(appearance.digits)
 
-            caption
+			Text(model.caption ?? Constants.captionPlaceholder)
+				.micro(appearance.caption)
+				.textCase(.uppercase)
+				.opacity(model.caption == nil ? 0 : 1)
         }
-    }
-
-    var caption: some View {
-        Text(model.caption ?? Constants.captionPlaceholder)
-            .micro(model.state.captionColor)
-            .textCase(.uppercase)
-            .opacity(model.caption == nil ? 0 : 1)
     }
 
     var cardShape: RoundedRectangle {
@@ -54,21 +59,15 @@ struct ClockFace: View {
 
     @ViewBuilder
     var turnRing: some View {
-        if model.state.showsTurnRing {
+        if appearance.ring != .none {
             cardShape
                 .strokeBorder(ColorPalette.accent, lineWidth: Constants.turnRingWidth)
                 .opacity(isPulsing ? Constants.pulseOpacity : 1)
                 .animation(pulseAnimation, value: isPulsing)
                 .task(id: model.state) {
-                    isPulsing = model.state == .lowTime
+                    isPulsing = appearance.ring == .pulsing
                 }
         }
-    }
-
-    var pulseAnimation: Animation? {
-        guard isPulsing else { return nil }
-
-        return .easeInOut(duration: Constants.pulseDuration).repeatForever(autoreverses: true)
     }
 
 }
@@ -85,38 +84,77 @@ extension ClockFace {
 
     }
 
+	enum Side {
+
+		case white
+		case black
+
+	}
+
+	enum State {
+
+		case awaitingStart
+		case toMove
+		case lowTime
+		case waiting
+		case flagged
+
+	}
+
+	enum Action {
+
+		case press(Side)
+
+	}
+
 }
 
-extension ClockFace {
+private extension ClockFace.State {
 
-    enum Side {
-
-        case white
-        case black
-
+    var appearance: Appearance {
+        switch self {
+        case .awaitingStart, .waiting:
+            Appearance(
+                fill: ColorPalette.surface,
+                name: ColorPalette.textSecondary,
+                digits: ColorPalette.textSecondary,
+                caption: ColorPalette.accent,
+                ring: .none)
+        case .toMove:
+            Appearance(
+                fill: ColorPalette.surface,
+                name: ColorPalette.accent,
+                digits: ColorPalette.ink,
+                caption: ColorPalette.accent,
+                ring: .steady)
+        case .lowTime:
+            Appearance(
+                fill: ColorPalette.surface,
+                name: ColorPalette.accent,
+                digits: ColorPalette.ink,
+                caption: ColorPalette.accent,
+                ring: .pulsing)
+        case .flagged:
+            Appearance(
+                fill: ColorPalette.accent,
+                name: ColorPalette.inkInverse,
+                digits: ColorPalette.inkInverse,
+                caption: ColorPalette.inkInverse,
+                ring: .none)
+        }
     }
 
 }
 
-extension ClockFace {
+private extension ClockFace.State {
 
-    enum Action {
+    struct Appearance {
 
-        case press(Side)
-
-    }
-
-}
-
-extension ClockFace {
-
-    enum State {
-
-        case awaitingStart
-        case toMove
-        case lowTime
-        case waiting
-        case flagged
+        let fill: Color
+        let name: Color
+        let digits: Color
+        let caption: Color
+        let ring: Ring
 
     }
 
@@ -124,38 +162,12 @@ extension ClockFace {
 
 private extension ClockFace.State {
 
-    var fill: Color {
-        switch self {
-        case .awaitingStart, .toMove, .lowTime, .waiting: ColorPalette.surface
-        case .flagged: ColorPalette.accent
-        }
-    }
+    enum Ring {
 
-    var digitsColor: Color {
-        switch self {
-        case .awaitingStart, .waiting: ColorPalette.textSecondary
-        case .toMove, .lowTime: ColorPalette.ink
-        case .flagged: ColorPalette.inkInverse
-        }
-    }
+        case none
+        case steady
+        case pulsing
 
-    var nameColor: Color {
-        switch self {
-        case .awaitingStart, .waiting: ColorPalette.textSecondary
-        case .toMove, .lowTime: ColorPalette.accent
-        case .flagged: ColorPalette.inkInverse
-        }
-    }
-
-    var captionColor: Color {
-        switch self {
-        case .awaitingStart, .toMove, .lowTime, .waiting: ColorPalette.accent
-        case .flagged: ColorPalette.inkInverse
-        }
-    }
-
-    var showsTurnRing: Bool {
-        self == .toMove || self == .lowTime
     }
 
 }

@@ -3,9 +3,10 @@ import Observation
 import Core
 @testable import Clock
 
-struct ClockPresenterObservationTests {
+struct ClockPresenterObservationTests: ClockPresenterTestSuite {
 
-    private let timeSource = FakeTimeSource()
+    let timeSource = FakeTimeSource()
+    let router = FakeClockRouter()
 
     @Test
     func pressingInvalidatesEveryObserverOfTheClockModels() {
@@ -14,7 +15,7 @@ struct ClockPresenterObservationTests {
 
         withObservationTracking {
             _ = presenter.whiteClock
-            _ = presenter.isPaused
+            _ = presenter.isCountingDown
         } onChange: {
             observation.fired = true
         }
@@ -41,15 +42,6 @@ struct ClockPresenterObservationTests {
         presenter.confirmReset()
 
         #expect(observation.fired)
-    }
-
-    private func makePresenter() -> ClockPresenter {
-        let timeControl = TimeControl(baseMinutes: 3, incrementSeconds: 2)
-
-        return ClockPresenter(
-            gameConfiguration: GameConfiguration(timeControl: timeControl, category: "Blitz"),
-            gameService: GameService(timeControl: timeControl, timeSource: timeSource),
-            router: FakeClockRouter())
     }
 
 }

@@ -31,7 +31,7 @@ public struct ClockView: View {
     }
 
     var clocks: some View {
-        TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: presenter.isPaused)) { _ in
+        TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: !presenter.isCountingDown)) { _ in
             HStack(spacing: .lg) {
                 ClockFace(model: presenter.whiteClock, action: onClockFaceAction)
 

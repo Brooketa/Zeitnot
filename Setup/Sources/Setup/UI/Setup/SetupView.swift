@@ -14,7 +14,7 @@ public struct SetupView: View {
             VStack(alignment: .leading, spacing: .xxl) {
                 subtitle
 
-                PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSelected)
+                PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSectionAction)
             }
             .padding(.horizontal, .lg)
             .padding(.bottom, .xxl)
@@ -36,8 +36,10 @@ public struct SetupView: View {
 
 private extension SetupView {
 
-    func onPresetRulesetSelected(_ ruleset: PresetRuleset) {
-        presenter.select(ruleset)
+    func onPresetRulesetSectionAction(_ action: PresetRulesetSection.Action) {
+        switch action {
+        case let .select(ruleset): presenter.select(ruleset)
+        }
     }
 
     func onStartGameBarAction(_ action: StartGameBar.Action) {

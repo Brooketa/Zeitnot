@@ -15,12 +15,8 @@ struct SectionCard<Content: View>: View {
 
 }
 
-private extension SectionCard {
+private enum Constants {
 
-    enum Constants {
-
-        static var cornerRadius: CGFloat { 16 }
-
-    }
+    static let cornerRadius: CGFloat = 16
 
 }

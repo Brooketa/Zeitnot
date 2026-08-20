@@ -57,7 +57,7 @@ struct StartGameBar: View {
 	}
 
 	var arrow: some View {
-		Image(systemName: Constants.arrowSymbol)
+		Image.startGame
 			.font(.system(size: Constants.arrowSize, weight: .bold))
 			.foregroundStyle(ColorPalette.inkInverse)
 			.frame(width: Constants.arrowDiameter, height: Constants.arrowDiameter)
@@ -90,8 +90,6 @@ extension StartGameBar {
 private extension StartGameBar {
 
     enum Constants {
-
-        static var arrowSymbol: String { "arrow.right" }
 
         static let arrowSize: CGFloat = 14
         static let arrowDiameter: CGFloat = 36

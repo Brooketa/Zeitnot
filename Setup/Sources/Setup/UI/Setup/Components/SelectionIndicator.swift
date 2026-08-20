@@ -11,7 +11,7 @@ struct SelectionIndicator: View {
             .background(Circle().fill(fillColor))
             .overlay {
                 if isSelected {
-                    Image(systemName: "checkmark")
+                    Image.selected
                         .font(.system(size: Constants.checkmarkSize, weight: .bold))
                         .foregroundStyle(ColorPalette.inkInverse)
                 }
