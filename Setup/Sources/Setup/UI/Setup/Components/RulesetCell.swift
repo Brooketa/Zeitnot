@@ -27,12 +27,10 @@ private extension RulesetCell {
                     .micro()
                     .textCase(.uppercase)
 
-                Text(timeControlNotation)
-                    .title()
+                timeControlNotation
 
                 Text(model.ruleset.description)
                     .callout()
-                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -42,10 +40,11 @@ private extension RulesetCell {
         .contentShape(.rect)
     }
 
-    var timeControlNotation: String {
+    var timeControlNotation: Text {
         let timeControl = model.ruleset.timeControl
 
-        return "\(timeControl.baseMinutes) | \(timeControl.incrementSeconds)"
+        return Text("\(timeControl.baseMinutes) | \(timeControl.incrementSeconds)")
+            .title()
     }
 
 }
