@@ -197,6 +197,25 @@ between the tap and the opponent's clock running.
 
 ---
 
+## Pausing
+
+`PAUSE` in the control bar stops the running clock where it stands, and a dialog fades in over the
+board with the clocks blurred behind a scrim. It reads `PAUSED`, names the player whose turn will
+resume (`WHITE TO MOVE`), and offers `RESUME`.
+
+No time is consumed while it is up, however long the pause lasts, and resuming continues **the same
+turn** — the move counts do not change and no increment is credited.
+
+The clocks cannot be pressed while paused because the dialog is in the way, so that is a matter of
+layout rather than a rule the press logic has to enforce.
+
+The dialog covers the board but **not the navigation bar**, which stays above it — the back button
+and the move number remain visible and live while a game is paused. Covering them would mean
+replacing the system bar with a custom header, which is a decision for the whole app rather than
+this dialog.
+
+---
+
 ## Orientation
 
 This is the **only landscape screen in the app**. It declares that with the single modifier CoreUI
@@ -223,9 +242,8 @@ on screen. **Deliberately absent** afterwards is the opposite: things that were 
 
 - **Backgrounding** — a running game must come back paused and still correct after the app has been
   suspended or interrupted, and the screen must not sleep through a long think.
-- **The pause overlay and the reset confirmation** — the two buttons are built and work, but pausing
-  shows no overlay naming the player to move, and reset does not yet ask before throwing away a game
-  in progress.
+- **The reset confirmation** — `RESET` works, but does not yet ask before throwing away a game in
+  progress.
 - **Low-time warning** — a pulsing accent border on the running half below ten seconds. The clock
   face gains two more states with it: the running half keeps its fill and gains the border, and the
   *waiting* half below the threshold turns to a tinted fill with darker type — a still warning, since
@@ -304,3 +322,7 @@ Covering what exists today. Items for behaviour that is not built yet are not li
 - [x] A double press switches once, without a debounce.
 - [x] The caption slot holds its height whether or not it has text, so the digits never jump.
 - [x] The press rules are covered by presenter tests that advance time without waiting.
+- [x] Pausing raises a dialog naming the player whose turn resumes.
+- [x] No time reaches either clock while paused, however long the pause lasts.
+- [x] Resuming continues the same turn, leaving the move counts untouched.
+- [x] The clocks cannot be pressed while the pause dialog is up.
