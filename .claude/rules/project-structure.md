@@ -234,10 +234,23 @@ targets: [
 
 Each feature module follows a consistent internal layout:
 
+`Common/` sits **beside** the module's source folder, not inside it, so a reader can tell at a glance
+what is screen code and what the whole module shares:
+
 ```
 FeatureName/
 ├── Package.swift
 └── Sources/
+    ├── Common/                             # Shared by every screen in this module
+    │   ├── Navigation/                     # The module's routing protocol
+    │   │   └── FeatureRoutingProtocol.swift
+    │   ├── Extensions/                     # Type extensions scoped to this feature
+    │   ├── Images/                         # Images/icons used only within this feature
+    │   │   └── Image+Extensions.swift
+    │   ├── Components/                     # UI components reused across screens
+    │   └── Resources/
+    │       └── Localization/
+    │           └── Localizable.xcstrings
     └── FeatureName/
         ├── UI/
         │   ├── ScreenOne/
@@ -263,13 +276,6 @@ FeatureName/
         │   │       └── DomainClientModel.swift
         │   └── ScreenTwo/
         │       └── ...
-        ├── Common/
-        │   ├── Extensions/                 # Type extensions scoped to this feature
-        │   │   └── ...
-        │   ├── Components/                 # UI components reused across screens in this feature
-        │   │   └── ...
-        │   └── Images/                     # Images/icons used only within this feature
-        │       └── FeatureImages.swift
         └── Models/                         # Optional: shared feature-level models (e.g. SelectedFilter)
 ```
 
@@ -278,6 +284,18 @@ FeatureName/
 ```
 Movies/
 └── Sources/
+    ├── Common/
+    │   ├── Navigation/
+    │   │   └── MoviesRoutingProtocol.swift
+    │   ├── Extensions/
+    │   │   └── Movie+Formatting.swift
+    │   ├── Components/
+    │   │   └── MovieRatingBadge.swift
+    │   ├── Images/
+    │   │   └── Image+Extensions.swift
+    │   └── Resources/
+    │       └── Localization/
+    │           └── Localizable.xcstrings
     └── Movies/
         ├── UI/
         │   ├── MovieList/
@@ -311,13 +329,6 @@ Movies/
         │       │   ├── MovieUseCaseProtocol.swift
         │       │   └── MovieUseCaseModel.swift
         │       └── ...
-        ├── Common/
-        │   ├── Extensions/
-        │   │   └── Movie+Formatting.swift
-        │   ├── Components/
-        │   │   └── MovieRatingBadge.swift
-        │   └── Images/
-        │       └── MoviesImages.swift
         └── Models/                         # Optional: e.g. SelectedFilter
             └── Movie.swift
 ```
@@ -325,6 +336,13 @@ Movies/
 ---
 
 ## Layer Responsibilities
+
+**`Common/Navigation/`**
+- Holds the module's routing protocol — `FeatureRoutingProtocol` — which is the contract whoever
+  navigates the module implements, and the one file in a feature the app target must know about.
+- It belongs to the **module**, not to a screen: it says how the app enters and leaves the feature,
+  and it serves every screen the module grows. Keeping it in the first screen's folder only works
+  while there is one screen.
 
 **`Presenter`**
 - Owns the screen's state and drives the `View`
@@ -411,8 +429,8 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 
 | Originally in | Needed by | Move to |
 |---|---|---|
-| Screen's `Components/` | Another screen in the same feature | `FeatureName/Common/Components/` |
-| Screen's layer (`UseCase/`, `Client/`, etc.) | Another screen in the same feature | `FeatureName/Common/` |
+| Screen's `Components/` | Another screen in the same feature | `Sources/Common/Components/` |
+| Screen's layer (`UseCase/`, `Client/`, etc.) | Another screen in the same feature | `Sources/Common/` |
 | `Common/Components/` | Another feature module | `CoreUI/Components/` |
 | `Common/Extensions/` | Another feature module | `Core/Extensions/` |
 | `Common/Images/` | Another feature module | `CoreUI/Images/` |
@@ -431,7 +449,8 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 4. Link the module product to the App target: an `XCSwiftPackageProductDependency` with only
    `productName`, plus a `PBXBuildFile` in the target's Frameworks build phase. Confirm
    `packageReferences` still contains no local packages.
-5. Add a `Docs/` folder at the package root for the module's behavioural spec file(s).
+5. Add a `Docs/` folder at the package root for the module's behavioural spec file(s), and put the
+   module's routing protocol in `Sources/Common/Navigation/`.
 6. Wire the module's entry screen in: a `NavigationDestination` case, a presenter factory on
    `Dependencies`, and the router's conformance to that module's own `Routing` protocol.
 7. Do not import other feature modules — use protocol-based injection if cross-feature communication is needed.
