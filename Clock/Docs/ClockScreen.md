@@ -14,12 +14,13 @@ their own half. This document describes what the screen does today.
         3:00                                3:00
                                       PRESS TO START
 
-                    PAUSE     RESET
+         DIGITAL | ANALOG   PAUSE   RESET
 ```
 
 - **Header** — a custom header, not the system bar. Back control, ruleset, move number.
 - **Two equal cards**, White left, Black right, both upright. Each is a full-height tap target.
-- **Control bar** — `PAUSE` and `RESET`, centred beneath.
+- **Control bar** — the `DIGITAL | ANALOG` control, `PAUSE` and `RESET`, centred as one row
+  beneath.
 
 ---
 
@@ -100,8 +101,19 @@ The presenter supplies data only; each face derives its own colours from the sta
 | Digital | The shared reading from `Core` — `h:mm:ss` from an hour up, `m:ss` below, whole seconds, truncating towards zero |
 | Analog | A dial: supplied artwork under a minute hand and a second hand |
 
-Until the `DIGITAL | ANALOG` toggle lands (ZN-51) the mode cannot be changed, and the card shows the
-analog face.
+The mode is chosen with the `DIGITAL | ANALOG` control in the control bar. **Digital is the
+default.** Selecting a mode changes both cards at once — the two are never in different modes.
+
+The control is **custom, not `UISegmentedControl`** — the platform control has a fixed 32pt height
+and offers no way to fill the selected segment with ink, so it could match neither the design nor the
+buttons beside it. It is a muted capsule track holding two segments, the selected one an inset ink
+capsule with inverse label; the selection slides between them with `matchedGeometryEffect`. Its
+labels are a size smaller than the buttons', so it reads as a mode switch rather than a third
+button.
+
+Switching is presentation only. It never pauses, resumes, resets, switches turns or touches a move
+count, and doing it mid-game while a clock runs is expected and safe. It also works while paused and
+once the game is over.
 
 - **Digits never move as they count** — monospaced, one fixed size, no scaling.
 - **The caption slot holds its height** whether or not it has text, so nothing jumps.

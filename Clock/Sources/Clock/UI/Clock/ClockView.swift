@@ -65,6 +65,7 @@ private extension ClockView {
         switch action {
         case .pause: presenter.pause()
         case .reset: presenter.reset()
+        case let .selectDisplayMode(mode): presenter.selectDisplayMode(mode)
         }
     }
 

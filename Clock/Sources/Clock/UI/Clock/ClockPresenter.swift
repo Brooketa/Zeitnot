@@ -5,18 +5,14 @@ import Core
 @Observable
 public final class ClockPresenter {
 
-    private(set) var displayMode: DisplayMode = .analog
+    private(set) var displayMode: DisplayMode = .digital
     private(set) var showResetDialog = false
 
     private let gameConfiguration: GameConfiguration
     private let gameService: GameServiceProtocol
     private let router: ClockRoutingProtocol
 
-    public init(
-        gameConfiguration: GameConfiguration,
-        gameService: GameServiceProtocol,
-        router: ClockRoutingProtocol
-    ) {
+    public init(gameConfiguration: GameConfiguration, gameService: GameServiceProtocol, router: ClockRoutingProtocol) {
         self.gameConfiguration = gameConfiguration
         self.gameService = gameService
         self.router = router
@@ -36,7 +32,9 @@ public final class ClockPresenter {
     }
 
     var controlBarModel: ControlBar.Model {
-        ControlBar.Model(canPause: !isGameOver)
+        ControlBar.Model(
+            canPause: !isGameOver,
+            displayModeControl: DisplayModeControl.Model(displayMode: displayMode))
     }
 
     var pauseDialogModel: PauseDialog.Model {
@@ -93,6 +91,10 @@ public final class ClockPresenter {
         case let .running(active) where active == player: gameService.endTurn()
         default: break
         }
+    }
+
+    func selectDisplayMode(_ mode: DisplayMode) {
+        displayMode = mode
     }
 
     func pause() {
