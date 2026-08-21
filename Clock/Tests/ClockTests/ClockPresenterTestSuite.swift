@@ -57,3 +57,11 @@ private extension DialHands {
     }
 
 }
+
+extension ClockFace.TimeDisplay {
+
+    var isAnalog: Bool {
+        if case .analog = self { true } else { false }
+    }
+
+}
