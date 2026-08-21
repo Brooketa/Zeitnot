@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "analogMode": {
+      "comment": "Control bar segment showing the clock as a dial. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analog"
+          }
+        }
+      }
+    },
     "backButton": {
       "comment": "Accessibility label for the clock screen's back control.",
       "extractionState": "manual",
@@ -45,6 +57,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reset"
+          }
+        }
+      }
+    },
+    "digitalMode": {
+      "comment": "Control bar segment showing the clock as digits. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digital"
           }
         }
       }

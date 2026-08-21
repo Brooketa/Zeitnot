@@ -24,3 +24,44 @@ extension ClockPresenterTestSuite {
     }
 
 }
+
+extension ClockFace.Model {
+
+    var reading: String {
+        switch timeDisplay {
+        case let .digital(digital): digital.reading
+        case let .analog(analog): analog.hands.remaining.timeReading
+        }
+    }
+
+}
+
+extension ClockPresenter {
+
+    var whiteClock: ClockFace.Model {
+        clocksModel.white
+    }
+
+    var blackClock: ClockFace.Model {
+        clocksModel.black
+    }
+
+}
+
+private extension DialHands {
+
+    static let secondsPerMinuteHandDegree: Double = 10
+
+    var remaining: Duration {
+        .seconds(minuteDegrees * Self.secondsPerMinuteHandDegree)
+    }
+
+}
+
+extension ClockFace.TimeDisplay {
+
+    var isAnalog: Bool {
+        if case .analog = self { true } else { false }
+    }
+
+}

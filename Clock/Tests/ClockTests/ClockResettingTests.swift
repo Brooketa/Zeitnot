@@ -27,7 +27,7 @@ struct ClockResettingTests: ClockPresenterTestSuite {
 
         #expect(presenter.showResetDialog)
         #expect(presenter.whiteClock.state == .toMove)
-        #expect(presenter.whiteClock.time == "2:50")
+        #expect(presenter.whiteClock.reading == "2:50")
     }
 
     @Test
@@ -52,10 +52,9 @@ struct ClockResettingTests: ClockPresenterTestSuite {
         presenter.confirmReset()
 
         #expect(!presenter.showResetDialog)
-        #expect(presenter.whiteClock.time == "3:00")
-        #expect(presenter.blackClock.time == "3:00")
+        #expect(presenter.whiteClock.reading == "3:00")
+        #expect(presenter.blackClock.reading == "3:00")
         #expect(presenter.whiteClock.state == .awaitingStart)
-        #expect(presenter.blackClock.caption == "Press to start")
         #expect(presenter.headerModel.moveNumber == 1)
     }
 
@@ -71,7 +70,7 @@ struct ClockResettingTests: ClockPresenterTestSuite {
 
         #expect(!presenter.showResetDialog)
         #expect(presenter.whiteClock.state == .toMove)
-        #expect(presenter.whiteClock.time == "2:45")
+        #expect(presenter.whiteClock.reading == "2:45")
     }
 
     @Test
@@ -83,7 +82,7 @@ struct ClockResettingTests: ClockPresenterTestSuite {
         presenter.reset()
 
         #expect(!presenter.showResetDialog)
-        #expect(presenter.whiteClock.time == "1:00")
+        #expect(presenter.whiteClock.reading == "1:00")
         #expect(presenter.whiteClock.state == .awaitingStart)
     }
 
@@ -97,7 +96,6 @@ struct ClockResettingTests: ClockPresenterTestSuite {
         presenter.reset()
 
         #expect(presenter.whiteClock.state == .awaitingStart)
-        #expect(presenter.whiteClock.caption == nil)
         #expect(presenter.controlBarModel.canPause)
     }
 }

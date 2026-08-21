@@ -16,7 +16,7 @@ struct ClockLowTimeWarningTests: ClockPresenterTestSuite {
         presenter.press(.black)
 
         #expect(presenter.whiteClock.state == .toMove)
-        #expect(presenter.whiteClock.time == "0:11")
+        #expect(presenter.whiteClock.reading == "0:11")
 
         timeSource.advance(by: .seconds(2))
         presenter.press(.black)
@@ -60,7 +60,7 @@ struct ClockLowTimeWarningTests: ClockPresenterTestSuite {
         presenter.press(.black)
 
         #expect(presenter.whiteClock.state == .toMove)
-        #expect(presenter.whiteClock.time == "0:08")
+        #expect(presenter.whiteClock.reading == "0:08")
 
         timeSource.advance(by: .seconds(3))
         presenter.press(.black)

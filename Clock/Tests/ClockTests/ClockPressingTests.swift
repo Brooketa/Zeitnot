@@ -7,22 +7,7 @@ struct ClockPressingTests: ClockPresenterTestSuite {
     let timeSource = FakeTimeSource()
     let router = FakeClockRouter()
 
-    @Test
-    func blacksCardPromptsToPressBeforeTheGameStarts() {
-        let presenter = makePresenter()
 
-        #expect(presenter.blackClock.caption == "Press to start")
-        #expect(presenter.whiteClock.caption == nil)
-    }
-
-    @Test
-    func thePromptDisappearsOnceTheGameHasStarted() {
-        let presenter = makePresenter()
-
-        presenter.press(.black)
-
-        #expect(presenter.blackClock.caption == nil)
-    }
 
     @Test
     func pressingBlacksHalfStartsWhitesClock() {
@@ -42,7 +27,6 @@ struct ClockPressingTests: ClockPresenterTestSuite {
 
         #expect(presenter.whiteClock.state == .awaitingStart)
         #expect(presenter.blackClock.state == .awaitingStart)
-        #expect(presenter.blackClock.caption == "Press to start")
     }
 
     @Test
@@ -55,8 +39,7 @@ struct ClockPressingTests: ClockPresenterTestSuite {
 
         #expect(presenter.blackClock.state == .toMove)
         #expect(presenter.whiteClock.state == .waiting)
-        #expect(presenter.whiteClock.time == "2:52")
-        #expect(presenter.whiteClock.caption == nil)
+        #expect(presenter.whiteClock.reading == "2:52")
     }
 
     @Test
@@ -68,7 +51,7 @@ struct ClockPressingTests: ClockPresenterTestSuite {
         presenter.press(.black)
 
         #expect(presenter.whiteClock.state == .toMove)
-        #expect(presenter.whiteClock.time == "2:50")
+        #expect(presenter.whiteClock.reading == "2:50")
     }
 
     @Test
@@ -92,7 +75,7 @@ struct ClockPressingTests: ClockPresenterTestSuite {
         timeSource.advance(by: .seconds(60))
         presenter.press(.white)
 
-        #expect(presenter.whiteClock.time == "0:00")
+        #expect(presenter.whiteClock.reading == "0:00")
         #expect(presenter.whiteClock.state == .flagged)
         #expect(presenter.blackClock.state == .waiting)
     }

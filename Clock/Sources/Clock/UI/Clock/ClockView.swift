@@ -13,7 +13,9 @@ public struct ClockView: View {
         VStack(spacing: .large) {
             Header(model: presenter.headerModel, action: onHeaderAction)
 
-            clocks
+            TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: !presenter.isCountingDown)) { _ in
+                Clocks(model: presenter.clocksModel, action: onClocksAction)
+            }
 
             ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
         }
@@ -22,21 +24,11 @@ public struct ClockView: View {
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
         .supportsLandscape()
-		.presentFullScreen(if: presenter.showResetDialog) {
-			ResetDialog(action: onResetDialogAction)
-		}
-		.presentFullScreen(if: presenter.showPauseDialog) {
-			PauseDialog(model: presenter.pauseDialogModel, action: onPauseDialogAction)
-		}
-    }
-
-    var clocks: some View {
-        TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: !presenter.isCountingDown)) { _ in
-            HStack(spacing: .large) {
-                ClockFace(model: presenter.whiteClock, action: onClockFaceAction)
-
-                ClockFace(model: presenter.blackClock, action: onClockFaceAction)
-            }
+        .presentFullScreen(if: presenter.showResetDialog) {
+            ResetDialog(action: onResetDialogAction)
+        }
+        .presentFullScreen(if: presenter.showPauseDialog) {
+            PauseDialog(model: presenter.pauseDialogModel, action: onPauseDialogAction)
         }
     }
 
@@ -50,9 +42,9 @@ private extension ClockView {
         }
     }
 
-    func onClockFaceAction(_ action: ClockFace.Action) {
+    func onClocksAction(_ action: Clocks.Action) {
         switch action {
-        case let .press(player): presenter.press(player)
+        case let .press(side): presenter.press(side)
         }
     }
 
@@ -73,6 +65,7 @@ private extension ClockView {
         switch action {
         case .pause: presenter.pause()
         case .reset: presenter.reset()
+        case let .selectDisplayMode(mode): presenter.selectDisplayMode(mode)
         }
     }
 
@@ -82,7 +75,7 @@ private extension ClockView {
 
     enum Constants {
 
-        static let tickInterval: TimeInterval = 0.1
+        static let tickInterval: TimeInterval = 1.0 / 60
 
     }
 

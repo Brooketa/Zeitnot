@@ -14,12 +14,13 @@ their own half. This document describes what the screen does today.
         3:00                                3:00
                                       PRESS TO START
 
-                    PAUSE     RESET
+         DIGITAL | ANALOG   PAUSE   RESET
 ```
 
 - **Header** — a custom header, not the system bar. Back control, ruleset, move number.
 - **Two equal cards**, White left, Black right, both upright. Each is a full-height tap target.
-- **Control bar** — `PAUSE` and `RESET`, centred beneath.
+- **Control bar** — the `DIGITAL | ANALOG` control, `PAUSE` and `RESET`, centred as one row
+  beneath.
 
 ---
 
@@ -91,21 +92,63 @@ abandon a game with no confirmation and nothing to return to. Leaving is a delib
 One player's card: name above remaining time, centred on white, 26pt radius, soft shadow.
 
 The card renders what it is given and reports that it was pressed. It owns no timing and no rules.
+The presenter supplies data only; each face derives its own colours from the state it is handed.
 
-- **Time** comes from the shared reading in `Core` — `h:mm:ss` from an hour up, `m:ss` below, whole
-  seconds, truncating towards zero.
+**The card shows one of two faces**, chosen by a display mode. Both read the same remaining time.
+
+| Face | Shows |
+|---|---|
+| Digital | The shared reading from `Core` — `h:mm:ss` from an hour up, `m:ss` below, whole seconds, truncating towards zero |
+| Analog | A dial: supplied artwork under a minute hand and a second hand |
+
+The mode is chosen with the `DIGITAL | ANALOG` control in the control bar. **Digital is the
+default.** Selecting a mode changes both cards at once — the two are never in different modes.
+
+The control is **custom, not `UISegmentedControl`** — the platform control has a fixed 32pt height
+and offers no way to fill the selected segment with ink, so it could match neither the design nor the
+buttons beside it. It is a muted capsule track holding two segments, the selected one an inset ink
+capsule with inverse label; the selection slides between them with `matchedGeometryEffect`. Its
+labels are a size smaller than the buttons', so it reads as a mode switch rather than a third
+button.
+
+Switching is presentation only. It never pauses, resumes, resets, switches turns or touches a move
+count, and doing it mid-game while a clock runs is expected and safe. It also works while paused and
+once the game is over.
+
 - **Digits never move as they count** — monospaced, one fixed size, no scaling.
-- **The caption slot holds its height** whether or not it has text, so the digits never jump.
+- **The caption slot holds its height** whether or not it has text, so nothing jumps.
 
 | State | Card |
 |---|---|
-| Awaiting start | Muted name and digits. Black's card reads `PRESS TO START` |
-| To move | Accent name, ink digits, steady accent ring |
+| Awaiting start | Muted name, muted face. Black's card reads `PRESS TO START` |
+| To move | Accent name, ink face, accent second hand, steady accent ring |
 | Low time | As to-move, ring pulsing |
-| Waiting | Muted name and digits, no ring |
-| Flagged | Fills accent, inverse type, reads `FLAG FELL` |
+| Waiting | Muted name and face, no ring |
+| Flagged | Fills accent, inverse type and face, reads `FLAG FELL` |
 
 To-move and waiting differ by ring and name colour rather than fill, so neither card shouts.
+
+### The dial
+
+An ordinary clock face read **backwards from the 12**: each hand sits behind the 12 by the remaining
+time and travels clockwise as it is spent, so both reach the 12 at zero — the way a physical chess
+clock is set so the flag falls at the top of the hour.
+
+Two hands, no hour hand — a **minute** hand on a 60 minute revolution and a **second** hand on a 60
+second one. Bullet and blitz are read off the second hand, as they are on a real clock in time
+trouble.
+
+**`90 | 30` is ambiguous on the dial.** 90 minutes and 30 minutes both put the minute hand on the 6,
+and without an hour hand nothing separates them until the hand crosses the 12. It is the only preset
+affected — every other base time is under an hour. Accepted deliberately, and pinned by a test.
+
+**The hands are placed, never animated.** Every redraw positions them at the absolute angle for that
+instant, so there is no drift and no catch-up sweep after backgrounding. Animation is explicitly
+suppressed on the rotation: the second hand wraps 0° → 360° once a minute, and any inherited
+animation turns that wrap into a full spin.
+
+**The artwork carries no colour of its own** — it is a template, tinted per state, which is how the
+dial greys while waiting and inverts whole when flagged.
 
 ---
 
