@@ -11,13 +11,13 @@ public struct ClockView: View {
 
     public var body: some View {
         VStack(spacing: .large) {
-            Header(model: presenter.headerModel, action: onHeaderAction)
-
             TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: !presenter.isCountingDown)) { _ in
-                Clocks(model: presenter.clocksModel, action: onClocksAction)
-            }
+				Header(model: presenter.headerModel, action: onHeaderAction)
 
-            ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
+                Clocks(model: presenter.clocksModel, action: onClocksAction)
+
+				ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
+            }
         }
         .padding(.large)
         .primaryBackground()
