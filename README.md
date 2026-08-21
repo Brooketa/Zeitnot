@@ -60,9 +60,9 @@ The waiting half greys out; the half to move carries the accent ring.
 
 **Pause and reset**
 
-<img width="1266" height="585" alt="paused" src="https://github.com/user-attachments/assets/013cc810-04e0-4830-997f-65618de749f5" />
+<img width="640" alt="paused" src="https://github.com/user-attachments/assets/013cc810-04e0-4830-997f-65618de749f5" />
 
-<img width="1266" height="585" alt="reset" src="https://github.com/user-attachments/assets/858f2741-e24a-43a7-8dcd-50c9d7c86de0" />
+<img width="640" alt="reset" src="https://github.com/user-attachments/assets/858f2741-e24a-43a7-8dcd-50c9d7c86de0" />
 
 <sub>The flag-fell, paused and reset captures predate the face toggle, so their bottom row shows only PAUSE / RESET.</sub>
 
