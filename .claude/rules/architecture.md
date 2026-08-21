@@ -1,80 +1,82 @@
 # Architecture
 
-This project follows Clean Architecture divided into four strict layers.
-Each layer communicates only with the layer directly below it and all
-cross-layer dependencies are hidden behind protocols.
+This project layers a screen as **View → Presenter → Service**, with navigation entering and leaving
+through a routing protocol the app target implements.
 
-**Single source of truth** is a core principle of this architecture at every layer. Data enters the system at the Client level and flows strictly upward. No layer reaches sideways or skips down to fetch data from an alternative source. The Repository decides which DataSource is the source of truth for a given feature; the UseCase trusts the Repository entirely; the Presenter trusts the UseCase entirely.
+Each layer talks only to the layer directly below it, and every cross-layer dependency that *can* be
+a protocol is one. Each layer owns its own models and maps at the boundary — a view never sees a
+domain type.
+
+**Single source of truth** is the principle underneath all of it. State lives in exactly one place
+and flows upward. The Presenter trusts its Service entirely; the View trusts its Presenter entirely.
+No layer reaches sideways for an alternative copy of the same state.
 
 ---
 
 ## Layer Overview
 
 ```
-View -> Presenter -> UseCase -> Repository -> DataSource -> Client -> BaseClient
+View  ──▶  Presenter  ──▶  Service  ──▶  injected seam (e.g. a time source)
+              │
+              └──▶  Routing protocol  ──▶  the app's router
 ```
 
-Each layer has its own models. Never pass a model from one layer directly
-into another -- always map/convert at the boundary.
+That is the whole chain today. There is deliberately **no UseCase, Repository, DataSource or
+Client** anywhere in this project, because there is no data to fetch: the app is a chess clock with
+no network, no database and no persistence. Inventing those layers to hold nothing would be
+ceremony.
 
 ---
 
 ## Dependency Injection
 
-All dependencies are injected through the constructor (initializer injection). No layer
-creates its own dependencies internally. This applies at every level of the architecture:
+All dependencies are injected through the constructor. No layer creates its own dependencies
+internally, and every injected dependency is expressed as a **protocol**, never a concrete type.
 
-- View receives Presenter via constructor
-- Presenter receives UseCase via constructor
-- UseCase receives Repository via constructor
-- Repository receives DataSource(s) via constructor
-- DataSource receives Client via constructor
-- Client (e.g., ItemNetworkClient) receives BaseClient (e.g., BaseNetworkClient) via constructor
+```swift
+public final class ClockPresenter {
 
-All injected dependencies must be expressed as protocols, never as concrete types.
-This ensures every component is independently testable and replaceable.
+    private let gameService: GameServiceProtocol
+    private let router: ClockRoutingProtocol
 
-Example:
+    public init(gameConfiguration: GameConfiguration, gameService: GameServiceProtocol, router: ClockRoutingProtocol) { ... }
 
-    final class ItemPresenter: ItemPresenterProtocol {
-        private let itemUseCase: ItemUseCaseProtocol
+}
 
-        init(itemUseCase: ItemUseCaseProtocol) {
-            self.itemUseCase = itemUseCase
-        }
-    }
+public final class GameService: GameServiceProtocol {
 
-    final class ItemUseCase: ItemUseCaseProtocol {
-        private let itemRepository: ItemRepositoryProtocol
+    private let timeSource: TimeSourceProtocol
 
-        init(itemRepository: ItemRepositoryProtocol) {
-            self.itemRepository = itemRepository
-        }
-    }
+    public init(timeControl: TimeControl, timeSource: TimeSourceProtocol) { ... }
 
-    final class ItemRepository: ItemRepositoryProtocol {
-        private let remoteDataSource: ItemRemoteDataSourceProtocol
+}
+```
 
-        init(remoteDataSource: ItemRemoteDataSourceProtocol) {
-            self.remoteDataSource = remoteDataSource
-        }
-    }
+The chain is assembled in one place — `Dependencies` in the app target, the composition root. It is
+the only thing that names concrete types.
 
-    final class ItemRemoteDataSource: ItemRemoteDataSourceProtocol {
-        private let networkClient: ItemNetworkClientProtocol
+### Exception: the View holds its Presenter concretely
 
-        init(networkClient: ItemNetworkClientProtocol) {
-            self.networkClient = networkClient
-        }
-    }
+A View's Presenter is the one dependency that is **not** behind a protocol:
 
-    final class ItemNetworkClient: ItemNetworkClientProtocol {
-        private let baseNetworkClient: BaseNetworkClientProtocol
+```swift
+public struct ClockView: View {
 
-        init(baseNetworkClient: BaseNetworkClientProtocol) {
-            self.baseNetworkClient = baseNetworkClient
-        }
-    }
+    @State private var presenter: ClockPresenter
+
+    public init(presenter: ClockPresenter) { ... }
+
+}
+```
+
+This is a constraint, not a preference. Presenters are `@Observable`, and observation is delivered
+through `@State` holding the concrete type. A presenter behind an existential protocol would not
+drive the view — the screen would simply stop updating. So the type is concrete, while the
+dependency is still **injected** rather than constructed: the view never builds its own presenter,
+and whoever routes to the screen decides what it is showing.
+
+Testing does not suffer for it, because the Presenter's own dependencies are all protocols. A test
+substitutes the Service and the router and drives the real Presenter.
 
 ### Exception: services UIKit owns the lifetime of
 
@@ -92,199 +94,158 @@ still typed as the protocol rather than the concrete class. What is given up is 
 substitute it per call site — nothing else.
 
 This does not generalise. A shared instance is permitted only where the consumer is constructed by
-the system and cannot be reached any other way. Anything the app itself builds — every Presenter,
-UseCase, Repository, DataSource and Client — takes its dependencies through the constructor,
-without exception.
+the system and cannot be reached any other way.
 
 ---
 
 ## Presentation Layer
 
 ### View
+
 - Each View has exactly one Presenter. No exceptions.
-- Views are passive -- they only render state provided by the Presenter.
-- Views never talk to UseCases, Repositories, or DataSources directly.
+- Views are passive — they render state the Presenter gives them and report interactions back.
+- Views never talk to Services directly.
 
-### View Model & Action Extensions
-- Every view that receives data defines its own `Model` as a nested struct inside an extension on the view.
-- Every view that produces user interactions defines its own `Action` as a nested enum inside an extension on the view.
-- The Presenter is responsible for constructing the `Model` with all the data the view needs to render.
-- The View never sees domain or data-layer models directly -- only its own `Model`.
+### View Model & Action
 
-Example:
+- Every view that receives data defines its own `Model` as a nested struct in an extension.
+- Every view that produces interactions defines its own `Action` as a nested enum in an extension.
+- The Presenter constructs the `Model` with everything the view needs to render.
+- **The View never sees a domain type.** Where a view needs an identity, it declares its own
+  presentational enum rather than accepting the domain one.
 
-    struct ItemCard: View {
+```swift
+struct ClockFace: View {
 
-        let model: Model
-        let action: (Action) -> Void
+    let model: Model
+    let action: (Action) -> Void
 
-        var body: some View { ... }
+    var body: some View { ... }
+
+}
+
+extension ClockFace {
+
+    struct Model {
+
+        let side: Side
+        let name: String
+        let time: String
+        let state: State
 
     }
 
-    extension ItemCard {
+}
 
-        struct Model {
+extension ClockFace {
 
-            let title: String
-            let subtitle: String
-            let accentColor: Color
-            let isSelected: Bool
+    enum Action {
 
+        case press(Side)
+
+    }
+
+}
+```
+
+The parent switches over a child's `Action` in a private extension and calls the presenter:
+
+```swift
+private extension ClockView {
+
+    func onClockFaceAction(_ action: ClockFace.Action) {
+        switch action {
+        case let .press(side): presenter.press(side)
         }
-
     }
 
-    extension ItemCard {
+}
+```
 
-        enum Action {
+### Presenter
 
-            case select
-            case delete
+- `@Observable`, and holds no stored UI state it can compute instead — the models it exposes are
+  computed from the Service's state, so there is one copy of the truth.
+- Maps domain state into view models, and turns view actions into calls on a Service or the router.
+- Named `ScreenNamePresenter`, and lives beside its view.
 
-        }
+```swift
+var whiteClock: ClockFace.Model {
+    makeClockModel(for: .white)
+}
+```
 
-    }
-
-### Presenter (ViewModel)
-- Holds and exposes UI state to the View.
-- Calls UseCases to fetch or mutate data.
-- Maps UseCase models (ItemUseCaseModel) to Presenter-level view models (View.Model).
-- Exposed to the View only through its protocol.
-
-Example:
-
-    func fetchItems() async throws -> [ItemCard.Model] {
-        try await itemUseCase.fetchItems()
-            .map { ItemCard.Model(from: $0) }
-    }
+Localization belongs to the **view**, not the presenter: the `Model` carries the parameters a string
+needs, and the view builds the copy. A presenter that returns a finished sentence has become a
+string factory, and the format string stops being whole for a translator.
 
 ---
 
 ## Domain Layer
 
-### UseCase
-- One UseCase per feature (e.g., ItemUseCase for everything related to that feature).
-- Implements a protocol (e.g., ItemUseCaseProtocol) -- only the protocol is visible to the Presenter.
-- Contains business logic. Orchestrates one or more Repositories.
-- Trusts the Repository completely -- never decides where data comes from.
-- Maps Repository models (ItemRepositoryModel) to UseCase models (ItemUseCaseModel).
+### Service
 
-Example:
+Anything that **holds state or owns rules** is a Service. It lives in `Sources/<Module>/Services/`.
 
-    func fetchItems() async throws -> [ItemUseCaseModel] {
-        try await itemRepository.fetchItems()
-            .map { ItemUseCaseModel(from: $0) }
-    }
+- Implements a protocol (`GameServiceProtocol`) — only the protocol is visible to the Presenter.
+- Owns the feature's state and the rules that mutate it. `GameService` owns the two clocks, whose
+  turn it is, and what starting, ending a turn, pausing and resetting mean.
+- Exposes state as a value the Presenter reads, and intent-named methods that change it.
+- Takes its own dependencies — the seams that make it testable — through the constructor.
+
+**They are Services, not UseCases.** A UseCase is a stateless operation; these components keep state
+for the life of a screen, and calling one a UseCase would misdescribe it. One Service per coherent
+piece of domain behaviour — do not create fat services spanning unrelated features.
+
+### Seams
+
+Where a Service depends on something the test needs to control — the clock, the calendar, a random
+source — that dependency goes behind a small protocol and is injected:
+
+```swift
+public protocol TimeSourceProtocol {
+
+    var now: ContinuousClock.Instant { get }
+
+}
+```
+
+This is what lets a 90 minute game be played out in milliseconds instead of in real time, and it is
+the reason the clock's correctness is testable at all.
 
 ---
 
-## Data Layer
+## Navigation
 
-The Data Layer is composed of three components: Repository, DataSource, and Client.
-Together they form the single source of truth for the entire app -- data enters the
-system here and nowhere else.
+A feature does not know where it sits in the app. It declares **what it needs to be able to do**,
+and something above it obliges.
 
-### Models
-Each component in the Data Layer owns its models:
-- ItemClientModel -- raw model returned by the Client (e.g., decoded from JSON, BLE packet, etc.)
-- ItemDataSourceModel -- model owned by the DataSource, mapped from the Client model
-- ItemRepositoryModel -- model owned by the Repository, mapped from the DataSource model
+- Each module owns a routing protocol in `Sources/Common/Navigation/` — `SetupRoutingProtocol`,
+  `ClockRoutingProtocol`. It is the one file in a feature the app target must know about.
+- The protocol belongs to the **module**, not to a screen: it says how the app enters and leaves the
+  feature, and it serves every screen the module grows.
+- The Presenter takes it through the constructor, like any other dependency.
+- The app target owns a single `@Observable` router holding the navigation path, and conforms to
+  each feature's routing protocol in its own extension.
+- Destinations are cases on one `NavigationDestination` enum, carrying whatever the destination
+  needs to be built.
 
-Models never cross component boundaries without being explicitly mapped.
-
-### Repository
-- Implements a protocol (e.g., ItemRepositoryProtocol) -- only the protocol is visible to the UseCase.
-- Orchestrates one or more DataSources (e.g., remote, local database, Bluetooth).
-- Single source of truth: the Repository decides which DataSource data comes from.
-  Remote is the default. A local DataSource is only used when the feature explicitly
-  requires it (e.g., offline support, user preferences).
-- Maps DataSource models (ItemDataSourceModel) to Repository models (ItemRepositoryModel).
-
-Example (remote as source of truth):
-
-    func fetchItems() async throws -> [ItemRepositoryModel] {
-        try await remoteDataSource.fetchItems()
-            .map { ItemRepositoryModel(from: $0) }
-    }
-
-Example (local as source of truth, e.g. after sync):
-
-    func fetchItems() async throws -> [ItemRepositoryModel] {
-        let remoteItems = try await remoteDataSource.fetchItems()
-        try await databaseDataSource.save(remoteItems)
-        return try await databaseDataSource.fetchItems()
-            .map { ItemRepositoryModel(from: $0) }
-    }
-
-### DataSource
-- Implements a protocol (e.g., ItemRemoteDataSourceProtocol) -- only the protocol is visible to the Repository.
-- Each DataSource represents exactly one source of data:
-  - ItemRemoteDataSource -- fetches data over the network via ItemNetworkClient
-  - ItemDatabaseDataSource -- reads/writes to a local database (e.g., SwiftData, CoreData, Realm)
-  - ItemBluetoothDataSource -- receives data from a Bluetooth peripheral via ItemBluetoothClient
-  - ItemFileDataSource -- reads/writes data from the local file system
-- Holds a reference to its underlying Client via constructor injection. Responsible only for
-  data retrieval and storage -- no business logic.
-- Maps Client models (ItemClientModel) to DataSource models (ItemDataSourceModel).
-
-Example:
-
-    func fetchItems() async throws -> [ItemDataSourceModel] {
-        try await itemNetworkClient.fetchItems()
-            .map { ItemDataSourceModel(from: $0) }
-    }
-
-### Client
-- A feature-specific Client (e.g., ItemNetworkClient) exposes named, intent-driven functions
-  (e.g., fetchItems(), createItem(_:)). This is the only interface visible to the DataSource.
-- Implemented behind a protocol (e.g., ItemNetworkClientProtocol).
-- Holds a reference to the corresponding BaseClient via constructor injection and delegates
-  the actual execution to it.
-- Maps the raw response from BaseClient into Client-level models (e.g., ItemClientModel).
-- Each Client type has a corresponding base abstraction:
-  - ItemNetworkClient holds BaseNetworkClient (abstraction over URLSession)
-  - ItemBluetoothClient holds BaseBluetoothClient (abstraction over CoreBluetooth)
-- No business logic lives in the Client -- only request construction and model mapping.
-
-Example:
-
-    // ItemNetworkClientProtocol
-    protocol ItemNetworkClientProtocol {
-        func fetchItems() async throws -> [ItemClientModel]
-    }
-
-    // ItemNetworkClient
-    func fetchItems() async throws -> [ItemClientModel] {
-        try await baseNetworkClient.execute(ItemEndpoint.fetchAll)
-            .map { ItemClientModel(from: $0) }
-    }
-
-    // BaseNetworkClientProtocol
-    protocol BaseNetworkClientProtocol {
-        func execute<T: Decodable>(_ endpoint: Endpoint) async throws -> T
-    }
-
-    // BaseNetworkClient
-    func execute<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
-        let request = try buildRequest(from: endpoint)
-        let (data, _) = try await session.data(for: request)
-        return try decoder.decode(T.self, from: data)
-    }
+Feature modules therefore never import each other, and a feature can be presented from anywhere that
+can satisfy its protocol.
 
 ---
 
 ## Rules
 
-- Every cross-layer dependency must go through a protocol. Never depend on a concrete type across layers.
-- All dependencies are injected through the constructor. No component creates its own dependencies.
-  The one exception is a service whose consumer UIKit constructs -- see Exception: services UIKit owns
-  the lifetime of.
-- Never skip layers. A View cannot talk to a UseCase directly; a UseCase cannot talk to a DataSource directly, etc.
-- Never leak models across layer boundaries. Each layer owns its models and maps at the boundary.
-- Single source of truth at every layer. Each layer has one designated source it trusts -- it never
-  reaches sideways or pulls from multiple sources on its own.
-- One UseCase per feature. Do not create fat UseCases that span multiple unrelated features.
+- Every cross-layer dependency goes through a protocol, with one exception: a View holds its
+  Presenter concretely, because `@Observable` requires it.
+- All dependencies are injected through the constructor. The only components that construct their
+  own are the composition root and services whose consumer UIKit owns — see the two exceptions above.
+- Never skip layers. A View does not talk to a Service.
+- Never leak a domain model into a View's `Model` or `Action`.
+- Single source of truth at every layer. A Presenter computes from the Service's state rather than
+  keeping its own copy.
 - One Presenter per View. Do not share Presenters between Views.
-- Repository decides the source of truth. Remote is the default; local is only used when
-  the feature explicitly requires it.
+- State-holding components are Services in `Services/`, not UseCases.
+- Feature modules never import each other. Communication goes through a protocol the app satisfies.
+- Do not add layers for data the app does not have.

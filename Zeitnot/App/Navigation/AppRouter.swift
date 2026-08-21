@@ -23,7 +23,7 @@ final class AppRouter {
 
 }
 
-// MARK: - SetupRoutingProtocol
+// MARK: SetupRoutingProtocol
 
 extension AppRouter: SetupRoutingProtocol {
 
@@ -33,7 +33,7 @@ extension AppRouter: SetupRoutingProtocol {
 
 }
 
-// MARK: - ClockRoutingProtocol
+// MARK: ClockRoutingProtocol
 
 extension AppRouter: ClockRoutingProtocol {
 

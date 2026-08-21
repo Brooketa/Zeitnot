@@ -140,6 +140,7 @@ private extension ClockPresenter {
 }
 
 // MARK: Mappers
+
 private extension ClockPresenter {
 
 	func makeClockModel(for player: Player) -> ClockFace.Model {
