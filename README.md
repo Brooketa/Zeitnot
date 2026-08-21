@@ -84,4 +84,4 @@ The clock screen carries a custom header and disables back-swipe, so a stray ges
 
 Flat, single accent, San Francisco throughout. Colours are colorsets, so dark mode later doesn't mean touching every screen.
 
-<img height="520" alt="swatches" src="https://github.com/user-attachments/assets/02da4e33-1b8b-4893-a320-8a7c8c54e0c7" />
+<img height="320" alt="swatches" src="https://github.com/user-attachments/assets/02da4e33-1b8b-4893-a320-8a7c8c54e0c7" />
