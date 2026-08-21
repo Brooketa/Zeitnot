@@ -28,19 +28,25 @@ If something is missing from `Core` or `CoreUI` but would logically belong there
 
 ## Feature Spec Files
 
-Every module has behavioral spec / "control point" markdown file(s) in its `Docs/` folder, describing how it
-works. A module with screens has one spec per screen (`<Module>/Docs/<ScreenName>Screen.md`); a service-only
-module has one for the module (`<Module>/Docs/<Module>.md`). These are the source of truth for intended
-behavior and drive spec-driven development.
+Every module has behavioural spec markdown file(s) in its `Docs/` folder, describing how it works. A module
+with screens has one spec per screen (`<Module>/Docs/<ScreenName>Screen.md`); a service-only module has one for
+the module (`<Module>/Docs/<Module>.md`).
+
+**A spec describes what is built, and nothing else.** No deferred work, no "not built yet" sections, no future
+plans, and **no ticket references**. A developer must be able to read it and know what the app does today. The
+board is where unbuilt work lives; a spec that mixes the two stops being trustworthy.
+
+Keep them short and scannable — bullets and tables over prose, and short paragraphs where prose is needed.
+Describe *how it behaves*, not how the code is structured.
 
 At the **end of any work that touches a module**, you must:
-- **Update the relevant spec file(s)** to reflect the behavior you changed, added, or removed. Keep them
-  describing *how it behaves*, not how the code is structured.
-- **Re-check the spec against the implementation**: go through its Acceptance Checklist and confirm everything
-  the file describes is still implemented — *if it still should be*. If a behavior was intentionally removed or
-  changed, update the spec to match. If something that should be there is missing, flag it.
+- **Update the relevant spec file(s)** to reflect the behaviour you changed, added, or removed.
+- **Re-check the spec against the implementation**: every statement in it must still be true. If a behaviour
+  was intentionally changed, update the spec. If something the spec claims is missing from the code, flag it
+  rather than quietly deleting either side.
 
-If a module has no spec file yet and your work meaningfully defines its behavior, create one in the same format.
+If a module has no spec file yet and your work meaningfully defines its behaviour, create one in the same
+format.
 
 ## Backlog (Jira)
 

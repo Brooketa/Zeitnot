@@ -132,7 +132,39 @@ struct Constants {
 }
 ```
 
----
+#### Where `Constants` lives
+
+A type's `Constants` enum sits in a **private extension of that type**, placed below the type rather
+than above it:
+
+```swift
+struct ItemCard: View {
+
+    var body: some View { ... }
+
+}
+
+private extension ItemCard {
+
+    enum Constants {
+
+        static let cornerRadius: CGFloat = 26
+
+    }
+
+}
+```
+
+Two shapes cannot express that, and **file scope is correct in both**:
+
+- **There is no type to nest into.** A free-standing extension on a protocol — `extension View { func ... }` —
+  has no type of its own, and Swift does not permit a nested type inside a protocol extension.
+- **The type is generic.** Anything nested inside a generic type is itself generic, and Swift rejects a
+  stored `static let` there: *static stored properties not supported in generic types*.
+
+In both cases declare `private enum Constants` at file scope, below the type. Do not reach for a
+computed `static var` to force the nesting — one file spelling its constants differently from every
+other is worse than an exception that is written down.
 
 ## Spacing
 
@@ -158,6 +190,11 @@ reads on its own.
 
 The only exception is `// MARK:` section markers, which structure a file and are used throughout
 this codebase.
+
+Write them **without a trailing dash** — `// MARK: Mappers`, never `// MARK: - Mappers`. The dashed
+form draws a separator line in Xcode's jump bar, which is a real thing to give up; the plain form is
+chosen anyway because it is what this guide has always used and what the codebase already reads as.
+Leave one blank line after the marker, before the declaration it introduces.
 
 Never use C-style block comments `/* ... */` under any circumstances.
 

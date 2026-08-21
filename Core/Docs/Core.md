@@ -1,148 +1,59 @@
 # Core
 
-Zero-dependency foundation module. Holds the app's domain value types, plus non-UI utilities and
-extensions shared across features. Nothing here imports SwiftUI or UIKit.
+The lowest module. Non-UI types and extensions shared by more than one feature. It imports nothing
+and depends on nothing.
 
-Feature modules cannot import each other, so anything more than one screen needs lives here — and
-nothing that doesn't. `TimeControl`, `GameConfiguration` and the time reading are currently the
-whole module.
+Nothing that imports `SwiftUI` or `UIKit` belongs here — that is `CoreUI`. Nor does anything only one
+feature uses.
 
 ---
 
 ## Time Control
 
-A time control is what a game is played under: **one clock budget per player for the whole game,
-plus time credited to a player each time they complete a move.**
+A time control is **base minutes plus an increment in seconds**. That is the whole model.
 
-- `baseMinutes` — the player's entire budget for the game. It counts down only while it is that
-  player's turn. There is **no per-turn limit**: a player may spend the whole budget on a single
-  move, and then they have nothing left.
-- `incrementSeconds` — credited to the player **who just completed a move**, not the one about to
-  move. Zero is valid and means no time is ever added.
+```swift
+TimeControl(baseMinutes: 3, incrementSeconds: 2)
+```
 
-Both are `Int`, in the units time controls are written in and the units the custom steppers produce.
-The type also exposes them as **durations** — `baseTime` and `increment` — because the two integers
-are only meaningful as time, and whoever runs a clock should not have to know that a minute is sixty
-seconds. That conversion used to be written out in both `GameService` and `ClockPresenter`; it lives
-here now, beside the fields it interprets.
-A time control is configuration, not elapsed time: every value it can hold is a whole number of
-minutes or seconds, so it needs no sub-second precision. The clock's *running* state is a different
-matter — that needs monotonic timing and belongs to ZN-25.
+It stores integers because that is what the player picks and what the copy reads back, and exposes
+`baseTime` and `increment` as `Duration` for the clock to do arithmetic with. Storing durations
+instead would mean converting back to integers every time a label is drawn.
 
-Storing plain integers also keeps the persisted form legible for ZN-20: `{"baseMinutes":3,
-"incrementSeconds":2}` rather than an opaque attosecond pair.
-
-### Reading a time control
-
-Core exposes the two values and deliberately does not render them. The `3 | 2` reading shown on the
-ruleset cells, under the START GAME button and in the clock's navigation title is built by the
-screen that shows it, from those two values.
-
-Presentation therefore stays out of the domain type. Within a module the format no longer repeats:
-since ZN-22 the Setup module keeps it in its own String Catalog under a named key, so its cell and
-its Presenter both render the reading without either one writing a `|`.
-
-That does **not** make the format shared across modules. String Catalog symbols are generated per
-target, so the catalog has to live in the module that reads it, and the clock screen will need its
-own key for the same `3 | 2`. Two modules, two entries, nothing structural keeping them identical —
-the original risk, moved rather than removed. Whether they end up sharing one entry somewhere both
-can reach is a question for **ZN-60**, along with the rest of the app's copy.
+It is `Hashable`, `Codable` and `Sendable` — a value with no identity and no behaviour.
 
 ---
 
 ## Game Configuration
 
-What the setup screen hands to the clock when a game starts: the `TimeControl` the game is played
-under, plus the **category name** of the ruleset it came from (`"Classical"`).
+What a game is played under: a **time control** and the **category name** it came from (`"Classical"`).
 
-It carries the category because the clock's navigation title reads `● CLASSICAL · 90 | 30`, and the
-clock has to get that word from somewhere. It carries the category *name* rather than a rendered
-title so the clock composes its own chrome — the bullet, the middot and the casing are the clock's
-presentation, and Setup has no business knowing about them. This settles the open question this
-document carried until ZN-22.
+The category rides along because the clock screen shows it in the header, and re-deriving it from
+the numbers would mean the clock knowing about presets. It is resolved text, not a resource, so the
+domain never carries a localization key.
 
-It is a value type, and that is load-bearing rather than incidental. The configuration is read at
-the moment START GAME is tapped, so a game under way holds a snapshot: changing the selection on the
-setup screen afterwards cannot reach into it. The rule "changing the selection later does not alter
-a game already under way" is therefore structural, not something the clock has to remember to
-honour.
-
-Nothing else about a ruleset crosses this boundary. The description, the storage key and the
-selection state are all setup-screen concerns and stop there.
-
-The type exists ahead of its consumer: the setup screen builds a configuration when START GAME is
-tapped, but the clock screen that receives one is ZN-23. It lives here rather than in Setup because
-the boundary it describes is between two feature modules, which cannot import one another.
+It is a value taken when a game starts, which is what stops a later selection change reaching a game
+already under way.
 
 ---
 
 ## Time Reading
 
-How a time is written for a player to read. One accessor on `Duration`. It lives here rather than in
-the clock module so that any screen which shows a time reads the same one; with the turns and
-statistics screens deferred (ZN-37, ZN-43), the clock is its only caller today.
+One shared way to render a duration, as an accessor on `Duration`:
 
-    1:30:00 · 59:59 · 3:07 · 0:08 · 0:00
+| Remaining | Reads |
+|---|---|
+| 1h 30m | `1:30:00` |
+| 59m 59s | `59:59` |
+| 3m 7s | `3:07` |
+| 8s | `0:08` |
+| 0 | `0:00` |
 
-`h:mm:ss` from an hour up, `m:ss` below it. The leading unit is unpadded, everything after it padded
-to two digits. Under a minute it keeps its `0:` — a bare `8` does not read as a time.
+- `h:mm:ss` from an hour up, `m:ss` below it.
+- **Whole seconds only.** No tenths anywhere.
+- **Truncates towards zero, never rounds.** 1.9 seconds left reads `0:01` — showing a player time
+  they do not have is the one direction a clock must not err in.
+- Never negative; a clock at or past zero reads `0:00`.
 
-**Whole seconds only.** No tenths anywhere. The handoff shows tenths below twenty seconds and the
-ticket asked for them under a minute; both were dropped for the first pass. Adding them later
-changes this accessor and no screen.
-
-**Truncates towards zero, never rounds.** 1.9 seconds left reads `0:01` — rounding up would show a
-player time they do not have, the one direction a clock must not err in. Negatives clamp to `0:00`.
-
-Integer arithmetic on the duration's components, no date formatter and no locale — which is also why
-it holds no String Catalog entry.
-
-One accessor rather than a family: with tenths gone, turn durations, totals and the running clock
-all want the same string. `Duration` rather than `TimeInterval` because the clock's timing is
-monotonic (ZN-25) and produces durations naturally.
-
----
-
-## What Deliberately Is Not Here
-
-The preset catalogue lives in the **Setup** module. There is no `Ruleset` type and no category type
-anywhere — a preset carries its category name, time control and description directly. A struct
-wrapping two of those, and an enum whose only job was to return a label, both earned nothing.
-
-A time control is what a game is genuinely played under — the clock counts it down, reset restores
-it, rematch reuses it. Everything else about a ruleset is presentation belonging to the screen that
-presents it: the category name, the description under each option, whether it is the editable custom
-one.
-
-The clock screen does display `● CLASSICAL · 90 | 30`, which looks like a reason to share the types.
-It isn't. The clock needs a time control to run a game and a *word* to put in its title bar, which
-is exactly what `GameConfiguration` carries — never a category type, and never the ruleset itself.
-
-Moved out of Core on 2026-08-19, during ZN-15.
-
----
-
-## Not Built Yet
-
-- Tenths of a second in the time reading — deliberately out of the first pass, see Time Reading
-- A String Catalog for the rest of the user-facing copy (ZN-60), and a decision on whether modules
-  that render the same string share an entry — see Reading A Time Control. The Setup module carries
-  its own catalog already.
-- Multi-stage time controls (ZN-53) — deliberately absent; a stage needs a move-number trigger that
-  fires per player, which a bare extra duration cannot express
-
----
-
-## Acceptance Checklist
-
-- [x] A time control expresses a base time and a per-move increment, and zero increment is
-      supported.
-- [x] A time control converts its own integers to durations, so no consumer repeats the arithmetic.
-- [x] A game configuration carries a time control and the category name of the ruleset it came from.
-- [x] A game configuration is a value, so a started game is unaffected by later selection changes —
-      covered by the Setup module's presenter tests, since that is where a configuration is made.
-- [x] One time reading is defined once, where every module can reach it.
-- [x] The reading switches format at the hour and at the minute, truncates towards zero and clamps
-      negatives to `0:00`.
-- [x] The reading is locale-independent and holds no user-facing copy.
-- [x] Time control and the time reading are covered by unit tests.
+It lives here rather than in the clock so that any screen showing a time reads the same one, and the
+format cannot diverge between two callers.
