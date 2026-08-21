@@ -6,15 +6,23 @@ struct ClockFace: View {
     let model: Model
     let action: (Action) -> Void
 
-	private var appearance: State.Appearance {
-		model.state.appearance
-	}
+    private var appearance: State.Appearance {
+        model.state.appearance
+    }
 
-	private var pulseAnimation: Animation? {
-		guard isPulsing else { return nil }
+    private var caption: LocalizedStringResource? {
+        switch model.state {
+        case .flagged: .flagFell
+        case .awaitingStart where model.side == .black: .pressToStart
+        default: nil
+        }
+    }
 
-		return .easeInOut(duration: Constants.pulseDuration).repeatForever(autoreverses: true)
-	}
+    private var pulseAnimation: Animation? {
+        guard isPulsing else { return nil }
+
+        return .easeInOut(duration: Constants.pulseDuration).repeatForever(autoreverses: true)
+    }
 
     @SwiftUI.State private var isPulsing = false
 
@@ -42,14 +50,29 @@ struct ClockFace: View {
             Text(model.name)
                 .playerName(appearance.name)
                 .textCase(.uppercase)
+                .padding(.top, .small)
 
-            Text(model.time)
-                .clockDigits(appearance.digits)
+            timeDisplay
 
-			Text(model.caption ?? Constants.captionPlaceholder)
-				.micro(appearance.caption)
-				.textCase(.uppercase)
-				.opacity(model.caption == nil ? 0 : 1)
+            captionText
+                .micro(appearance.caption)
+                .textCase(.uppercase)
+                .opacity(caption == nil ? 0 : 1)
+                .padding(.bottom, .small)
+        }
+    }
+
+    var captionText: Text {
+        guard let caption else { return Text(verbatim: Constants.captionPlaceholder) }
+
+        return Text(caption)
+    }
+
+    @ViewBuilder
+    var timeDisplay: some View {
+        switch model.timeDisplay {
+        case let .digital(digital): DigitalFace(model: digital, state: model.state)
+        case let .analog(analog): AnalogFace(model: analog, state: model.state)
         }
     }
 
@@ -78,34 +101,40 @@ extension ClockFace {
 
         let side: Side
         let name: String
-        let time: String
-        let caption: String?
         let state: State
+        let timeDisplay: TimeDisplay
 
     }
 
-	enum Side {
+    enum Side {
 
-		case white
-		case black
+        case white
+        case black
 
-	}
+    }
 
-	enum State {
+    enum State {
 
-		case awaitingStart
-		case toMove
-		case lowTime
-		case waiting
-		case flagged
+        case awaitingStart
+        case toMove
+        case lowTime
+        case waiting
+        case flagged
 
-	}
+    }
 
-	enum Action {
+    enum TimeDisplay: Equatable {
 
-		case press(Side)
+        case digital(DigitalFace.Model)
+        case analog(AnalogFace.Model)
 
-	}
+    }
+
+    enum Action {
+
+        case press(Side)
+
+    }
 
 }
 
@@ -117,28 +146,24 @@ private extension ClockFace.State {
             Appearance(
                 fill: ColorPalette.surface,
                 name: ColorPalette.textSecondary,
-                digits: ColorPalette.textSecondary,
                 caption: ColorPalette.accent,
                 ring: .none)
         case .toMove:
             Appearance(
                 fill: ColorPalette.surface,
                 name: ColorPalette.accent,
-                digits: ColorPalette.ink,
                 caption: ColorPalette.accent,
                 ring: .steady)
         case .lowTime:
             Appearance(
                 fill: ColorPalette.surface,
                 name: ColorPalette.accent,
-                digits: ColorPalette.ink,
                 caption: ColorPalette.accent,
                 ring: .pulsing)
         case .flagged:
             Appearance(
                 fill: ColorPalette.accent,
                 name: ColorPalette.inkInverse,
-                digits: ColorPalette.inkInverse,
                 caption: ColorPalette.inkInverse,
                 ring: .none)
         }
@@ -152,7 +177,6 @@ private extension ClockFace.State {
 
         let fill: Color
         let name: Color
-        let digits: Color
         let caption: Color
         let ring: Ring
 

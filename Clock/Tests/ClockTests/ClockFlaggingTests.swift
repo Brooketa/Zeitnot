@@ -16,9 +16,7 @@ struct ClockFlaggingTests: ClockPresenterTestSuite {
         presenter.press(.white)
 
         #expect(presenter.whiteClock.state == .flagged)
-        #expect(presenter.whiteClock.caption == "Flag fell")
         #expect(presenter.blackClock.state == .waiting)
-        #expect(presenter.blackClock.caption == nil)
     }
 
     @Test

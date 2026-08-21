@@ -22,7 +22,10 @@ let package = Package(
             name: "Clock",
             dependencies: ["Core", "CoreUI"],
             path: "Sources",
-            resources: [.process("Common/Resources/Localization")],
+            resources: [
+                .process("Common/Resources/Localization"),
+                .process("Common/Images/Images.xcassets")
+            ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
                 .defaultIsolation(MainActor.self)

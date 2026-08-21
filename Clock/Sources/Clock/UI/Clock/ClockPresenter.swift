@@ -5,6 +5,23 @@ import Core
 @Observable
 public final class ClockPresenter {
 
+    private(set) var displayMode: DisplayMode = .analog
+    private(set) var showResetDialog = false
+
+    private let gameConfiguration: GameConfiguration
+    private let gameService: GameServiceProtocol
+    private let router: ClockRoutingProtocol
+
+    public init(
+        gameConfiguration: GameConfiguration,
+        gameService: GameServiceProtocol,
+        router: ClockRoutingProtocol
+    ) {
+        self.gameConfiguration = gameConfiguration
+        self.gameService = gameService
+        self.router = router
+    }
+
     var headerModel: Header.Model {
         Header.Model(
             category: gameConfiguration.category,
@@ -14,35 +31,25 @@ public final class ClockPresenter {
             isRunning: isCountingDown)
     }
 
-    var whiteClock: ClockFace.Model {
-        makeClockModel(for: .white)
+    var clocksModel: Clocks.Model {
+        Clocks.Model(white: makeClockModel(for: .white), black: makeClockModel(for: .black))
     }
-
-    var blackClock: ClockFace.Model {
-        makeClockModel(for: .black)
-    }
-
-    private(set) var showResetDialog = false
 
     var controlBarModel: ControlBar.Model {
         ControlBar.Model(canPause: !isGameOver)
-    }
-
-    var showPauseDialog: Bool {
-        if case .paused = state.phase { true } else { false }
     }
 
     var pauseDialogModel: PauseDialog.Model {
         PauseDialog.Model(playerName: String(localized: playerToMove.name))
     }
 
+    var showPauseDialog: Bool {
+        if case .paused = state.phase { true } else { false }
+    }
+
     var isCountingDown: Bool {
         if case .running = state.phase { true } else { false }
     }
-
-    private let gameConfiguration: GameConfiguration
-    private let gameService: GameServiceProtocol
-    private let router: ClockRoutingProtocol
 
     private var state: GameState {
         gameService.state
@@ -59,10 +66,6 @@ public final class ClockPresenter {
         }
     }
 
-    private var warningThreshold: Duration {
-        min(Constants.warningThreshold, timeControl.baseTime / Constants.warningShareOfBaseTime)
-    }
-
     private var playerToMove: Player {
         switch state.phase {
         case let .running(player), let .paused(player): player
@@ -74,14 +77,8 @@ public final class ClockPresenter {
         gameConfiguration.timeControl
     }
 
-    public init(
-        gameConfiguration: GameConfiguration,
-        gameService: GameServiceProtocol,
-        router: ClockRoutingProtocol
-    ) {
-        self.gameConfiguration = gameConfiguration
-        self.gameService = gameService
-        self.router = router
+    private var warningThreshold: Duration {
+        min(Constants.warningThreshold, timeControl.baseTime / Constants.warningShareOfBaseTime)
     }
 
     func navigateBack() {
@@ -130,12 +127,12 @@ public final class ClockPresenter {
 
 private extension ClockPresenter {
 
-	enum Constants {
+    enum Constants {
 
-		static let warningThreshold: Duration = .seconds(10)
-		static let warningShareOfBaseTime = 10
+        static let warningThreshold: Duration = .seconds(10)
+        static let warningShareOfBaseTime = 10
 
-	}
+    }
 
 }
 
@@ -143,63 +140,60 @@ private extension ClockPresenter {
 
 private extension ClockPresenter {
 
-	func makeClockModel(for player: Player) -> ClockFace.Model {
-		ClockFace.Model(
-			side: side(for: player),
-			name: String(localized: player.name),
-			time: state[player].remaining.timeReading,
-			caption: caption(for: player),
-			state: faceState(for: player))
-	}
+    func makeClockModel(for player: Player) -> ClockFace.Model {
+        ClockFace.Model(
+            side: side(for: player),
+            name: String(localized: player.name),
+            state: faceState(for: player),
+            timeDisplay: timeDisplay(for: player))
+    }
 
-	func side(for player: Player) -> ClockFace.Side {
-		switch player {
-		case .white: .white
-		case .black: .black
-		}
-	}
+    func timeDisplay(for player: Player) -> ClockFace.TimeDisplay {
+        switch displayMode {
+        case .digital: .digital(DigitalFace.Model(reading: state[player].remaining.timeReading))
+        case .analog: .analog(AnalogFace.Model(hands: DialHands(remaining: state[player].remaining)))
+        }
+    }
 
-	func player(for side: ClockFace.Side) -> Player {
-		switch side {
-		case .white: .white
-		case .black: .black
-		}
-	}
+    func side(for player: Player) -> ClockFace.Side {
+        switch player {
+        case .white: .white
+        case .black: .black
+        }
+    }
 
-	func caption(for player: Player) -> String? {
-		if case let .finished(winner) = state.phase, winner != player {
-			return String(localized: .flagFell)
-		}
+    func player(for side: ClockFace.Side) -> Player {
+        switch side {
+        case .white: .white
+        case .black: .black
+        }
+    }
 
-		let isPromptingToStart = state.phase == .notStarted && player == .black
+    func faceState(for player: Player) -> ClockFace.State {
+        switch state.phase {
+        case .notStarted: .awaitingStart
+        case let .running(active): runningFaceState(for: player, active: active)
+        case let .paused(active): active == player ? .toMove : .waiting
+        case let .finished(winner): winner == player ? .waiting : .flagged
+        }
+    }
 
-		return isPromptingToStart ? String(localized: .pressToStart) : nil
-	}
+    func runningFaceState(for player: Player, active: Player) -> ClockFace.State {
+        guard active == player else { return .waiting }
 
-	func faceState(for player: Player) -> ClockFace.State {
-		switch state.phase {
-		case .notStarted: .awaitingStart
-		case let .running(active): runningFaceState(for: player, active: active)
-		case let .paused(active): active == player ? .toMove : .waiting
-		case let .finished(winner): winner == player ? .waiting : .flagged
-		}
-	}
-
-	func runningFaceState(for player: Player, active: Player) -> ClockFace.State {
-		guard active == player else { return .waiting }
-
-		return state[player].remaining <= warningThreshold ? .lowTime : .toMove
-	}
+        return state[player].remaining <= warningThreshold ? .lowTime : .toMove
+    }
 
 }
 
 private extension Player {
 
-	var name: LocalizedStringResource {
-		switch self {
-		case .white: .whitePlayer
-		case .black: .blackPlayer
-		}
-	}
+    var name: LocalizedStringResource {
+        switch self {
+        case .white: .whitePlayer
+        case .black: .blackPlayer
+        }
+    }
 
 }
+

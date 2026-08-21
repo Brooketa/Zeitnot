@@ -1,0 +1,80 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] /Resources << /Font << /F1 5 0 R >> /ExtGState << /GS0 6 0 R /GS1 7 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 939 >>
+stream
+q
+1 0 0 -1 0 200 cm
+0.1255 0.1176 0.1137 RG 2 w
+195 100 m
+195 152.469 152.469 195 100 195 c
+47.532 195 5 152.469 5 100 c
+5 47.532 47.532 5 100 5 c
+152.469 5 195 47.532 195 100 c
+S
+1 J 2.5 w
+0.1255 0.1176 0.1137 RG
+100 12 m 100 19 l S
+144 23.79 m 140.5 29.852 l S
+176.21 56 m 170.148 59.5 l S
+188 100 m 181 100 l S
+176.21 144 m 170.148 140.5 l S
+144 176.21 m 140.5 170.148 l S
+100 188 m 100 181 l S
+56 176.21 m 59.5 170.148 l S
+23.79 144 m 29.852 140.5 l S
+12 100 m 19 100 l S
+23.79 56 m 29.852 59.5 l S
+56 23.79 m 59.5 29.852 l S
+/GS1 gs
+0.1255 0.1176 0.1137 rg
+BT /F1 15 Tf
+1 0 0 -1 91.66 49 Tm (12) Tj
+1 0 0 -1 123.83 56 Tm (1) Tj
+1 0 0 -1 143.83 77 Tm (2) Tj
+1 0 0 -1 151.83 105 Tm (3) Tj
+1 0 0 -1 143.83 133 Tm (4) Tj
+1 0 0 -1 123.83 153 Tm (5) Tj
+1 0 0 -1 95.83 161 Tm (6) Tj
+1 0 0 -1 67.83 153 Tm (7) Tj
+1 0 0 -1 46.83 133 Tm (8) Tj
+1 0 0 -1 39.83 105 Tm (9) Tj
+1 0 0 -1 42.66 77 Tm (10) Tj
+1 0 0 -1 63.66 56 Tm (11) Tj
+ET
+/GS0 gs
+Q
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /ExtGState /ca 1 /CA 1 >>
+endobj
+7 0 obj
+<< /Type /ExtGState /ca 0.78 /CA 0.78 >>
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000280 00000 n 
+0000001269 00000 n 
+0000001371 00000 n 
+0000001421 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1477
+%%EOF
