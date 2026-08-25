@@ -44,6 +44,24 @@ struct ClockPresenterObservationTests: ClockPresenterTestSuite {
         #expect(observation.fired)
     }
 
+    @Test
+    func aFlagFallInvalidatesEveryObserverOfTheClockModels() {
+        let presenter = makePresenter(baseMinutes: 1)
+        let observation = ObservationFlag()
+
+        presenter.press(.black)
+
+        withObservationTracking {
+            _ = presenter.controlBarModel
+        } onChange: {
+            observation.fired = true
+        }
+
+        timeSource.advance(by: .seconds(120))
+
+        #expect(observation.fired)
+    }
+
 }
 
 private nonisolated final class ObservationFlag: @unchecked Sendable {

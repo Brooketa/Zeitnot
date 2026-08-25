@@ -3,15 +3,9 @@ import CoreUI
 
 struct DisplayModeControl: View {
 
-    let model: Model
-    let action: (Action) -> Void
+    @Binding var displayMode: DisplayMode
 
     @Namespace private var namespace
-    @State private var selection: DisplayMode?
-
-    private var selected: DisplayMode {
-        selection ?? model.displayMode
-    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -22,20 +16,15 @@ struct DisplayModeControl: View {
         .padding(Constants.trackPadding)
         .background(ColorPalette.surfaceMuted)
         .clipShape(.capsule)
-        .task(id: model.displayMode) {
-            selection = model.displayMode
-        }
     }
 
     func segment(for mode: DisplayMode) -> some View {
-        let isSelected = mode == selected
+        let isSelected = mode == displayMode
 
         return Button {
             withAnimation(.snappy(duration: Constants.selectionDuration)) {
-                selection = mode
+                displayMode = mode
             }
-
-            action(.select(mode))
         } label: {
             Text(title(for: mode))
                 .label(isSelected ? ColorPalette.inkInverse : ColorPalette.textSecondary)
@@ -63,22 +52,6 @@ struct DisplayModeControl: View {
         case .digital: .digitalMode
         case .analog: .analogMode
         }
-    }
-
-}
-
-extension DisplayModeControl {
-
-    struct Model {
-
-        let displayMode: DisplayMode
-
-    }
-
-    enum Action {
-
-        case select(DisplayMode)
-
     }
 
 }

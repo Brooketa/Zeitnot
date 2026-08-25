@@ -36,6 +36,20 @@ struct ClockFlaggingTests: ClockPresenterTestSuite {
     }
 
     @Test
+    func pressingAfterAFlagFallsDoesNotHandTheTurnToTheOpponent() {
+        let presenter = makePresenter(baseMinutes: 1)
+
+        presenter.press(.black)
+        timeSource.advanceWithoutTicking(by: .seconds(60))
+        presenter.press(.white)
+
+        #expect(presenter.whiteClock.state == .flagged)
+        #expect(presenter.blackClock.state == .waiting)
+        #expect(presenter.blackClock.reading == "1:00")
+        #expect(!presenter.isCountingDown)
+    }
+
+    @Test
     func aFlaggedClockIsNotWarning() {
         let presenter = makePresenter(baseMinutes: 1)
 

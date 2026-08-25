@@ -32,14 +32,14 @@ struct ClockDisplayModeTests: ClockPresenterTestSuite {
     }
 
     @Test
-    func theControlBarReportsTheSelectedMode() {
+    func thePresenterReportsTheSelectedMode() {
         let presenter = makePresenter()
 
-        #expect(presenter.controlBarModel.displayModeControl.displayMode == .digital)
+        #expect(presenter.displayMode == .digital)
 
         presenter.selectDisplayMode(.analog)
 
-        #expect(presenter.controlBarModel.displayModeControl.displayMode == .analog)
+        #expect(presenter.displayMode == .analog)
     }
 
     @Test

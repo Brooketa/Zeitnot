@@ -56,6 +56,18 @@ struct TimeControlTests {
         #expect(json.contains("\"incrementSeconds\":2"))
     }
 
+    @Test(arguments: [
+        (timeControl: TimeControl.bullet1plus0, baseMinutes: 1, incrementSeconds: 0),
+        (timeControl: TimeControl.blitz3plus2, baseMinutes: 3, incrementSeconds: 2),
+        (timeControl: TimeControl.blitz5plus0, baseMinutes: 5, incrementSeconds: 0),
+        (timeControl: TimeControl.rapid10plus0, baseMinutes: 10, incrementSeconds: 0),
+        (timeControl: TimeControl.rapid15plus10, baseMinutes: 15, incrementSeconds: 10),
+        (timeControl: TimeControl.classical90plus30, baseMinutes: 90, incrementSeconds: 30)
+    ])
+    func namedTimeControlsCarryTheirValues(timeControl: TimeControl, baseMinutes: Int, incrementSeconds: Int) {
+        #expect(timeControl == TimeControl(baseMinutes: baseMinutes, incrementSeconds: incrementSeconds))
+    }
+
     @Test
     func theBaseTimeIsTheBaseMinutesAsADuration() {
         #expect(TimeControl(baseMinutes: 90, incrementSeconds: 30).baseTime == .seconds(5_400))

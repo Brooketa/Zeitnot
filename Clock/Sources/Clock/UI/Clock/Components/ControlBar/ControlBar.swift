@@ -6,9 +6,11 @@ struct ControlBar: View {
     let model: Model
     let action: (Action) -> Void
 
+    @Binding var displayMode: DisplayMode
+
     var body: some View {
         HStack(spacing: .medium) {
-            DisplayModeControl(model: model.displayModeControl, action: onDisplayModeAction)
+            DisplayModeControl(displayMode: $displayMode)
 
             button(for: .pause, title: .pauseButton)
                 .enabled(model.canPause)
@@ -45,7 +47,6 @@ extension ControlBar {
     struct Model {
 
         let canPause: Bool
-        let displayModeControl: DisplayModeControl.Model
 
     }
 
@@ -53,18 +54,7 @@ extension ControlBar {
 
         case pause
         case reset
-        case selectDisplayMode(DisplayMode)
 
-    }
-
-}
-
-private extension ControlBar {
-
-    func onDisplayModeAction(_ displayModeAction: DisplayModeControl.Action) {
-        switch displayModeAction {
-        case let .select(mode): action(.selectDisplayMode(mode))
-        }
     }
 
 }

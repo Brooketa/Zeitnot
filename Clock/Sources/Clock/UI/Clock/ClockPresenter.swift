@@ -9,10 +9,14 @@ public final class ClockPresenter {
     private(set) var showResetDialog = false
 
     private let gameConfiguration: GameConfiguration
-    private let gameService: GameServiceProtocol
-    private let router: ClockRoutingProtocol
+    private let gameService: any GameServiceProtocol
+    private let router: any ClockRoutingProtocol
 
-    public init(gameConfiguration: GameConfiguration, gameService: GameServiceProtocol, router: ClockRoutingProtocol) {
+    public init(
+		gameConfiguration: GameConfiguration,
+		gameService: any GameServiceProtocol,
+		router: any ClockRoutingProtocol
+	) {
         self.gameConfiguration = gameConfiguration
         self.gameService = gameService
         self.router = router
@@ -32,9 +36,7 @@ public final class ClockPresenter {
     }
 
     var controlBarModel: ControlBar.Model {
-        ControlBar.Model(
-            canPause: !isGameOver,
-            displayModeControl: DisplayModeControl.Model(displayMode: displayMode))
+        return ControlBar.Model(canPause: !isGameOver)
     }
 
     var pauseDialogModel: PauseDialog.Model {

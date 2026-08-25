@@ -36,6 +36,7 @@ struct AnalogFace: View {
             layer(Image.minuteHand, color: appearance.minuteHand)
                 .rotationEffect(.degrees(-model.hands.minuteDegrees))
         }
+        .animation(.linear(duration: Constants.sweepDuration), value: model.hands)
     }
 
     func layer(_ image: Image, color: Color) -> some View {
@@ -58,6 +59,12 @@ extension AnalogFace {
 }
 
 private extension AnalogFace {
+
+    enum Constants {
+
+        static let sweepDuration: TimeInterval = 0.1
+
+    }
 
     struct Appearance {
 

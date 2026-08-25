@@ -4,26 +4,29 @@ import Core
 @Observable
 public final class GameService: GameServiceProtocol {
 
-    public var state: GameState {
-        switch countdownState {
-        case .notStarted: makeState(phase: .notStarted)
-        case let .running(player, since): makeRunningState(player: player, since: since)
-        case let .paused(player): makeState(phase: .paused(player: player))
-        }
-    }
+    public private(set) var state: GameState
 
     private let timeControl: TimeControl
     private let timeSource: TimeSourceProtocol
+    private let ticker: TickerProtocol
 
-    private var countdownState: CountdownState = .notStarted
-    private var white: PlayerClock
-    private var black: PlayerClock
+    private var countdownState: CountdownState = .notStarted {
+        didSet {
+            syncTicking()
+            publish()
+        }
+    }
 
-    public init(timeControl: TimeControl, timeSource: TimeSourceProtocol) {
+    private var clocks: PlayerClocks
+
+    public init(timeControl: TimeControl, timeSource: TimeSourceProtocol, ticker: TickerProtocol) {
+        let clock = Self.makeClock(for: timeControl)
+
         self.timeControl = timeControl
         self.timeSource = timeSource
-        white = Self.makeClock(for: timeControl)
-        black = Self.makeClock(for: timeControl)
+        self.ticker = ticker
+        clocks = PlayerClocks(white: clock, black: clock)
+        state = GameState(phase: .notStarted, white: clock, black: clock)
     }
 
     public func start() {
@@ -38,10 +41,14 @@ public final class GameService: GameServiceProtocol {
         let now = timeSource.now
         let remaining = remaining(for: player, since: since, at: now)
 
-        guard remaining > .zero else { return }
+        guard remaining > .zero else {
+            flag(losingPlayer: player)
+            return
+        }
 
-        self[player].remaining = remaining + timeControl.increment
-        self[player].moveCount += 1
+        let clock = clocks[player]
+
+        clocks[player] = PlayerClock(remaining: remaining + timeControl.increment, moveCount: clock.moveCount + 1)
         countdownState = .running(player: player.opponent, since: now)
     }
 
@@ -50,9 +57,12 @@ public final class GameService: GameServiceProtocol {
 
         let remaining = remaining(for: player, since: since, at: timeSource.now)
 
-        guard remaining > .zero else { return }
+        guard remaining > .zero else {
+            flag(losingPlayer: player)
+            return
+        }
 
-        self[player].remaining = remaining
+        clocks[player].remaining = remaining
         countdownState = .paused(player: player)
     }
 
@@ -63,12 +73,27 @@ public final class GameService: GameServiceProtocol {
     }
 
     public func reset() {
-        white = Self.makeClock(for: timeControl)
-        black = Self.makeClock(for: timeControl)
+        let clock = Self.makeClock(for: timeControl)
+
+        clocks = PlayerClocks(white: clock, black: clock)
         countdownState = .notStarted
     }
 
 }
+
+// MARK: Constants
+
+private extension GameService {
+
+    enum Constants {
+
+        static let tickInterval = Duration.milliseconds(100)
+
+    }
+
+}
+
+// MARK: Countdown
 
 private extension GameService {
 
@@ -77,52 +102,89 @@ private extension GameService {
         case notStarted
         case running(player: Player, since: ContinuousClock.Instant)
         case paused(player: Player)
+        case finished(winner: Player)
+
+        var isRunning: Bool {
+            if case .running = self { true } else { false }
+        }
 
     }
 
-    subscript(player: Player) -> PlayerClock {
-        get {
-            switch player {
-            case .white: white
-            case .black: black
-            }
+    func syncTicking() {
+        if countdownState.isRunning {
+            startTicking()
+        } else {
+            stopTicking()
         }
-        set {
-            switch player {
-            case .white: white = newValue
-            case .black: black = newValue
-            }
+    }
+
+    func startTicking() {
+        ticker.start(interval: Constants.tickInterval) { [weak self] in
+            guard let self else { return }
+
+            tick()
         }
+    }
+
+    func stopTicking() {
+        ticker.stop()
+    }
+
+    func tick() {
+        guard case let .running(player, since) = countdownState else { return }
+
+        guard remaining(for: player, since: since, at: timeSource.now) > .zero else {
+            flag(losingPlayer: player)
+            return
+        }
+
+        publish()
+    }
+
+    func flag(losingPlayer: Player) {
+        clocks[losingPlayer].remaining = .zero
+        countdownState = .finished(winner: losingPlayer.opponent)
+    }
+
+    func remaining(for player: Player, since: ContinuousClock.Instant, at now: ContinuousClock.Instant) -> Duration {
+        max(clocks[player].remaining - (now - since), .zero)
     }
 
     static func makeClock(for timeControl: TimeControl) -> PlayerClock {
         PlayerClock(remaining: timeControl.baseTime, moveCount: 0)
     }
 
+}
+
+// MARK: Publishing
+
+private extension GameService {
+
+    func publish() {
+        state = makeState()
+    }
+
+    func makeState() -> GameState {
+        switch countdownState {
+        case .notStarted: makeState(phase: .notStarted)
+        case let .running(player, since): makeRunningState(player: player, since: since)
+        case let .paused(player): makeState(phase: .paused(player: player))
+        case let .finished(winner): makeState(phase: .finished(winner: winner))
+        }
+    }
+
     func makeState(phase: GameState.Phase) -> GameState {
-        GameState(phase: phase, white: white, black: black)
+        GameState(phase: phase, white: clocks.white, black: clocks.black)
     }
 
     func makeRunningState(player: Player, since: ContinuousClock.Instant) -> GameState {
-        var clock = self[player]
+        var clock = clocks[player]
         clock.remaining = remaining(for: player, since: since, at: timeSource.now)
 
-        let phase: GameState.Phase = clock.remaining > .zero ?
-            .running(player: player) :
-            .finished(winner: player.opponent)
-
         return GameState(
-            phase: phase,
-            white: player == .white ? clock : white,
-            black: player == .black ? clock : black)
-    }
-
-    func remaining(
-        for player: Player,
-        since: ContinuousClock.Instant,
-        at now: ContinuousClock.Instant
-    ) -> Duration {
-        max(self[player].remaining - (now - since), .zero)
+            phase: .running(player: player),
+            white: player == .white ? clock : clocks.white,
+            black: player == .black ? clock : clocks.black)
     }
 
 }
