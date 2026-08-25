@@ -5,7 +5,7 @@ import Core
 @Observable
 public final class ClockPresenter {
 
-    private(set) var displayMode: DisplayMode = .digital
+    var displayMode: DisplayMode = .digital
     private(set) var showResetDialog = false
 
     private let gameConfiguration: GameConfiguration
@@ -36,7 +36,7 @@ public final class ClockPresenter {
     }
 
     var controlBarModel: ControlBar.Model {
-        return ControlBar.Model(canPause: !isGameOver)
+        ControlBar.Model(canPause: isCountingDown, canReset: isCountingDown || isGameOver)
     }
 
     var pauseDialogModel: PauseDialog.Model {
@@ -93,10 +93,6 @@ public final class ClockPresenter {
         case let .running(active) where active == player: gameService.endTurn()
         default: break
         }
-    }
-
-    func selectDisplayMode(_ mode: DisplayMode) {
-        displayMode = mode
     }
 
     func pause() {

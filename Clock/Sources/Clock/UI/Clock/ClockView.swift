@@ -15,7 +15,10 @@ public struct ClockView: View {
 
             Clocks(model: presenter.clocksModel, action: onClocksAction)
 
-            ControlBar(model: presenter.controlBarModel, action: onControlBarAction, displayMode: displayMode)
+            ControlBar(
+                model: presenter.controlBarModel,
+                action: onControlBarAction,
+                displayMode: $presenter.displayMode)
         }
         .padding(.large)
         .primaryBackground()
@@ -33,10 +36,6 @@ public struct ClockView: View {
 }
 
 private extension ClockView {
-
-    var displayMode: Binding<DisplayMode> {
-        Binding(get: { presenter.displayMode }, set: { presenter.selectDisplayMode($0) })
-    }
 
     func onHeaderAction(_ action: Header.Action) {
         switch action {

@@ -8,6 +8,22 @@ struct ClockPausingTests: ClockPresenterTestSuite {
     let router = FakeClockRouter()
 
     @Test
+    func thePauseButtonIsEnabledOnlyWhileRunning() {
+        let presenter = makePresenter()
+
+        #expect(!presenter.controlBarModel.canPause)
+
+        presenter.press(.black)
+
+        #expect(presenter.controlBarModel.canPause)
+
+        timeSource.advance(by: .seconds(10))
+        presenter.pause()
+
+        #expect(!presenter.controlBarModel.canPause)
+    }
+
+    @Test
     func thePauseDialogIsAbsentWhileTheGameRuns() {
         let presenter = makePresenter()
 

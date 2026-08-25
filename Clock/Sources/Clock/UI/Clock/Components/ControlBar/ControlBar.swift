@@ -17,6 +17,8 @@ struct ControlBar: View {
                 .opacity(model.canPause ? 1 : Constants.disabledOpacity)
 
             button(for: .reset, title: .resetButton)
+                .enabled(model.canReset)
+                .opacity(model.canReset ? 1 : Constants.disabledOpacity)
         }
         .alignCenterHorizontal()
     }
@@ -47,6 +49,7 @@ extension ControlBar {
     struct Model {
 
         let canPause: Bool
+        let canReset: Bool
 
     }
 

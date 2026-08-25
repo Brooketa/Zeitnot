@@ -171,6 +171,9 @@ dial greys while waiting and inverts whole when flagged.
 
 ## Pausing
 
+`PAUSE` is enabled only while a clock is running — disabled before the game starts and once it has
+finished, so the button never offers to pause a clock that isn't counting down.
+
 `PAUSE` stops the running clock where it stands and fades in a dialog over a blurred, dimmed board.
 It reads `PAUSED`, names the player who will resume, and offers `RESUME`.
 
@@ -186,6 +189,9 @@ live control while paused. Anything else needs the game resumed first.
 
 `RESET` returns the game to not started: both clocks to full base time, both move counts to zero,
 Black to press first.
+
+`RESET` is enabled while the game is **running** or **finished**, and disabled before the game
+starts — a fresh game has nothing to reset.
 
 - While a game is **running**, it asks first — a dialog offering `RESET` and `CANCEL`. Cancelling
   leaves the game exactly as it was, clock still counting.

@@ -23,8 +23,6 @@ struct ClockFlaggingTests: ClockPresenterTestSuite {
     func pausingIsUnavailableOnceAClockHasRunOut() {
         let presenter = makePresenter(baseMinutes: 1)
 
-        #expect(presenter.controlBarModel.canPause)
-
         presenter.press(.black)
 
         #expect(presenter.controlBarModel.canPause)

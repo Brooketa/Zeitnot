@@ -96,6 +96,22 @@ struct ClockResettingTests: ClockPresenterTestSuite {
         presenter.reset()
 
         #expect(presenter.whiteClock.state == .awaitingStart)
-        #expect(presenter.controlBarModel.canPause)
+        #expect(!presenter.controlBarModel.canPause)
+    }
+
+    @Test
+    func theResetButtonIsEnabledWhileRunningOrFinished() {
+        let presenter = makePresenter(baseMinutes: 1)
+
+        #expect(!presenter.controlBarModel.canReset)
+
+        presenter.press(.black)
+
+        #expect(presenter.controlBarModel.canReset)
+
+        timeSource.advance(by: .seconds(60))
+        presenter.press(.white)
+
+        #expect(presenter.controlBarModel.canReset)
     }
 }
