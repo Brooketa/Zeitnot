@@ -62,15 +62,16 @@ A running clock's remaining time is **measured, never counted down**: what it he
 began, less the real time elapsed since. Nothing sums ticks, so a 90 minute game accumulates no
 drift.
 
-A tick decides only **when the game publishes**, never what the time is. Every published value is
-measured afresh from the current instant, so a tick that arrives late publishes a correct time
-slightly late — it cannot publish a wrong one, and the tick rate has no bearing on accuracy.
+A tick decides only **when the clock is sampled**, never what the time is. Every reading is measured
+afresh from the sampled instant, so a tick that arrives late reads a correct time slightly late — it
+cannot read a wrong one, and the tick rate has no bearing on accuracy.
 
-The game therefore **runs itself and announces what it holds**. It emits a new state on every tick
-while a clock is running, and on every input — start, turn change, pause, resume, reset. The screen
-observes; it never polls, and it never asks whether the game has ended. Flag fall is one of those
-announcements: the clock reaching zero ends the game, stops the tick, and tells the screen, whether
-or not anything was looking.
+The game therefore **runs itself and announces what it holds**. What it holds is derived rather than
+stored, so there is no stale copy to go out of date: every tick while a clock is running, and every
+input — start, turn change, pause, resume, reset — invalidates what the screen is watching. The
+screen observes; it never polls, and it never asks whether the game has ended. Flag fall is one of
+those announcements: the clock reaching zero ends the game, stops the tick, and tells the screen,
+whether or not anything was looking.
 
 Time comes from a monotonic source that keeps counting while the app is suspended, so a system clock
 change cannot move a game and backgrounding cannot gain a player time. Both the time source and the

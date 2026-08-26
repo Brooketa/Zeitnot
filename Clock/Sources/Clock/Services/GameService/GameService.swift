@@ -4,20 +4,12 @@ import Core
 @Observable
 public final class GameService: GameServiceProtocol {
 
-    public private(set) var state: GameState
-
     private let timeControl: TimeControl
     private let timeSource: TimeSourceProtocol
     private let ticker: TickerProtocol
 
-    private var countdownState: CountdownState = .notStarted {
-        didSet {
-            syncTicking()
-            publish()
-        }
-    }
-
     private var clocks: PlayerClocks
+    private var now: ContinuousClock.Instant
 
     public init(timeControl: TimeControl, timeSource: TimeSourceProtocol, ticker: TickerProtocol) {
         let clock = Self.makeClock(for: timeControl)
@@ -26,19 +18,31 @@ public final class GameService: GameServiceProtocol {
         self.timeSource = timeSource
         self.ticker = ticker
         clocks = PlayerClocks(white: clock, black: clock)
-        state = GameState(phase: .notStarted, white: clock, black: clock)
+        now = timeSource.now
     }
+
+    public var state: GameState {
+        makeState()
+    }
+
+	private var countdownState: CountdownState = .notStarted {
+		didSet {
+			syncTicking()
+		}
+	}
 
     public func start() {
         guard case .notStarted = countdownState else { return }
 
-        countdownState = .running(player: .white, since: timeSource.now)
+        now = timeSource.now
+        countdownState = .running(player: .white, since: now)
     }
 
     public func endTurn() {
         guard case let .running(player, since) = countdownState else { return }
 
-        let now = timeSource.now
+        now = timeSource.now
+
         let remaining = remaining(for: player, since: since, at: now)
 
         guard remaining > .zero else {
@@ -55,7 +59,9 @@ public final class GameService: GameServiceProtocol {
     public func pause() {
         guard case let .running(player, since) = countdownState else { return }
 
-        let remaining = remaining(for: player, since: since, at: timeSource.now)
+        now = timeSource.now
+
+        let remaining = remaining(for: player, since: since, at: now)
 
         guard remaining > .zero else {
             flag(losingPlayer: player)
@@ -69,7 +75,8 @@ public final class GameService: GameServiceProtocol {
     public func resume() {
         guard case let .paused(player) = countdownState else { return }
 
-        countdownState = .running(player: player, since: timeSource.now)
+        now = timeSource.now
+        countdownState = .running(player: player, since: now)
     }
 
     public func reset() {
@@ -131,14 +138,12 @@ private extension GameService {
     }
 
     func tick() {
+        now = timeSource.now
+
         guard case let .running(player, since) = countdownState else { return }
+        guard remaining(for: player, since: since, at: now) <= .zero else { return }
 
-        guard remaining(for: player, since: since, at: timeSource.now) > .zero else {
-            flag(losingPlayer: player)
-            return
-        }
-
-        publish()
+        flag(losingPlayer: player)
     }
 
     func flag(losingPlayer: Player) {
@@ -156,13 +161,9 @@ private extension GameService {
 
 }
 
-// MARK: Publishing
+// MARK: State
 
 private extension GameService {
-
-    func publish() {
-        state = makeState()
-    }
 
     func makeState() -> GameState {
         switch countdownState {
@@ -179,7 +180,7 @@ private extension GameService {
 
     func makeRunningState(player: Player, since: ContinuousClock.Instant) -> GameState {
         var clock = clocks[player]
-        clock.remaining = remaining(for: player, since: since, at: timeSource.now)
+        clock.remaining = remaining(for: player, since: since, at: now)
 
         return GameState(
             phase: .running(player: player),

@@ -45,6 +45,24 @@ struct ClockPresenterObservationTests: ClockPresenterTestSuite {
     }
 
     @Test
+    func aTickInvalidatesEveryObserverOfTheClockModels() {
+        let presenter = makePresenter()
+        let observation = ObservationFlag()
+
+        presenter.press(.black)
+
+        withObservationTracking {
+            _ = presenter.whiteClock
+        } onChange: {
+            observation.fired = true
+        }
+
+        timeSource.advance(by: .seconds(1))
+
+        #expect(observation.fired)
+    }
+
+    @Test
     func aFlagFallInvalidatesEveryObserverOfTheClockModels() {
         let presenter = makePresenter(baseMinutes: 1)
         let observation = ObservationFlag()
