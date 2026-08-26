@@ -42,7 +42,7 @@ struct ClockPausingTests: ClockPresenterTestSuite {
         presenter.pause()
 
         #expect(presenter.showPauseDialog)
-        #expect(presenter.pauseDialogModel.playerName == "Black")
+        #expect(presenter.pauseDialogModel.playerToMove == .black)
     }
 
     @Test
@@ -72,7 +72,7 @@ struct ClockPausingTests: ClockPresenterTestSuite {
         presenter.press(.black)
 
         #expect(presenter.showPauseDialog)
-        #expect(presenter.pauseDialogModel.playerName == "White")
+        #expect(presenter.pauseDialogModel.playerToMove == .white)
         #expect(presenter.whiteClock.reading == "2:50")
     }
 }

@@ -4,6 +4,10 @@ public final class Ticker: TickerProtocol {
 
     public init() {}
 
+    deinit {
+        task?.cancel()
+    }
+
     public func start(interval: Duration, onTick: @escaping () -> Void) {
         stop()
 

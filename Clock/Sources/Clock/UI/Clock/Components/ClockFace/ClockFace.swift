@@ -35,7 +35,7 @@ struct ClockFace: View {
 
     var content: some View {
         VStack(spacing: .small) {
-            Text(model.name)
+            Text(model.side.name)
                 .playerName(appearance.name)
                 .textCase(.uppercase)
                 .padding(.top, .small)
@@ -85,7 +85,6 @@ extension ClockFace {
     struct Model {
 
         let side: Side
-        let name: String
         let state: State
         let timeDisplay: TimeDisplay
 
@@ -153,6 +152,17 @@ private extension ClockFace {
             }
         }
 
+    }
+
+}
+
+private extension ClockFace.Side {
+
+    var name: LocalizedStringResource {
+        switch self {
+        case .white: .whitePlayer
+        case .black: .blackPlayer
+        }
     }
 
 }

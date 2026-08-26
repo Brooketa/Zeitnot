@@ -17,7 +17,6 @@ public enum ColorPalette {
     public static let accentRaised = Color("accentRaised", bundle: .module)
 
     public static let separator = Color("separator", bundle: .module)
-    public static let separatorOnBackground = Color("separatorOnBackground", bundle: .module)
     public static let rule = Color("rule", bundle: .module)
     public static let controlBorder = Color("controlBorder", bundle: .module)
 

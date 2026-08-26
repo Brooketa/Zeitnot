@@ -45,6 +45,27 @@ struct TickerTests {
         #expect(second.count > 1)
     }
 
+    @Test
+    func tickingStopsWhenTickerIsReleased() async throws {
+        var ticker: Ticker? = Ticker()
+        let counter = TickCounter()
+
+        ticker?.start(interval: .milliseconds(10)) {
+            counter.count += 1
+        }
+
+        try await waitUntil { counter.count > 1 }
+        ticker = nil
+
+        let countAtRelease = counter.count
+
+        #expect(countAtRelease > 1)
+
+        try await Task.sleep(for: .milliseconds(100))
+
+        #expect(counter.count == countAtRelease)
+    }
+
 }
 
 private extension TickerTests {

@@ -1,4 +1,3 @@
-import Foundation
 import Observation
 import Core
 
@@ -40,7 +39,7 @@ public final class ClockPresenter {
     }
 
     var pauseDialogModel: PauseDialog.Model {
-        PauseDialog.Model(playerName: String(localized: playerToMove.name))
+        PauseDialog.Model(playerToMove: dialogPlayer(for: playerToMove))
     }
 
     var showPauseDialog: Bool {
@@ -143,7 +142,6 @@ private extension ClockPresenter {
     func makeClockModel(for player: Player) -> ClockFace.Model {
         ClockFace.Model(
             side: side(for: player),
-            name: String(localized: player.name),
             state: faceState(for: player),
             timeDisplay: timeDisplay(for: player))
     }
@@ -169,6 +167,13 @@ private extension ClockPresenter {
         }
     }
 
+    func dialogPlayer(for player: Player) -> PauseDialog.Player {
+        switch player {
+        case .white: .white
+        case .black: .black
+        }
+    }
+
     func faceState(for player: Player) -> ClockFace.State {
         switch state.phase {
         case .notStarted: .awaitingStart
@@ -185,15 +190,3 @@ private extension ClockPresenter {
     }
 
 }
-
-private extension Player {
-
-    var name: LocalizedStringResource {
-        switch self {
-        case .white: .whitePlayer
-        case .black: .blackPlayer
-        }
-    }
-
-}
-
