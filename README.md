@@ -20,8 +20,6 @@ A two-player chess clock for iPhone. Named for the German term for having almost
 | Rapid | `15 \| 10` | Fifteen minutes, plus 10s per move. |
 | Classical | `90 \| 30` | 90 minutes each, plus 30s per move. |
 
-Classical here is base-plus-increment, **not** the standard two-stage Classical format. The copy in the app says as much.
-
 ## How the clock works
 
 - **Black presses to start.** From a fresh game only a tap on Black's half begins play, following the physical chess clock convention. That half reads `PRESS TO START`
