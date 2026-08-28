@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project follows a **feature-first modular architecture**, where each module encapsulates one large, self-contained feature. All modules are managed as local Swift packages via **Swift Package Manager (SPM)** and referenced directly by the `Zeitnot` Xcode project (`Zeitnot.xcodeproj`) — there is no `.xcworkspace`.
+This project follows a **feature-first modular architecture**, where each module encapsulates one large, self-contained feature. All modules are managed as local Swift packages via **Swift Package Manager (SPM)** and referenced directly by the `Zeitnot` Xcode project (`iosApp/Zeitnot.xcodeproj`) — there is no `.xcworkspace`.
 
 Modules are organized in a strict dependency hierarchy. A module may only depend on modules **lower** in the hierarchy — never on sibling feature modules or modules above it.
 
@@ -73,89 +73,102 @@ Each feature module represents **one large, user-facing product area**. Examples
 
 ## Full Project Layout
 
-Every module is its own local Swift package folder at the **repository root**, sitting as a sibling
-of `Zeitnot.xcodeproj` and the app target folder. There is no `Packages/` container directory and no
-`Features/` grouping directory — `Core`, `CoreUI` and every feature package live side by side at the
-top level.
+**A package lives with the platforms that use it.** There are two homes, and which one a package
+gets is decided by one question — does more than one platform build it?
+
+| Package | Lives in |
+|---|---|
+| Built by every platform | The **repository root**, beside the platform folders |
+| Built by one platform only | That **platform's folder** — `iosApp/`, `androidApp/` |
+
+So the root holds only what is genuinely shared, and each platform folder owns everything that is
+its own: its app target, its project file and its platform-only packages. A reader can tell what is
+cross-platform by looking at the root, and nothing else has to be checked.
+
+There is still no `Packages/` container directory and no `Features/` grouping directory. Within
+whichever home it has, a package sits directly there, side by side with its siblings.
 
 ```
 Zeitnot/
-├── Zeitnot.xcodeproj
 ├── CLAUDE.md
-├── Zeitnot/                            # Main app target
-│   ├── ZeitnotApp.swift                # @main entry point (SwiftUI App struct)
-│   ├── App/
-│   │   ├── Navigation/
-│   │   │   ├── AppRouter.swift         # Owns the navigation path, conforms to each feature's Routing protocol
-│   │   │   └── NavigationDestination.swift
-│   │   └── DependencyInjection/
-│   │       ├── Dependencies.swift      # Composition root: owns the router, builds presenters
-│   │       └── DependenciesContainer.swift
-│   ├── Services/                       # App-level services
-│   └── Assets.xcassets/                # App-level assets (app icon, accent colour)
-│
-├── Core/                               # Local Swift package
-│   ├── Package.swift
-│   ├── Docs/
-│   │   └── Core.md
-│   └── Sources/
-│       └── Core/
-│           ├── Extensions/
-│           │   ├── String+Extensions.swift
-│           │   ├── Date+Extensions.swift
-│           │   └── ...
-│           └── Types/
-│               ├── AppError.swift
-│               ├── LoadingState.swift
+├── Shared/                             # Local Swift package — every platform builds it
+├── iosApp/                             # The iOS app and its iOS-only packages
+│   ├── Zeitnot.xcodeproj
+│   ├── Zeitnot/                        # Main app target
+│   │   ├── ZeitnotApp.swift            # @main entry point (SwiftUI App struct)
+│   │   ├── App/
+│   │   │   ├── Navigation/
+│   │   │   │   ├── AppRouter.swift     # Owns the navigation path, conforms to each feature's Routing protocol
+│   │   │   │   └── NavigationDestination.swift
+│   │   │   └── DependencyInjection/
+│   │   │       ├── Dependencies.swift  # Composition root: owns the router, builds presenters
+│   │   │       └── DependenciesContainer.swift
+│   │   ├── Services/                   # App-level services
+│   │   └── Assets.xcassets/            # App-level assets (app icon, accent colour)
+│   │
+│   ├── Core/                           # Local Swift package — iOS only
+│   │   ├── Package.swift
+│   │   ├── Docs/
+│   │   │   └── Core.md
+│   │   └── Sources/
+│   │       └── Core/
+│   │           ├── Extensions/
+│   │           │   ├── String+Extensions.swift
+│   │           │   └── ...
+│   │           └── Types/
+│   │               ├── AppError.swift
+│   │               └── ...
+│   │
+│   ├── CoreUI/                         # Local Swift package — iOS only
+│   │   ├── Package.swift
+│   │   ├── Docs/
+│   │   └── Sources/
+│   │       └── CoreUI/
+│   │           ├── Design/
+│   │           │   ├── Colors/
+│   │           │   │   ├── ColorPalette.swift
+│   │           │   │   └── Colors.xcassets/
+│   │           │   ├── Typography/
+│   │           │   │   ├── Typography.swift
+│   │           │   │   └── Text+Typography.swift
+│   │           │   └── Spacing/
+│   │           │       └── CGFloat+Spacing.swift
+│   │           ├── Components/
+│   │           │   ├── PrimaryButton.swift
+│   │           │   └── ...
+│   │           ├── Modifiers/
+│   │           │   ├── ReadHeightModifier.swift
+│   │           │   └── ...
+│   │           ├── Extensions/
+│   │           │   └── View+Extensions.swift
+│   │           └── Images/
+│   │               └── AppImages.swift
+│   │
+│   ├── Setup/                          # Feature package — iOS only
+│   │   ├── Package.swift
+│   │   ├── Docs/
+│   │   │   └── SetupScreen.md
+│   │   └── Sources/
+│   │       └── Setup/
+│   │           └── ...
+│   │
+│   └── Clock/                          # Feature package — iOS only
+│       ├── Package.swift
+│       ├── Docs/
+│       │   └── ClockScreen.md
+│       └── Sources/
+│           └── Clock/
 │               └── ...
 │
-├── CoreUI/                             # Local Swift package
-│   ├── Package.swift
-│   ├── Docs/
-│   └── Sources/
-│       └── CoreUI/
-│           ├── Design/
-│           │   ├── Colors/
-│           │   │   ├── ColorPalette.swift
-│           │   │   └── Colors.xcassets/
-│           │   ├── Typography/
-│           │   │   ├── Typography.swift
-│           │   │   └── Text+Typography.swift
-│           │   └── Spacing/
-│           │       └── CGFloat+Spacing.swift
-│           ├── Components/
-│           │   ├── PrimaryButton.swift
-│           │   └── ...
-│           ├── Modifiers/
-│           │   ├── ReadHeightModifier.swift
-│           │   └── ...
-│           ├── Extensions/
-│           │   └── View+Extensions.swift
-│           └── Images/
-│               └── AppImages.swift
-│
-├── Setup/                              # Feature package
-│   ├── Package.swift
-│   ├── Docs/
-│   │   └── SetupScreen.md
-│   └── Sources/
-│       └── Setup/
-│           └── ...
-│
-└── Clock/                              # Feature package
-    ├── Package.swift
-    ├── Docs/
-    │   └── ClockScreen.md
-    └── Sources/
-        └── Clock/
-            └── ...
+└── androidApp/                         # The Android app and its Android-only modules
 ```
-
-`CoreUI` and the app target are what exist today; `Core`, `Setup` and `Clock` above show where
-modules land as they are added.
 
 Notes on the tree:
 
+- A package shared by every platform sits at the repository root; a package only one platform
+  builds sits inside that platform's folder. Nothing else decides where a package goes.
+- A platform folder holds its app target, its project file and its platform-only packages, so it
+  can be read on its own without chasing references out to the root.
 - The package folder name, the `Package.swift` product name, the target name and the
   `Sources/<Module>/` folder all carry the **same** module name.
 - Sources always sit under `Sources/<ModuleName>/`, never directly under `Sources/`.
@@ -178,13 +191,16 @@ the Package Dependencies node. It is the more obvious route in Xcode's UI and it
 `packageReferences` is reserved for *remote* dependencies (`XCRemoteSwiftPackageReference`) — no
 local package ever appears there.
 
-Adding a module means four entries in `Zeitnot.xcodeproj/project.pbxproj`. Substitute the module
-name for `<Module>` throughout:
+Adding a module means four entries in `iosApp/Zeitnot.xcodeproj/project.pbxproj`. Substitute the
+module name for `<Module>` throughout:
 
-**1. `PBXFileReference`** — the package folder itself, typed as a `wrapper`:
+**1. `PBXFileReference`** — the package folder itself, typed as a `wrapper`. An iOS-only package
+sits beside the project inside `iosApp/`, so its path is bare; a shared package lives at the
+repository root and is reached with `../`:
 
 ```
 <UUID_A> /* <Module> */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = <Module>; sourceTree = "<group>"; };
+<UUID_A> /* Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ../Shared; sourceTree = "<group>"; };
 ```
 
 **2. Main group `children`** — so the folder shows in the navigator:
@@ -214,18 +230,19 @@ It is listed in the target's `packageProductDependencies`.
 
 After adding a module, confirm `packageReferences` still contains no local package.
 
-**Cross-package dependencies** are declared by relative path, since every package folder is a
-sibling at the repository root:
+**Cross-package dependencies** are declared by relative path. Packages in the same home are
+siblings, so they reach each other with `../`; a platform-only package reaches a shared one at the
+repository root with `../../`:
 
 ```swift
 dependencies: [
-    .package(name: "Core", path: "../Core"),
-    .package(name: "CoreUI", path: "../CoreUI")
+    .package(name: "CoreUI", path: "../CoreUI"),
+    .package(name: "Shared", path: "../../Shared")
 ],
 targets: [
     .target(
         name: "Setup",
-        dependencies: ["Core", "CoreUI"])
+        dependencies: ["CoreUI", "Shared"])
 ]
 ```
 ---
@@ -439,11 +456,13 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 
 ## Adding a New Module Checklist
 
-1. Create the package folder at the **repository root**, `FeatureName/`, as a sibling of
-   `Zeitnot.xcodeproj` — not under a `Packages/` or `Features/` directory.
+1. Decide the package's home: the **repository root** if every platform builds it, otherwise the
+   folder of the one platform that does (`iosApp/FeatureName/`). Not under a `Packages/` or
+   `Features/` directory either way.
 2. Add `Package.swift` with the product, target and `Sources/FeatureName/` folder all named after the
-   module, declaring `Core` and `CoreUI` by relative path (`.package(name: "Core", path: "../Core")`).
-3. Reference the package folder in `Zeitnot.xcodeproj` as a **wrapper folder reference** off the
+   module, declaring its dependencies by relative path — `../CoreUI` for a sibling, `../../Shared`
+   for a shared package at the root.
+3. Reference the package folder in `iosApp/Zeitnot.xcodeproj` as a **wrapper folder reference** off the
    project's main group — **not** through _Package Dependencies_. See Referencing A Package In The
    Xcode Project for the exact `project.pbxproj` entries.
 4. Link the module product to the App target: an `XCSwiftPackageProductDependency` with only
