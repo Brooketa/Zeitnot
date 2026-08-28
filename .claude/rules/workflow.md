@@ -59,6 +59,20 @@ Each issue must carry a **type of work** (feature, bug, chore, refactor, etc.) �
 drive branch names (see Git → Branch Naming). Write a clear title and put the full context in the
 description. The Jira board is the single source of truth for deferred work — there is no `backlog.md`.
 
+### Type Of Work Is A Label
+
+The board's **issue type** does not carry the type of work. `ZN` offers only Epic, Story, Task, Bug
+and Subtask, so a refactor and a chore are both filed as `Task` and the branch prefix cannot be read
+off the issue type.
+
+The type of work is therefore a **label** on the issue, spelled exactly as the branch prefix:
+`feat`, `bugfix`, `chore`, `refactor`. Every issue carries one, set at creation, and it is what a
+branch name is built from. Bugs carry `bugfix` as well as being typed `Bug` — the label is the
+single place to read the prefix from, so it is never left implicit.
+
+Labels are queryable (`project = ZN AND labels = refactor`) and show on the board card, which the
+description alone does not.
+
 ## Git
 
 ### Two Levels Of Branch
@@ -101,8 +115,9 @@ branch; the PR tag does that.
 | Chore        | `chore`    |
 | Refactor     | `refactor` |
 
-Each issue must carry a type of work. Ask for it only if it isn't given and can't be inferred from
-the issue.
+The prefix comes from the issue's **type-of-work label**, not its Jira issue type — see Backlog →
+Type Of Work Is A Label. If an issue has no such label, add one before cutting the branch. Ask for
+it only if it isn't given and can't be inferred from the issue.
 
 ### Starting Work
 

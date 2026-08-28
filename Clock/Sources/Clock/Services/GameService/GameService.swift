@@ -8,6 +8,12 @@ public final class GameService: GameServiceProtocol {
     private let timeSource: TimeSourceProtocol
     private let ticker: TickerProtocol
 
+    private var countdownState: CountdownState = .notStarted {
+        didSet {
+            syncTicking()
+        }
+    }
+
     private var clocks: PlayerClocks
     private var now: ContinuousClock.Instant
 
@@ -24,12 +30,6 @@ public final class GameService: GameServiceProtocol {
     public var state: GameState {
         makeState()
     }
-
-	private var countdownState: CountdownState = .notStarted {
-		didSet {
-			syncTicking()
-		}
-	}
 
     public func start() {
         guard case .notStarted = countdownState else { return }

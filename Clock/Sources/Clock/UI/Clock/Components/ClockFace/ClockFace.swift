@@ -27,10 +27,10 @@ struct ClockFace: View {
                 radius: Constants.shadowRadius,
                 y: Constants.shadowOffset)
             .contentShape(.rect)
-			.onTapGesture {
-				action(.press(model.side))
-			}
-			.animation(.easeOut(duration: Constants.stateChangeDuration), value: model.state)
+            .onTapGesture {
+                action(.press(model.side))
+            }
+            .animation(.easeOut(duration: Constants.stateChangeDuration), value: model.state)
     }
 
     var content: some View {
@@ -124,19 +124,19 @@ extension ClockFace {
 
 private extension ClockFace {
 
-	enum Constants {
+    enum Constants {
 
-		static let captionPlaceholder = " "
-		static let cornerRadius: CGFloat = 26
-		static let turnRingWidth: CGFloat = 3
-		static let shadowRadius: CGFloat = 3
-		static let shadowOffset: CGFloat = 1
-		static let shadowOpacity: CGFloat = 0.12
-		static let stateChangeDuration: TimeInterval = 0.2
-		static let pulseDuration: TimeInterval = 0.5
-		static let pulseOpacity: CGFloat = 0.25
+        static let captionPlaceholder = " "
+        static let cornerRadius: CGFloat = 26
+        static let turnRingWidth: CGFloat = 3
+        static let shadowRadius: CGFloat = 3
+        static let shadowOffset: CGFloat = 1
+        static let shadowOpacity: CGFloat = 0.12
+        static let stateChangeDuration: TimeInterval = 0.2
+        static let pulseDuration: TimeInterval = 0.5
+        static let pulseOpacity: CGFloat = 0.25
 
-	}
+    }
 
     enum RingPhase {
 
@@ -169,30 +169,30 @@ private extension ClockFace.Side {
 
 private extension ClockFace.State {
 
-	struct Appearance {
+    struct Appearance {
 
-		let fill: Color
-		let name: Color
-		let caption: Color
-		let ring: Ring
+        let fill: Color
+        let name: Color
+        let caption: Color
+        let ring: Ring
 
-	}
+    }
 
-	enum Ring {
+    enum Ring {
 
-		case none
-		case steady
-		case pulsing
+        case none
+        case steady
+        case pulsing
 
-		var phases: [ClockFace.RingPhase] {
-			switch self {
-			case .none: [.hidden]
-			case .steady: [.shown]
-			case .pulsing: [.shown, .dimmed]
-			}
-		}
+        var phases: [ClockFace.RingPhase] {
+            switch self {
+            case .none: [.hidden]
+            case .steady: [.shown]
+            case .pulsing: [.shown, .dimmed]
+            }
+        }
 
-	}
+    }
 
 }
 
@@ -227,12 +227,12 @@ private extension ClockFace.State {
         }
     }
 
-	func caption(side: ClockFace.Side) -> LocalizedStringResource? {
-		switch self {
-		case .flagged: .flagFell
-		case .awaitingStart where side == .black: .pressToStart
-		default: nil
-		}
-	}
+    func caption(side: ClockFace.Side) -> LocalizedStringResource? {
+        switch self {
+        case .flagged: .flagFell
+        case .awaitingStart where side == .black: .pressToStart
+        default: nil
+        }
+    }
 
 }

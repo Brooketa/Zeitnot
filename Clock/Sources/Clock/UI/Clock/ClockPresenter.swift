@@ -12,10 +12,10 @@ public final class ClockPresenter {
     private let router: any ClockRoutingProtocol
 
     public init(
-		gameConfiguration: GameConfiguration,
-		gameService: any GameServiceProtocol,
-		router: any ClockRoutingProtocol
-	) {
+        gameConfiguration: GameConfiguration,
+        gameService: any GameServiceProtocol,
+        router: any ClockRoutingProtocol
+    ) {
         self.gameConfiguration = gameConfiguration
         self.gameService = gameService
         self.router = router
