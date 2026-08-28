@@ -59,6 +59,21 @@ Each issue must carry a **type of work** (feature, bug, chore, refactor, etc.) �
 drive branch names (see Git → Branch Naming). Write a clear title and put the full context in the
 description. The Jira board is the single source of truth for deferred work — there is no `backlog.md`.
 
+### Ticket Structure
+
+Every issue is written the same way, so a reader knows where to look:
+
+- **Title** — understandable on its own, in the board's list, by someone who wasn't in the conversation.
+- **Description** — a short paragraph or two saying what this is and why. No implementation.
+- **Task details** — what to actually do. Bullets, sub-headings, code or trees where they say it faster.
+- **Acceptance criteria** — how we know it's done. Checkable statements, not restated task details.
+
+The type-of-work line sits above the Description. Epics follow the same shape and list their tickets
+in Task details.
+
+Acceptance criteria are the part most often skipped and the part most worth writing: a ticket that
+cannot say when it is finished will be finished by whoever gets bored first.
+
 ### Type Of Work Is A Label
 
 The board's **issue type** does not carry the type of work. `ZN` offers only Epic, Story, Task, Bug

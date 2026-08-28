@@ -72,6 +72,17 @@ One local Swift package per module, and a screen is layered View → Presenter �
 App  ──▶  Setup · Clock  ──▶  CoreUI  ──▶  Core
 ```
 
+Each platform gets a folder holding its app and the packages only it builds; anything every platform
+builds sits at the repository root. Open `iosApp/Zeitnot.xcodeproj` to build.
+
+```
+Zeitnot/
+└── iosApp/
+    ├── Zeitnot.xcodeproj
+    ├── Zeitnot/                       # app target
+    └── Core/  CoreUI/  Setup/  Clock/ # local Swift packages, iOS only
+```
+
 - **The Service holds the game.** `GameService` owns the two clocks, whose turn it is, and what starting, passing, pausing and resetting mean. The Presenter turns that into the strings a view renders; the View only reports taps back
 - **Remaining time is computed from a monotonic instant**, never accumulated tick by tick, so a 90-minute game doesn't drift and backgrounding can't cheat
 - **Features never import each other.** Each declares a routing protocol; `AppRouter` satisfies both
