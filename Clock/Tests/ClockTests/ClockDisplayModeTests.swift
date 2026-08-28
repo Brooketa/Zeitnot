@@ -20,26 +20,26 @@ struct ClockDisplayModeTests: ClockPresenterTestSuite {
     func selectingAModeChangesBothClocksTogether() {
         let presenter = makePresenter()
 
-        presenter.selectDisplayMode(.analog)
+        presenter.displayMode = .analog
 
         #expect(presenter.whiteClock.timeDisplay.isAnalog)
         #expect(presenter.blackClock.timeDisplay.isAnalog)
 
-        presenter.selectDisplayMode(.digital)
+        presenter.displayMode = .digital
 
         #expect(!presenter.whiteClock.timeDisplay.isAnalog)
         #expect(!presenter.blackClock.timeDisplay.isAnalog)
     }
 
     @Test
-    func theControlBarReportsTheSelectedMode() {
+    func thePresenterReportsTheSelectedMode() {
         let presenter = makePresenter()
 
-        #expect(presenter.controlBarModel.displayModeControl.displayMode == .digital)
+        #expect(presenter.displayMode == .digital)
 
-        presenter.selectDisplayMode(.analog)
+        presenter.displayMode = .analog
 
-        #expect(presenter.controlBarModel.displayModeControl.displayMode == .analog)
+        #expect(presenter.displayMode == .analog)
     }
 
     @Test
@@ -51,7 +51,7 @@ struct ClockDisplayModeTests: ClockPresenterTestSuite {
 
         let moveNumber = presenter.headerModel.moveNumber
 
-        presenter.selectDisplayMode(.analog)
+        presenter.displayMode = .analog
 
         #expect(presenter.isCountingDown)
         #expect(presenter.whiteClock.state == .toMove)
@@ -72,7 +72,7 @@ struct ClockDisplayModeTests: ClockPresenterTestSuite {
         timeSource.advance(by: .seconds(10))
         presenter.pause()
 
-        presenter.selectDisplayMode(.analog)
+        presenter.displayMode = .analog
 
         #expect(presenter.showPauseDialog)
         #expect(presenter.whiteClock.timeDisplay.isAnalog)
@@ -92,7 +92,7 @@ struct ClockDisplayModeTests: ClockPresenterTestSuite {
 
         #expect(presenter.whiteClock.state == .flagged)
 
-        presenter.selectDisplayMode(.analog)
+        presenter.displayMode = .analog
 
         #expect(presenter.whiteClock.state == .flagged)
         #expect(presenter.whiteClock.timeDisplay.isAnalog)
@@ -107,8 +107,8 @@ struct ClockDisplayModeTests: ClockPresenterTestSuite {
 
         for _ in 0..<5 {
             timeSource.advance(by: .seconds(2))
-            presenter.selectDisplayMode(.analog)
-            presenter.selectDisplayMode(.digital)
+            presenter.displayMode = .analog
+            presenter.displayMode = .digital
         }
 
         presenter.press(.white)

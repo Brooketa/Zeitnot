@@ -8,6 +8,22 @@ struct ClockPausingTests: ClockPresenterTestSuite {
     let router = FakeClockRouter()
 
     @Test
+    func thePauseButtonIsEnabledOnlyWhileRunning() {
+        let presenter = makePresenter()
+
+        #expect(!presenter.controlBarModel.canPause)
+
+        presenter.press(.black)
+
+        #expect(presenter.controlBarModel.canPause)
+
+        timeSource.advance(by: .seconds(10))
+        presenter.pause()
+
+        #expect(!presenter.controlBarModel.canPause)
+    }
+
+    @Test
     func thePauseDialogIsAbsentWhileTheGameRuns() {
         let presenter = makePresenter()
 
@@ -26,7 +42,7 @@ struct ClockPausingTests: ClockPresenterTestSuite {
         presenter.pause()
 
         #expect(presenter.showPauseDialog)
-        #expect(presenter.pauseDialogModel.playerName == "Black")
+        #expect(presenter.pauseDialogModel.playerToMove == .black)
     }
 
     @Test
@@ -56,7 +72,7 @@ struct ClockPausingTests: ClockPresenterTestSuite {
         presenter.press(.black)
 
         #expect(presenter.showPauseDialog)
-        #expect(presenter.pauseDialogModel.playerName == "White")
+        #expect(presenter.pauseDialogModel.playerToMove == .white)
         #expect(presenter.whiteClock.reading == "2:50")
     }
 }

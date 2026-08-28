@@ -1,18 +1,21 @@
-import Foundation
 import Observation
 import Core
 
 @Observable
 public final class ClockPresenter {
 
-    private(set) var displayMode: DisplayMode = .digital
+    var displayMode: DisplayMode = .digital
     private(set) var showResetDialog = false
 
     private let gameConfiguration: GameConfiguration
-    private let gameService: GameServiceProtocol
-    private let router: ClockRoutingProtocol
+    private let gameService: any GameServiceProtocol
+    private let router: any ClockRoutingProtocol
 
-    public init(gameConfiguration: GameConfiguration, gameService: GameServiceProtocol, router: ClockRoutingProtocol) {
+    public init(
+        gameConfiguration: GameConfiguration,
+        gameService: any GameServiceProtocol,
+        router: any ClockRoutingProtocol
+    ) {
         self.gameConfiguration = gameConfiguration
         self.gameService = gameService
         self.router = router
@@ -32,13 +35,11 @@ public final class ClockPresenter {
     }
 
     var controlBarModel: ControlBar.Model {
-        ControlBar.Model(
-            canPause: !isGameOver,
-            displayModeControl: DisplayModeControl.Model(displayMode: displayMode))
+        ControlBar.Model(canPause: isCountingDown, canReset: isCountingDown || isGameOver)
     }
 
     var pauseDialogModel: PauseDialog.Model {
-        PauseDialog.Model(playerName: String(localized: playerToMove.name))
+        PauseDialog.Model(playerToMove: dialogPlayer(for: playerToMove))
     }
 
     var showPauseDialog: Bool {
@@ -93,10 +94,6 @@ public final class ClockPresenter {
         }
     }
 
-    func selectDisplayMode(_ mode: DisplayMode) {
-        displayMode = mode
-    }
-
     func pause() {
         gameService.pause()
     }
@@ -145,7 +142,6 @@ private extension ClockPresenter {
     func makeClockModel(for player: Player) -> ClockFace.Model {
         ClockFace.Model(
             side: side(for: player),
-            name: String(localized: player.name),
             state: faceState(for: player),
             timeDisplay: timeDisplay(for: player))
     }
@@ -171,6 +167,13 @@ private extension ClockPresenter {
         }
     }
 
+    func dialogPlayer(for player: Player) -> PauseDialog.Player {
+        switch player {
+        case .white: .white
+        case .black: .black
+        }
+    }
+
     func faceState(for player: Player) -> ClockFace.State {
         switch state.phase {
         case .notStarted: .awaitingStart
@@ -187,15 +190,3 @@ private extension ClockPresenter {
     }
 
 }
-
-private extension Player {
-
-    var name: LocalizedStringResource {
-        switch self {
-        case .white: .whitePlayer
-        case .black: .blackPlayer
-        }
-    }
-
-}
-

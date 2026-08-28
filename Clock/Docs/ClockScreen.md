@@ -58,17 +58,24 @@ The screen keeps **per-player move counts** and nothing more.
 
 ### Time is elapsed, never accumulated
 
-A running clock's remaining time is **computed on read**: what it held when the turn began, less the
-real time since. Nothing sums ticks, so a 90 minute game accumulates no drift and accuracy does not
-depend on how often the display refreshes.
+A running clock's remaining time is **measured, never counted down**: what it held when the turn
+began, less the real time elapsed since. Nothing sums ticks, so a 90 minute game accumulates no
+drift.
 
-Flag fall is therefore **derived, not detected** — a game whose running clock has reached zero *is*
-finished at that instant, whether or not anything looked. Zero is exact and a clock never reads
-negative.
+A tick decides only **when the clock is sampled**, never what the time is. Every reading is measured
+afresh from the sampled instant, so a tick that arrives late reads a correct time slightly late — it
+cannot read a wrong one, and the tick rate has no bearing on accuracy.
+
+The game therefore **runs itself and announces what it holds**. What it holds is derived rather than
+stored, so there is no stale copy to go out of date: every tick while a clock is running, and every
+input — start, turn change, pause, resume, reset — invalidates what the screen is watching. The
+screen observes; it never polls, and it never asks whether the game has ended. Flag fall is one of
+those announcements: the clock reaching zero ends the game, stops the tick, and tells the screen,
+whether or not anything was looking.
 
 Time comes from a monotonic source that keeps counting while the app is suspended, so a system clock
-change cannot move a game and backgrounding cannot gain a player time. The source is injected, which
-is what lets a 90 minute game be played out in milliseconds under test.
+change cannot move a game and backgrounding cannot gain a player time. Both the time source and the
+tick are injected, which is what lets a 90 minute game be played out in milliseconds under test.
 
 ---
 
@@ -165,6 +172,9 @@ dial greys while waiting and inverts whole when flagged.
 
 ## Pausing
 
+`PAUSE` is enabled only while a clock is running — disabled before the game starts and once it has
+finished, so the button never offers to pause a clock that isn't counting down.
+
 `PAUSE` stops the running clock where it stands and fades in a dialog over a blurred, dimmed board.
 It reads `PAUSED`, names the player who will resume, and offers `RESUME`.
 
@@ -180,6 +190,9 @@ live control while paused. Anything else needs the game resumed first.
 
 `RESET` returns the game to not started: both clocks to full base time, both move counts to zero,
 Black to press first.
+
+`RESET` is enabled while the game is **running** or **finished**, and disabled before the game
+starts — a fresh game has nothing to reset.
 
 - While a game is **running**, it asks first — a dialog offering `RESET` and `CANCEL`. Cancelling
   leaves the game exactly as it was, clock still counting.

@@ -11,13 +11,14 @@ public struct ClockView: View {
 
     public var body: some View {
         VStack(spacing: .large) {
-            TimelineView(.animation(minimumInterval: Constants.tickInterval, paused: !presenter.isCountingDown)) { _ in
-				Header(model: presenter.headerModel, action: onHeaderAction)
+            Header(model: presenter.headerModel, action: onHeaderAction)
 
-                Clocks(model: presenter.clocksModel, action: onClocksAction)
+            Clocks(model: presenter.clocksModel, action: onClocksAction)
 
-				ControlBar(model: presenter.controlBarModel, action: onControlBarAction)
-            }
+            ControlBar(
+                model: presenter.controlBarModel,
+                action: onControlBarAction,
+                displayMode: $presenter.displayMode)
         }
         .padding(.large)
         .primaryBackground()
@@ -65,18 +66,7 @@ private extension ClockView {
         switch action {
         case .pause: presenter.pause()
         case .reset: presenter.reset()
-        case let .selectDisplayMode(mode): presenter.selectDisplayMode(mode)
         }
-    }
-
-}
-
-private extension ClockView {
-
-    enum Constants {
-
-        static let tickInterval: TimeInterval = 1.0 / 60
-
     }
 
 }

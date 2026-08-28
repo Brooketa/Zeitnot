@@ -24,7 +24,7 @@ struct PauseDialog: View {
     }
 
     var playerToMove: some View {
-        Text(.playerToMove(model.playerName))
+        Text(model.playerToMove.text)
             .callout(ColorPalette.textSecondary)
             .textCase(.uppercase)
     }
@@ -52,7 +52,14 @@ extension PauseDialog {
 
     struct Model {
 
-        let playerName: String
+        let playerToMove: Player
+
+    }
+
+    enum Player {
+
+        case white
+        case black
 
     }
 
@@ -64,6 +71,17 @@ extension PauseDialog {
 
         case resume
 
+    }
+
+}
+
+private extension PauseDialog.Player {
+
+    var text: LocalizedStringResource {
+        switch self {
+        case .white: .whiteToMove
+        case .black: .blackToMove
+        }
     }
 
 }

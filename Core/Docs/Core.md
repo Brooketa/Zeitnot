@@ -22,6 +22,11 @@ instead would mean converting back to integers every time a label is drawn.
 
 It is `Hashable`, `Codable` and `Sendable` — a value with no identity and no behaviour.
 
+The six time controls the app plays under are named on the type itself — `.bullet1plus0`,
+`.blitz3plus2`, `.blitz5plus0`, `.rapid10plus0`, `.rapid15plus10`, `.classical90plus30`. The numbers
+live here so a screen naming a time control never spells the pair out, and two screens naming the
+same one cannot disagree about it.
+
 ---
 
 ## Game Configuration

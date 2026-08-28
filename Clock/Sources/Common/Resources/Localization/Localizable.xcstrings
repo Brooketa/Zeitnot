@@ -37,6 +37,18 @@
         }
       }
     },
+    "blackToMove": {
+      "comment": "Shown on the pause dialog when Black resumes. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Black to move"
+          }
+        }
+      }
+    },
     "cancelButton": {
       "comment": "Button on the reset dialog that dismisses it and keeps the game. Uppercased for display.",
       "extractionState": "manual",
@@ -121,18 +133,6 @@
         }
       }
     },
-    "playerToMove": {
-      "comment": "Names the player whose turn resumes, shown on the pause dialog. Uppercased for display.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ to move"
-          }
-        }
-      }
-    },
     "pressToStart": {
       "comment": "Prompt on the black player's clock face before the game starts, naming the half to press. Uppercased for display.",
       "extractionState": "manual",
@@ -213,6 +213,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "White"
+          }
+        }
+      }
+    },
+    "whiteToMove": {
+      "comment": "Shown on the pause dialog when White resumes. Uppercased for display.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "White to move"
           }
         }
       }

@@ -126,11 +126,23 @@ struct GameServiceTests {
         let service = makeService(baseMinutes: 1)
 
         service.start()
-        timeSource.advance(by: .milliseconds(59_999))
+        timeSource.advance(by: .milliseconds(59_900))
         let state = service.state
 
         #expect(state.phase == .running(player: .white))
-        #expect(state.white.remaining == .milliseconds(1))
+        #expect(state.white.remaining == .milliseconds(100))
+    }
+
+    @Test
+    func aClockWithLessThanATickLeftCanStillEndItsTurn() {
+        let service = makeService(baseMinutes: 1)
+
+        service.start()
+        timeSource.advanceWithoutTicking(by: .milliseconds(59_999))
+        service.endTurn()
+
+        #expect(service.state.phase == .running(player: .black))
+        #expect(service.state.white.remaining == .milliseconds(1))
     }
 
     @Test
@@ -155,6 +167,31 @@ struct GameServiceTests {
         #expect(state.phase == .finished(winner: .black))
         #expect(state.white.remaining == .zero)
         #expect(state.white.moveCount == 0)
+    }
+
+    @Test
+    func aClockThatRanOutCannotEndItsTurnBeforeTheNextTick() {
+        let service = makeService(baseMinutes: 1, incrementSeconds: 30)
+
+        service.start()
+        timeSource.advanceWithoutTicking(by: .seconds(60))
+        service.endTurn()
+
+        #expect(service.state.phase == .finished(winner: .black))
+        #expect(service.state.white.remaining == .zero)
+        #expect(service.state.white.moveCount == 0)
+        #expect(service.state.black.remaining == .seconds(60))
+    }
+
+    @Test
+    func aClockThatRanOutCannotBePausedBeforeTheNextTick() {
+        let service = makeService(baseMinutes: 1)
+
+        service.start()
+        timeSource.advanceWithoutTicking(by: .seconds(60))
+        service.pause()
+
+        #expect(service.state.phase == .finished(winner: .black))
     }
 
     @Test
@@ -200,7 +237,8 @@ struct GameServiceTests {
     private func makeService(baseMinutes: Int, incrementSeconds: Int = 0) -> GameService {
         GameService(
             timeControl: TimeControl(baseMinutes: baseMinutes, incrementSeconds: incrementSeconds),
-            timeSource: timeSource)
+            timeSource: timeSource,
+            ticker: timeSource)
     }
 
 }

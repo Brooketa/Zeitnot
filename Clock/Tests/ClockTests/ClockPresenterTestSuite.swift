@@ -19,7 +19,7 @@ extension ClockPresenterTestSuite {
 
         return ClockPresenter(
             gameConfiguration: GameConfiguration(timeControl: timeControl, category: category),
-            gameService: GameService(timeControl: timeControl, timeSource: timeSource),
+            gameService: GameService(timeControl: timeControl, timeSource: timeSource, ticker: timeSource),
             router: router)
     }
 
