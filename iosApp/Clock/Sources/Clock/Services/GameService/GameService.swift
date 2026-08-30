@@ -1,5 +1,5 @@
 import Observation
-import Core
+import GameDomain
 
 @Observable
 public final class GameService: GameServiceProtocol {

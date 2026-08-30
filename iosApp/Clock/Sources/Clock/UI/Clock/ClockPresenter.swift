@@ -1,5 +1,5 @@
 import Observation
-import Core
+import GameDomain
 
 @Observable
 public final class ClockPresenter {
@@ -23,7 +23,7 @@ public final class ClockPresenter {
 
     var headerModel: Header.Model {
         Header.Model(
-            category: gameConfiguration.category,
+            category: gameConfiguration.category.name,
             baseMinutes: timeControl.baseMinutes,
             incrementSeconds: timeControl.incrementSeconds,
             moveNumber: state.black.moveCount + 1,

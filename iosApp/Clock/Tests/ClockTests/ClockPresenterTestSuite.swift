@@ -1,4 +1,4 @@
-import Core
+import GameDomain
 @testable import Clock
 
 protocol ClockPresenterTestSuite {
@@ -11,7 +11,7 @@ protocol ClockPresenterTestSuite {
 extension ClockPresenterTestSuite {
 
     func makePresenter(
-        category: String = "Blitz",
+        category: RulesetCategory = .blitz,
         baseMinutes: Int = 3,
         incrementSeconds: Int = 2
     ) -> ClockPresenter {

@@ -1,4 +1,4 @@
-import Core
+import GameDomain
 
 public protocol SetupRoutingProtocol {
 

@@ -1,42 +1,38 @@
 import Observation
-import Core
+import GameDomain
 
 @Observable
 public final class SetupPresenter {
-
-    var rulesetModels: [RulesetCell.Model] {
-        PresetRuleset.catalogue.map { preset in
-            RulesetCell.Model(
-                id: preset.id,
-                category: preset.category,
-                description: preset.description,
-                baseMinutes: preset.timeControl.baseMinutes,
-                incrementSeconds: preset.timeControl.incrementSeconds,
-                isSelected: preset.id == selection.id)
-        }
-    }
-
-    var startGameModel: StartGameBar.Model {
-        StartGameBar.Model(
-            category: selectedCategory,
-            baseMinutes: selection.timeControl.baseMinutes,
-            incrementSeconds: selection.timeControl.incrementSeconds)
-    }
-
-    var gameConfiguration: GameConfiguration {
-        GameConfiguration(timeControl: selection.timeControl, category: selectedCategory)
-    }
 
     private let router: SetupRoutingProtocol
 
     private var selection: PresetRuleset = .bullet1plus0
 
-    private var selectedCategory: String {
-        String(localized: selection.category)
-    }
-
     public init(router: SetupRoutingProtocol) {
         self.router = router
+    }
+
+    var rulesetModels: [RulesetCell.Model] {
+        PresetRuleset.allCases.map { preset in
+            RulesetCell.Model(
+                id: preset.id,
+                category: preset.category.name,
+                description: preset.description,
+                baseMinutes: preset.timeControl.baseMinutes,
+                incrementSeconds: preset.timeControl.incrementSeconds,
+                isSelected: preset == selection)
+        }
+    }
+
+    var startGameModel: StartGameBar.Model {
+        StartGameBar.Model(
+            category: selection.category.name,
+            baseMinutes: selection.timeControl.baseMinutes,
+            incrementSeconds: selection.timeControl.incrementSeconds)
+    }
+
+    var gameConfiguration: GameConfiguration {
+        GameConfiguration(timeControl: selection.timeControl, category: selection.category)
     }
 
     func select(_ ruleset: PresetRuleset) {
@@ -44,9 +40,9 @@ public final class SetupPresenter {
     }
 
     func selectRuleset(id: String) {
-        guard let preset = PresetRuleset.catalogue.first(where: { preset in preset.id == id }) else { return }
+        guard let ruleset = PresetRuleset(rawValue: id) else { return }
 
-        select(preset)
+        select(ruleset)
     }
 
     func startGame() {

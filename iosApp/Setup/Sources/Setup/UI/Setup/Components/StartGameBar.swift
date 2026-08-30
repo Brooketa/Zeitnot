@@ -50,7 +50,7 @@ struct StartGameBar: View {
 				.buttonLabel()
 				.textCase(.uppercase)
 
-			Text(.selectedRuleset(model.category, model.baseMinutes, model.incrementSeconds))
+			Text(.selectedRuleset(String(localized: model.category), model.baseMinutes, model.incrementSeconds))
 				.footnote(ColorPalette.inkInverse)
 		}
 	}
@@ -69,7 +69,7 @@ extension StartGameBar {
 
     struct Model {
 
-        let category: String
+        let category: LocalizedStringResource
         let baseMinutes: Int
         let incrementSeconds: Int
 

@@ -1,6 +1,6 @@
 import Testing
 import Observation
-import Core
+import GameDomain
 @testable import Clock
 
 struct ClockPresenterObservationTests: ClockPresenterTestSuite {

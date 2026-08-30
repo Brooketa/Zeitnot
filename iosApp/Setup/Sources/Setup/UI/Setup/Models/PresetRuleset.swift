@@ -1,60 +1,40 @@
-import Foundation
-import Core
+import GameDomain
 
-nonisolated struct PresetRuleset: Identifiable, Equatable, Sendable {
+nonisolated enum PresetRuleset: String, CaseIterable, Identifiable, Sendable {
 
-    let id: String
-    let category: LocalizedStringResource
-    let description: LocalizedStringResource
-    let timeControl: TimeControl
+    case bullet1plus0 = "bullet-1-0"
+    case blitz3plus2 = "blitz-3-2"
+    case blitz5plus0 = "blitz-5-0"
+    case rapid10plus0 = "rapid-10-0"
+    case rapid15plus10 = "rapid-15-10"
+    case classical90plus30 = "classical-90-30"
 
 }
 
 nonisolated extension PresetRuleset {
 
-    static let bullet1plus0 = PresetRuleset(
-        id: "bullet-1-0",
-        category: .bulletCategory,
-        description: .bullet1Plus0Description,
-        timeControl: .bullet1plus0)
+    var id: String {
+        rawValue
+    }
 
-    static let blitz3plus2 = PresetRuleset(
-        id: "blitz-3-2",
-        category: .blitzCategory,
-        description: .blitz3Plus2Description,
-        timeControl: .blitz3plus2)
+    var timeControl: TimeControl {
+        switch self {
+        case .bullet1plus0: .bullet1plus0
+        case .blitz3plus2: .blitz3plus2
+        case .blitz5plus0: .blitz5plus0
+        case .rapid10plus0: .rapid10plus0
+        case .rapid15plus10: .rapid15plus10
+        case .classical90plus30: .classical90plus30
+        }
+    }
 
-    static let blitz5plus0 = PresetRuleset(
-        id: "blitz-5-0",
-        category: .blitzCategory,
-        description: .blitz5Plus0Description,
-        timeControl: .blitz5plus0)
-
-    static let rapid10plus0 = PresetRuleset(
-        id: "rapid-10-0",
-        category: .rapidCategory,
-        description: .rapid10Plus0Description,
-        timeControl: .rapid10plus0)
-
-    static let rapid15plus10 = PresetRuleset(
-        id: "rapid-15-10",
-        category: .rapidCategory,
-        description: .rapid15Plus10Description,
-        timeControl: .rapid15plus10)
-
-    static let classical90plus30 = PresetRuleset(
-        id: "classical-90-30",
-        category: .classicalCategory,
-        description: .classical90Plus30Description,
-        timeControl: .classical90plus30)
-
-    static let catalogue: [PresetRuleset] = [
-        bullet1plus0,
-        blitz3plus2,
-        blitz5plus0,
-        rapid10plus0,
-        rapid15plus10,
-        classical90plus30
-    ]
+    var category: RulesetCategory {
+        switch self {
+        case .bullet1plus0: .bullet
+        case .blitz3plus2, .blitz5plus0: .blitz
+        case .rapid10plus0, .rapid15plus10: .rapid
+        case .classical90plus30: .classical
+        }
+    }
 
 }

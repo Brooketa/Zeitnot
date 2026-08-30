@@ -3,25 +3,29 @@
 import PackageDescription
 
 let package = Package(
-    name: "Core",
+    name: "GameDomain",
+    defaultLocalization: "en",
     platforms: [
         .iOS("26.5"),
         .macOS(.v14)
     ],
     products: [
         .library(
-            name: "Core",
-            targets: ["Core"])
+            name: "GameDomain",
+            targets: ["GameDomain"])
     ],
     targets: [
         .target(
-            name: "Core",
+            name: "GameDomain",
+            resources: [
+                .process("Resources/Localization")
+            ],
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]),
         .testTarget(
-            name: "CoreTests",
-            dependencies: ["Core"],
+            name: "GameDomainTests",
+            dependencies: ["GameDomain"],
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ])

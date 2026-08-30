@@ -1,5 +1,6 @@
+import Foundation
 import Testing
-import Core
+import GameDomain
 @testable import Setup
 
 struct SetupPresenterTests {
@@ -8,17 +9,17 @@ struct SetupPresenterTests {
     func bulletOnePlusZeroIsSelectedInitially() {
         let presenter = makePresenter()
 
-        #expect(selectedPresets(of: presenter) == [.bullet1plus0])
+        #expect(selectedIds(of: presenter) == [PresetRuleset.bullet1plus0.id])
     }
 
     @Test
     func exactlyOneRulesetIsSelectedAtAllTimes() {
         let presenter = makePresenter()
 
-        for preset in PresetRuleset.catalogue {
+        for preset in PresetRuleset.allCases {
             presenter.select(preset)
 
-            #expect(selectedPresets(of: presenter) == [preset])
+            #expect(selectedIds(of: presenter) == [preset.id])
         }
     }
 
@@ -28,7 +29,7 @@ struct SetupPresenterTests {
 
         presenter.select(.classical90plus30)
 
-        #expect(selectedPresets(of: presenter) == [.classical90plus30])
+        #expect(selectedIds(of: presenter) == [PresetRuleset.classical90plus30.id])
     }
 
     @Test
@@ -38,21 +39,21 @@ struct SetupPresenterTests {
         presenter.select(.rapid15plus10)
         presenter.select(.rapid15plus10)
 
-        #expect(selectedPresets(of: presenter) == [.rapid15plus10])
+        #expect(selectedIds(of: presenter) == [PresetRuleset.rapid15plus10.id])
     }
 
     @Test
     func modelsFollowTheCatalogueOrder() {
         let presenter = makePresenter()
 
-        #expect(presenter.rulesetModels.map(\.id) == PresetRuleset.catalogue.map(\.id))
+        #expect(presenter.rulesetModels.map(\.id) == PresetRuleset.allCases.map(\.id))
     }
 
     @Test
     func startGameModelCarriesTheSelectedRuleset() {
         let presenter = makePresenter()
 
-        #expect(presenter.startGameModel.category == "Bullet")
+        #expect(presenter.startGameModel.category == RulesetCategory.bullet.name)
         #expect(presenter.startGameModel.baseMinutes == 1)
         #expect(presenter.startGameModel.incrementSeconds == 0)
     }
@@ -63,7 +64,7 @@ struct SetupPresenterTests {
 
         presenter.select(.classical90plus30)
 
-        #expect(presenter.startGameModel.category == "Classical")
+        #expect(presenter.startGameModel.category == RulesetCategory.classical.name)
         #expect(presenter.startGameModel.baseMinutes == 90)
         #expect(presenter.startGameModel.incrementSeconds == 30)
     }
@@ -75,7 +76,7 @@ struct SetupPresenterTests {
         presenter.select(.rapid15plus10)
 
         #expect(presenter.gameConfiguration.timeControl == TimeControl(baseMinutes: 15, incrementSeconds: 10))
-        #expect(presenter.gameConfiguration.category == "Rapid")
+        #expect(presenter.gameConfiguration.category == .rapid)
     }
 
     @Test
@@ -98,7 +99,7 @@ struct SetupPresenterTests {
         presenter.startGame()
 
         #expect(router.routedGameConfigurations.count == 1)
-        #expect(router.routedGameConfigurations.first?.category == "Classical")
+        #expect(router.routedGameConfigurations.first?.category == .classical)
         #expect(
             router.routedGameConfigurations.first?.timeControl
                 == TimeControl(baseMinutes: 90, incrementSeconds: 30))
@@ -117,7 +118,7 @@ struct SetupPresenterTests {
             router.routedGameConfigurations
                 == [GameConfiguration(
                     timeControl: TimeControl(baseMinutes: 1, incrementSeconds: 0),
-                    category: "Bullet")])
+                    category: .bullet)])
     }
 
     @Test
@@ -127,19 +128,17 @@ struct SetupPresenterTests {
         presenter.select(.rapid10plus0)
         presenter.startGame()
 
-        #expect(selectedPresets(of: presenter) == [.rapid10plus0])
+        #expect(selectedIds(of: presenter) == [PresetRuleset.rapid10plus0.id])
     }
 
     private func makePresenter(router: SetupRoutingProtocol = SetupRoutingSpy()) -> SetupPresenter {
         SetupPresenter(router: router)
     }
 
-    private func selectedPresets(of presenter: SetupPresenter) -> [PresetRuleset] {
-        let selectedIDs = presenter.rulesetModels
+    private func selectedIds(of presenter: SetupPresenter) -> [String] {
+        presenter.rulesetModels
             .filter(\.isSelected)
             .map(\.id)
-
-        return PresetRuleset.catalogue.filter { preset in selectedIDs.contains(preset.id) }
     }
 
 }
