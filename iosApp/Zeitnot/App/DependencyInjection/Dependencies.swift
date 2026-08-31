@@ -1,5 +1,5 @@
 import Clock
-import Core
+import GameDomain
 import Setup
 
 struct Dependencies {

@@ -1,7 +1,7 @@
 # CoreUI
 
-Shared SwiftUI building blocks — design tokens, view helpers, and orientation support. Depends on
-`Core` and nothing else.
+Shared SwiftUI building blocks — design tokens, view helpers, and orientation support. It depends on
+no other module.
 
 Feature-specific UI does not belong here, and neither does business logic or state. A component
 earns its place once a second module needs it.
@@ -21,6 +21,17 @@ grow, not that the type resizes.
 
 Two typography styles exist for the clock alone: `clockDigits`, monospaced so digits do not shift as
 they count, and `playerName`, small and widely tracked.
+
+---
+
+## No Copy Lives Here
+
+`CoreUI` owns **no strings** and has no String Catalog. It styles words; it does not choose them.
+
+Copy belongs either to the screen that writes the sentence or to the module that owns the thing being
+named — the ruleset category names sit in `GameDomain`, beside the type they describe, and the preset
+descriptions sit in `Setup`, beside theirs. A design system that also holds wording ends up as the place any string goes when nobody
+wants to decide where it belongs.
 
 ---
 

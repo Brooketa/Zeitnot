@@ -59,14 +59,10 @@ extension RulesetCell {
 
     }
 
-}
+	enum Action {
 
-extension RulesetCell {
+		case select
 
-    enum Action {
-
-        case select
-
-    }
+	}
 
 }

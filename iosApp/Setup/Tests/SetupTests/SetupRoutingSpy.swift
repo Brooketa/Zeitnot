@@ -1,4 +1,4 @@
-import Core
+import GameDomain
 @testable import Setup
 
 final class SetupRoutingSpy: SetupRoutingProtocol {

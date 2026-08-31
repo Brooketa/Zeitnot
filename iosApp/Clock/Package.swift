@@ -14,13 +14,13 @@ let package = Package(
             targets: ["Clock"])
     ],
     dependencies: [
-        .package(name: "Core", path: "../Core"),
+        .package(name: "GameDomain", path: "../GameDomain"),
         .package(name: "CoreUI", path: "../CoreUI")
     ],
     targets: [
         .target(
             name: "Clock",
-            dependencies: ["Core", "CoreUI"],
+            dependencies: ["GameDomain", "CoreUI"],
             path: "Sources",
             resources: [
                 .process("Common/Resources/Localization"),

@@ -32,8 +32,9 @@ Title, subtitle and the list scroll as one. The START GAME bar is pinned.
 
 ## Preset rulesets
 
-Six options, in display order. The catalogue is **one list of values** — each entry states its id,
-category, time control and description together, and the list's order is the display order.
+Six options, in display order. The catalogue is **one enum**, shared with every platform: a preset
+states its category and time control, and its case order is the display order. The wording is not
+part of it.
 
 | Category | Time control | Description |
 |---|---|---|
@@ -44,11 +45,15 @@ category, time control and description together, and the list's order is the dis
 | RAPID | 15 \| 10 | Fifteen minutes, plus 10s per move. |
 | CLASSICAL | 90 \| 30 | 90 minutes each, plus 30s per move. |
 
-- **Presets are not editable.** They are immutable values; the guarantee is structural, not enforced.
+- **Presets are not editable.** They are cases of an enum; the guarantee is structural, not enforced.
 - Each carries a **stable id** (`"blitz-3-2"`) that is deliberately not derived from its numbers, so
   changing a preset's values cannot orphan anything that stored the id.
-- A preset exposes only what its consumers need — category, time control, description. The time
-  control is the only real model; the rest is display copy.
+- **A preset carries its words.** The six presets and their descriptions are this screen's — nothing
+  else in the app knows presets exist. Only the **category** is shared, as a `GameDomain` token whose
+  name that module supplies, so this list and the clock header cannot disagree about what a category
+  is called.
+- **A preset never reaches the view.** The presenter hands each row finished words and a stable id;
+  tapping a row sends that id back, and the presenter turns it into the preset again.
 - **Classical's copy is accurate to what the app does**, which is base time plus increment. That is
   not the standard two-stage Classical format, and the copy does not claim to be.
 
@@ -65,9 +70,9 @@ three rules structural rather than coded:
 
 **Bullet `1 | 0` is selected on launch.** The Presenter decides that, not the catalogue.
 
-A row is identified by its **id**. The cell is handed what it renders — category, description, the
-two numbers behind `1 | 0`, and whether it is selected — and nothing else. A tap reports the id back,
-and the Presenter resolves it to a preset.
+A row is identified by its **id**. The cell is handed its preset, its category, the two numbers
+behind `1 | 0` and whether it is selected, and turns the first two into words itself. A tap reports
+the preset back.
 
 ---
 
@@ -117,8 +122,10 @@ Starting a game leaves the selection untouched, so returning finds the screen ex
 
 ## Localization
 
-Every user-facing string resolves from the module's String Catalog through a generated symbol. Copy
-is stored in **natural casing** and views uppercase for display, so it is still spoken as words.
+Every user-facing string resolves from a String Catalog through a generated symbol. This module's
+catalog holds the screen's copy, the preset descriptions included; only the four category names come
+from `GameDomain`. Copy is stored in **natural casing** and views uppercase for display, so it is
+still spoken as words.
 
 The time control notation (`1 | 0`) and the bar's subtitle are single phrase keys taking the numbers
 as parameters, rather than strings concatenated in the Presenter — so a translation can reorder them.

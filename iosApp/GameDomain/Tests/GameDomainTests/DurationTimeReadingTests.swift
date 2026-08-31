@@ -1,5 +1,5 @@
 import Testing
-import Core
+import GameDomain
 
 struct DurationTimeReadingTests {
 

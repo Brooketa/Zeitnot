@@ -27,7 +27,7 @@ their own half. This document describes what the screen does today.
 ## Configuration
 
 The screen is handed a **game configuration** when constructed and holds it for the life of the
-game: the time control, plus the category name of the ruleset it came from. It is a value taken when
+game: the time control, plus the category of the ruleset it came from. It is a value taken when
 START GAME was tapped, so changing the setup selection afterwards cannot reach a running game.
 
 The view is constructed with a presenter, the presenter with the configuration.
@@ -86,7 +86,8 @@ tick are injected, which is what lets a 90 minute game be played out in millisec
 - **Status dot** — accent while a clock counts down, grey before the first press, while paused and
   once finished. Cross-fades over 200ms. It is a view, never a character in the copy.
 - **Ruleset** — `CLASSICAL · 90 | 30`. The middle dot and the uppercasing are presentation; the
-  configuration supplies a category in natural casing and two integers.
+  configuration supplies a category and two integers, and the header is handed the category's name
+  already looked up.
 - **Move number** — counts *chess* moves, so it advances when **Black** presses, not White.
 
 Hiding the system bar also disables back-swipe, which this screen wants: a stray edge swipe would
@@ -105,7 +106,7 @@ The presenter supplies data only; each face derives its own colours from the sta
 
 | Face | Shows |
 |---|---|
-| Digital | The shared reading from `Core` — `h:mm:ss` from an hour up, `m:ss` below, whole seconds, truncating towards zero |
+| Digital | The shared reading from `GameDomain` — `h:mm:ss` from an hour up, `m:ss` below, whole seconds, truncating towards zero |
 | Analog | A dial: supplied artwork under a minute hand and a second hand |
 
 The mode is chosen with the `DIGITAL | ANALOG` control in the control bar. **Digital is the
@@ -239,6 +240,7 @@ every orientation is allowed everywhere.
 
 ## Localization
 
-Every user-facing string resolves from the module's String Catalog through a generated symbol. No
-view writes display copy as a Swift literal, and no `|`, `·` or `●` appears in the copy — those are
-presentation applied by the view.
+Every user-facing string resolves from a String Catalog through a generated symbol. The screen's own
+copy lives in this module; the ruleset category the header names comes from `GameDomain`'s catalog.
+No view writes display copy as a Swift literal, and no `|`, `·` or `●` appears in the copy — those
+are presentation applied by the view.

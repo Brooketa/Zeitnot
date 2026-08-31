@@ -1,4 +1,4 @@
-import Core
+import GameDomain
 
 enum NavigationDestination: Hashable {
 

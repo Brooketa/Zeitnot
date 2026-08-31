@@ -1,5 +1,5 @@
 import Observation
-import Core
+import GameDomain
 import Clock
 import Setup
 

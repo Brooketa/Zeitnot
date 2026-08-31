@@ -1,5 +1,6 @@
+import Foundation
 import Testing
-import Core
+import GameDomain
 @testable import Clock
 
 struct ClockHeaderTests: ClockPresenterTestSuite {
@@ -9,25 +10,18 @@ struct ClockHeaderTests: ClockPresenterTestSuite {
 
     @Test
     func theHeaderCarriesTheRulesetItWasConstructedWith() {
-        let presenter = makePresenter(category: "Classical", baseMinutes: 90, incrementSeconds: 30)
+        let presenter = makePresenter(category: .classical, baseMinutes: 90, incrementSeconds: 30)
 
-        #expect(presenter.headerModel.category == "Classical")
+        #expect(presenter.headerModel.category == RulesetCategory.classical.name)
         #expect(presenter.headerModel.baseMinutes == 90)
         #expect(presenter.headerModel.incrementSeconds == 30)
     }
 
     @Test
-    func theHeaderCarriesTheCategoryInNaturalCasing() {
-        let presenter = makePresenter(category: "Blitz", baseMinutes: 3, incrementSeconds: 2)
-
-        #expect(presenter.headerModel.category == "Blitz")
-    }
-
-    @Test
     func theHeaderKeepsAZeroIncrement() {
-        let presenter = makePresenter(category: "Bullet", baseMinutes: 1, incrementSeconds: 0)
+        let presenter = makePresenter(category: .bullet, baseMinutes: 1, incrementSeconds: 0)
 
-        #expect(presenter.headerModel.category == "Bullet")
+        #expect(presenter.headerModel.category == RulesetCategory.bullet.name)
         #expect(presenter.headerModel.incrementSeconds == 0)
     }
 

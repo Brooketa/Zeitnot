@@ -41,7 +41,7 @@ struct Header: View {
                 .frame(width: Constants.dotDiameter, height: Constants.dotDiameter)
                 .animation(.easeOut(duration: Constants.dotDuration), value: model.isRunning)
 
-            Text(.rulesetTitle(model.category, model.baseMinutes, model.incrementSeconds))
+            Text(.rulesetTitle(String(localized: model.category), model.baseMinutes, model.incrementSeconds))
                 .label(ColorPalette.ink)
                 .textCase(.uppercase)
         }
@@ -59,7 +59,7 @@ extension Header {
 
     struct Model {
 
-        let category: String
+        let category: LocalizedStringResource
         let baseMinutes: Int
         let incrementSeconds: Int
         let moveNumber: Int

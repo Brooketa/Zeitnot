@@ -69,7 +69,7 @@ The waiting half greys out; the half to move carries the accent ring.
 One local Swift package per module, and a screen is layered View → Presenter → Service.
 
 ```
-App  ──▶  Setup · Clock  ──▶  CoreUI  ──▶  Core
+App  ──▶  Setup · Clock  ──▶  GameDomain + CoreUI
 ```
 
 Each platform gets a folder holding its app and the packages only it builds; anything every platform
@@ -80,7 +80,8 @@ Zeitnot/
 └── iosApp/
     ├── Zeitnot.xcodeproj
     ├── Zeitnot/                       # app target
-    └── Core/  CoreUI/  Setup/  Clock/ # local Swift packages, iOS only
+    └── GameDomain/  CoreUI/         # local Swift packages, iOS only
+        Setup/  Clock/
 ```
 
 - **The Service holds the game.** `GameService` owns the two clocks, whose turn it is, and what starting, passing, pausing and resetting mean. The Presenter turns that into the strings a view renders; the View only reports taps back

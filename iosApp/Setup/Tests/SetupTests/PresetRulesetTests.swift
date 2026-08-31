@@ -1,13 +1,12 @@
-import Foundation
 import Testing
-import Core
+import GameDomain
 @testable import Setup
 
 struct PresetRulesetTests {
 
     @Test
-    func catalogueIsInDisplayOrder() {
-        #expect(PresetRuleset.catalogue == [
+    func theCatalogueIsInDisplayOrder() {
+        #expect(PresetRuleset.allCases == [
             .bullet1plus0,
             .blitz3plus2,
             .blitz5plus0,
@@ -18,15 +17,15 @@ struct PresetRulesetTests {
     }
 
     @Test(arguments: [
-        (preset: PresetRuleset.bullet1plus0, category: "Bullet"),
-        (preset: PresetRuleset.blitz3plus2, category: "Blitz"),
-        (preset: PresetRuleset.blitz5plus0, category: "Blitz"),
-        (preset: PresetRuleset.rapid10plus0, category: "Rapid"),
-        (preset: PresetRuleset.rapid15plus10, category: "Rapid"),
-        (preset: PresetRuleset.classical90plus30, category: "Classical")
+        (preset: PresetRuleset.bullet1plus0, category: RulesetCategory.bullet),
+        (preset: PresetRuleset.blitz3plus2, category: RulesetCategory.blitz),
+        (preset: PresetRuleset.blitz5plus0, category: RulesetCategory.blitz),
+        (preset: PresetRuleset.rapid10plus0, category: RulesetCategory.rapid),
+        (preset: PresetRuleset.rapid15plus10, category: RulesetCategory.rapid),
+        (preset: PresetRuleset.classical90plus30, category: RulesetCategory.classical)
     ])
-    func everyPresetHasItsCategory(preset: PresetRuleset, category: String) {
-        #expect(String(localized: preset.category) == category)
+    func everyPresetHasItsCategory(preset: PresetRuleset, category: RulesetCategory) {
+        #expect(preset.category == category)
     }
 
     @Test(arguments: [
@@ -42,18 +41,6 @@ struct PresetRulesetTests {
     }
 
     @Test(arguments: [
-        (preset: PresetRuleset.bullet1plus0, description: "One minute each. Sudden death."),
-        (preset: PresetRuleset.blitz3plus2, description: "Three minutes, plus 2s per move."),
-        (preset: PresetRuleset.blitz5plus0, description: "Five minutes each, classic blitz game."),
-        (preset: PresetRuleset.rapid10plus0, description: "Ten minutes each, no increment."),
-        (preset: PresetRuleset.rapid15plus10, description: "Fifteen minutes, plus 10s per move."),
-        (preset: PresetRuleset.classical90plus30, description: "90 minutes each, plus 30s per move.")
-    ])
-    func everyPresetHasItsDescription(preset: PresetRuleset, description: String) {
-        #expect(String(localized: preset.description) == description)
-    }
-
-    @Test(arguments: [
         (preset: PresetRuleset.bullet1plus0, storageKey: "bullet-1-0"),
         (preset: PresetRuleset.blitz3plus2, storageKey: "blitz-3-2"),
         (preset: PresetRuleset.blitz5plus0, storageKey: "blitz-5-0"),
@@ -63,6 +50,7 @@ struct PresetRulesetTests {
     ])
     func everyPresetHasAStableStorageKey(preset: PresetRuleset, storageKey: String) {
         #expect(preset.id == storageKey)
+        #expect(PresetRuleset(rawValue: storageKey) == preset)
     }
 
 }

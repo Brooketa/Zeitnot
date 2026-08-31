@@ -9,34 +9,37 @@ Modules are organized in a strict dependency hierarchy. A module may only depend
 ```
 App (main target)
  └── Feature Modules  (e.g. Authentication, Dashboard, Settings)
-      └── CoreUI
-           └── Core
+      ├── GameDomain   (what the game is — no UI)
+      └── CoreUI       (how anything is drawn — no domain)
 ```
 
-No circular dependencies are permitted. Feature modules must not import each other directly — shared communication should be done through protocols defined in `Core` or via the App target as a coordinator.
+The two base modules are **independent of each other**, not a chain: one knows the game and nothing about drawing, the other knows drawing and nothing about the game. Neither imports the other, and a feature takes both.
+
+No circular dependencies are permitted. Feature modules must not import each other directly — shared communication should be done through protocols defined in `GameDomain` or via the App target as a coordinator.
 
 ---
 
 ## Module Hierarchy
 
-### Core
+### GameDomain
 
-The `Core` module is the **lowest-level foundation**. It contains non-UI utilities, extensions, and lightweight services that are too small to justify their own module, but are useful in many places across the app.
+The `GameDomain` module is the **game's shared vocabulary** — the types every feature means the same thing by, together with the words for them. It is non-UI: `Foundation` only.
 
 **What belongs here:**
-- Foundation type extensions (`String`, `Date`, `Array`, `Int`, `URL`, etc.)
-- Custom value types and enums used broadly (e.g. `AppError`, `LoadingState`)
-- Lightweight service abstractions (e.g. `LoggingService`, `AnalyticsEvent`)
+- Domain value types and tokens used by **more than one feature** (`TimeControl`, `RulesetCategory`, `GameConfiguration`)
+- The **copy naming those types** — its own String Catalog, reached through generated symbols
+- Domain formatting every screen must agree on (the shared time reading)
 - Shared protocols and interfaces used across features
-- Generic utilities (e.g. `Debouncer`, `KeychainWrapper`)
-- Constants and configuration values
 
 **What does NOT belong here:**
 - Anything that imports `SwiftUI` or `UIKit`
-- Business logic specific to a single feature
-- Network or data layer logic large enough to be its own module
+- A type only one feature uses, however domain-shaped it looks. `PresetRuleset` is the setup screen's and lives there, its descriptions with it
+- Sentences a *screen* writes. A category's name is the category's; `BLITZ · 3 | 2` is the clock header's
+- Business logic or state specific to a single feature — a Service lives with its feature
 
-**Dependencies:** None. `Core` is a zero-dependency module.
+**Dependencies:** None. `GameDomain` is a zero-dependency module.
+
+**There is no generic `Core`.** Nothing in the app today is a non-UI utility without game meaning, and a module holding nothing is ceremony. If one appears — a `String` extension, a `Debouncer` — add `Core` beneath both base modules then, rather than parking it in `GameDomain` because it has nowhere else to go.
 
 ---
 
@@ -59,7 +62,7 @@ The `CoreUI` module contains all **reusable UI building blocks** — anything Sw
 - Feature-specific UI that is only used in one module
 - Network or data models
 
-**Dependencies:** `Core` only.
+**Dependencies:** None. `CoreUI` knows nothing about the game — it holds no copy and no String Catalog.
 
 ---
 
@@ -67,7 +70,7 @@ The `CoreUI` module contains all **reusable UI building blocks** — anything Sw
 
 Each feature module represents **one large, user-facing product area**. Examples: `Authentication`, `Dashboard`, `Settings`, `Onboarding`, `Profile`.
 
-**Dependencies:** `Core` and `CoreUI`. Never another feature module.
+**Dependencies:** `GameDomain` and `CoreUI`. Never another feature module.
 
 ---
 
@@ -106,18 +109,22 @@ Zeitnot/
 │   │   ├── Services/                   # App-level services
 │   │   └── Assets.xcassets/            # App-level assets (app icon, accent colour)
 │   │
-│   ├── Core/                           # Local Swift package — iOS only
+│   ├── GameDomain/                     # Local Swift package — iOS only
 │   │   ├── Package.swift
 │   │   ├── Docs/
-│   │   │   └── Core.md
+│   │   │   └── GameDomain.md
 │   │   └── Sources/
-│   │       └── Core/
+│   │       └── GameDomain/
 │   │           ├── Extensions/
-│   │           │   ├── String+Extensions.swift
+│   │           │   ├── Duration+TimeReading.swift
 │   │           │   └── ...
-│   │           └── Types/
-│   │               ├── AppError.swift
-│   │               └── ...
+│   │           ├── Types/
+│   │           │   ├── RulesetCategory.swift
+│   │           │   ├── RulesetCategory+Name.swift
+│   │           │   └── ...
+│   │           └── Resources/
+│   │               └── Localization/
+│   │                   └── Localizable.xcstrings
 │   │
 │   ├── CoreUI/                         # Local Swift package — iOS only
 │   │   ├── Package.swift
@@ -431,14 +438,15 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 
 | Module | Can depend on |
 |---|---|
-| `Core` | Nothing |
-| `CoreUI` | `Core` |
-| Feature Module | `Core`, `CoreUI` |
+| `GameDomain` | Nothing |
+| `CoreUI` | Nothing |
+| Feature Module | `GameDomain`, `CoreUI` |
 | App Target | All modules |
 
-- **No feature-to-feature imports.** If two features need to share something, move it into `Core` (non-UI) or `CoreUI` (UI), or define a protocol in `Core` and inject the implementation from the App target.
+- **The two base modules never import each other.** `CoreUI` importing `GameDomain` would make the design system game-aware; `GameDomain` importing `CoreUI` would make the domain drawable. Either one collapses the split.
+- **No feature-to-feature imports.** If two features need to share something, move it into `GameDomain` (non-UI) or `CoreUI` (UI), or define a protocol in `GameDomain` and inject the implementation from the App target.
 - **No upward dependencies.** Lower modules must never import higher ones.
-- All new cross-cutting utilities must be evaluated: non-UI → `Core`, UI → `CoreUI`, feature-specific → stays in the feature module.
+- All new cross-cutting utilities must be evaluated: game vocabulary → `GameDomain`, UI → `CoreUI`, feature-specific → stays in the feature module.
 
 ---
 
@@ -449,7 +457,8 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 | Screen's `Components/` | Another screen in the same feature | `Sources/Common/Components/` |
 | Screen's layer (`UseCase/`, `Client/`, etc.) | Another screen in the same feature | `Sources/Common/` |
 | `Common/Components/` | Another feature module | `CoreUI/Components/` |
-| `Common/Extensions/` | Another feature module | `Core/Extensions/` |
+| `Common/Extensions/` | Another feature module | `GameDomain/Extensions/` |
+| A type's own copy | The type moved to `GameDomain` | `GameDomain/Resources/Localization/` |
 | `Common/Images/` | Another feature module | `CoreUI/Images/` |
 
 ---
