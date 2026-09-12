@@ -31,7 +31,7 @@ everything else belongs to one platform and lives in `iosApp/` or `androidApp/`.
 
 | Module | Holds |
 |---|---|
-| `Shared` | Time control, ruleset category, presets, game configuration, the shared time reading, the game rules and both presenters. No UI, and no words. |
+| `Shared` | Time control, ruleset category, presets, game configuration, the shared time reading, the game rules and the snapshot a screen reads. No UI, no presenters, and no words. |
 | `CoreUI` | Colours, typography, spacing, view helpers, orientation support |
 | `Setup` | The setup screen — its views and its words |
 | `Clock` | The clock screen — its views and its words |

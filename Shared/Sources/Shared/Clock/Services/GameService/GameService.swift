@@ -26,18 +26,26 @@ public final class GameService: GameServiceProtocol {
         now = timeSource.now
     }
 
-    public var state: GameState {
-        makeState()
+    public var snapshot: GameSnapshot {
+        makeSnapshot()
     }
 
-    public func start() {
+    public func press(_ player: Player) {
+        switch countdownState {
+        case .notStarted where player == .black: start()
+        case let .running(active, _) where active == player: endTurn()
+        default: break
+        }
+    }
+
+    func start() {
         guard case .notStarted = countdownState else { return }
 
         now = timeSource.now
         countdownState = .running(player: .white, since: now)
     }
 
-    public func endTurn() {
+    func endTurn() {
         guard case let .running(player, since) = countdownState else { return }
 
         now = timeSource.now
@@ -94,6 +102,8 @@ private extension GameService {
     enum Constants {
 
         static let tickInterval = Duration.milliseconds(100)
+        static let warningThreshold = Duration.seconds(10)
+        static let warningShareOfBaseTime = 10
 
     }
 
@@ -160,31 +170,79 @@ private extension GameService {
 
 }
 
-// MARK: State
+// MARK: Snapshot
 
 private extension GameService {
 
-    func makeState() -> GameState {
+    var playerToMove: Player {
         switch countdownState {
-        case .notStarted: makeState(phase: .notStarted)
-        case let .running(player, since): makeRunningState(player: player, since: since)
-        case let .paused(player): makeState(phase: .paused(player: player))
-        case let .finished(winner): makeState(phase: .finished(winner: winner))
+        case let .running(player, _), let .paused(player): player
+        case .notStarted, .finished: .white
         }
     }
 
-    func makeState(phase: GameState.Phase) -> GameState {
-        GameState(phase: phase, white: clocks.white, black: clocks.black)
+    var winner: Player? {
+        guard case let .finished(winner) = countdownState else { return nil }
+
+        return winner
     }
 
-    func makeRunningState(player: Player, since: ContinuousClock.Instant) -> GameState {
-        var clock = clocks[player]
-        clock.remaining = remaining(for: player, since: since, at: now)
+    var isAwaitingStart: Bool {
+        if case .notStarted = countdownState { true } else { false }
+    }
 
-        return GameState(
-            phase: .running(player: player),
-            white: player == .white ? clock : clocks.white,
-            black: player == .black ? clock : clocks.black)
+    var isPaused: Bool {
+        if case .paused = countdownState { true } else { false }
+    }
+
+    var warningThreshold: Duration {
+        min(Constants.warningThreshold, timeControl.baseTime / Constants.warningShareOfBaseTime)
+    }
+
+    func makeSnapshot() -> GameSnapshot {
+        let clocks = liveClocks()
+
+        return GameSnapshot(
+            white: makeClockSnapshot(for: .white, clocks: clocks),
+            black: makeClockSnapshot(for: .black, clocks: clocks),
+            playerToMove: playerToMove,
+            moveNumber: clocks.black.moveCount + 1,
+            winner: winner,
+            isAwaitingStart: isAwaitingStart,
+            isRunning: countdownState.isRunning,
+            isPaused: isPaused,
+            isFinished: winner != nil)
+    }
+
+    func liveClocks() -> PlayerClocks {
+        guard case let .running(player, since) = countdownState else { return clocks }
+
+        var clocks = clocks
+        clocks[player].remaining = remaining(for: player, since: since, at: now)
+
+        return clocks
+    }
+
+    func makeClockSnapshot(for player: Player, clocks: PlayerClocks) -> ClockSnapshot {
+        ClockSnapshot(
+            remaining: clocks[player].remaining,
+            moveCount: clocks[player].moveCount,
+            status: status(for: player, clocks: clocks))
+    }
+
+    func status(for player: Player, clocks: PlayerClocks) -> ClockStatus {
+        switch countdownState {
+        case .notStarted: .awaitingStart
+        case let .running(active, _): runningStatus(for: player, active: active, clocks: clocks)
+        case let .paused(active): active == player ? .toMove : .waiting
+        case let .finished(winner): winner == player ? .waiting : .flagged
+        }
+    }
+
+    func runningStatus(for player: Player, active: Player, clocks: PlayerClocks) -> ClockStatus {
+        guard active == player else { return .waiting }
+
+        return clocks[player].remaining <= warningThreshold ? .lowTime : .toMove
     }
 
 }

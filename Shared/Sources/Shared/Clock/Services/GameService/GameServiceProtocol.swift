@@ -1,9 +1,8 @@
 public protocol GameServiceProtocol {
 
-    var state: GameState { get }
+    var snapshot: GameSnapshot { get }
 
-    func start()
-    func endTurn()
+    func press(_ player: Player)
     func pause()
     func resume()
     func reset()

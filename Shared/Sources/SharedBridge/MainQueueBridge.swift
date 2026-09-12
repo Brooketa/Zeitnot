@@ -1,7 +1,7 @@
 #if os(Android)
 import CJNI
 
-@_cdecl("Java_com_zeitnot_android_SwiftMainQueue_nativeDrain")
+@_cdecl("Java_com_zeitnot_android_bridge_SwiftMainQueue_nativeDrain")
 public nonisolated func swiftMainQueueDrain(
     _ environment: UnsafeMutablePointer<JNIEnv?>,
     _ caller: jobject?

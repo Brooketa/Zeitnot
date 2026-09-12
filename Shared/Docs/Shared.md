@@ -1,8 +1,11 @@
 # Shared
 
 Everything both platforms agree about: what a game is played under, the rules the clock enforces, and
-the presenters that turn that state into what a screen shows. It imports `Observation` and nothing
-else, and depends on no other module.
+the snapshot a screen reads to know what is true. It imports `Observation` and nothing else, and
+depends on no other module.
+
+**It holds no presentation.** No presenter, no view model, no routing protocol, no UI state — each
+platform writes its own over this domain. What is shared is the game; what is drawn with it is not.
 
 **Shared holds identity and classification; the platform holds the words.** A category, a side, a
 state and a time reading mean the same thing on iOS and Android, so they live here. Their names —
@@ -115,54 +118,54 @@ This is what lets a 90-minute game be played out in milliseconds.
 
 ---
 
-## Presenters
+## The Snapshot
 
-Both screens' presenters live here, so both platforms show the same thing at the same moment.
+A platform renders from one value, read whenever it wants to draw:
 
-**`SetupPresenter`** holds the selection. It exposes the presets in display order with the selected
-one marked, and the selected ruleset on its own for the start bar. Selecting is by **id**; starting a
-game routes with the configuration the selection describes, and leaves the selection alone.
+| Field | What it says |
+|---|---|
+| `white` · `black` | Each clock's `remaining`, `moveCount` and `status` |
+| `playerToMove` | Whose turn it is |
+| `moveNumber` | The move about to be played |
+| `winner` | Who won on time, if anyone |
+| `isAwaitingStart` · `isRunning` · `isPaused` · `isFinished` | Which phase the game is in |
 
-**`ClockPresenter`** maps the game's state into what each half shows — the side, its state, and the
-time reading in whichever face is chosen.
+The snapshot is **computed on every read**, never stored, so the running clock is always current.
 
-- A half is **awaiting start**, **to move**, **low time**, **waiting** or **flagged**.
-- **Low time** is under ten seconds, or a tenth of base time in games too short for ten seconds to
-  mean much.
-- The face toggle — **digital** or **analog** — is presenter state, and switching it mid-game changes
-  nothing about the clock.
-- **Pause** is shown while the game is paused. **Reset** asks first, but only while a game is
-  actually in progress; otherwise it just resets.
-- The move number is Black's completed moves plus one.
+### Clock Status
 
-### What a presenter hands over
+Each clock is in exactly one of five states, and this is domain rather than decoration:
 
-A view model carries **what to draw and what to report back**, never a domain type: a side rather than
-a player, an id rather than a preset, a category token rather than its name. The app turns those into
-words.
+| Status | When |
+|---|---|
+| `awaitingStart` | Nothing has begun |
+| `toMove` | This player's clock is running |
+| `lowTime` | Running, at or below the warning threshold |
+| `waiting` | The opponent is to move, or this player won |
+| `flagged` | This clock reached zero |
 
-The analog face gets `DialHands` — minute and second hand angles in degrees — rather than a duration,
-so the geometry is computed once for both platforms.
+**The warning threshold is ten seconds, or a tenth of base time when that is shorter** — so a bullet
+game warns at six seconds rather than never leaving the warning. It is stated here once. A platform
+turns `lowTime` into a colour; it does not decide when a clock is in trouble.
 
 ---
 
-## Navigation
+## Pressing
 
-Each feature's routing protocol lives here, because the presenter that calls it does:
-
-- `SetupRoutingProtocol` — enter the clock with a game configuration.
-- `ClockRoutingProtocol` — leave the clock.
-
-Whatever hosts the presenters implements them. On iOS that is the app's router.
+`press(_ player:)` carries the convention: from not started only **Black** may begin, and while
+running only the player whose clock is ticking can end their turn. Anything else is ignored. A
+platform forwards a tap and does not know the rule.
 
 ---
 
 ## Platform Constraints
 
 - **No `SwiftUI`, no `CoreUI`, no `UIKit`.** The only import in the module is `Observation`.
-- **No `LocalizedStringResource`, and no `String(localized:)`.** A presenter that resolved copy would
-  have chosen words for a platform it cannot see.
+- **No `LocalizedStringResource`, and no `String(localized:)`.** Copy belongs to whichever app draws
+  it; the type does not exist on every platform this module builds for.
 - The module builds for iOS and for Android's `aarch64-unknown-linux-android28` and
-  `x86_64-unknown-linux-android28`, and presenter isolation is the same on all three.
+  `x86_64-unknown-linux-android28`, and behaves identically on all three.
+- Everything is `MainActor`-isolated. On Android that means the host app has to drain libdispatch's
+  main queue, or the ticker never fires — the Android app does this from its frame loop.
 - It ships as a **dynamic** library, because Android loads it as `libShared.so` at runtime. iOS embeds
   the same product as a framework.

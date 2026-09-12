@@ -24,7 +24,11 @@ struct DigitalFace: View {
 
 extension DigitalFace {
 
-    typealias Model = DigitalFaceModel
+    struct Model: Equatable {
+
+        let reading: String
+
+    }
 
 }
 

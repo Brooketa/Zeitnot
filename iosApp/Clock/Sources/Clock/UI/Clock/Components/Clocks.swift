@@ -19,7 +19,12 @@ struct Clocks: View {
 
 extension Clocks {
 
-    typealias Model = ClocksModel
+    struct Model {
+
+        let white: ClockFace.Model
+        let black: ClockFace.Model
+
+    }
 
     enum Action {
 

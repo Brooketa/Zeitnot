@@ -8,11 +8,13 @@ struct GameServiceTests {
     @Test
     func aNewGameHasNotStartedWithFullClocks() {
         let service = makeService(baseMinutes: 5)
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .notStarted)
-        #expect(state.white == PlayerClock(remaining: .seconds(300), moveCount: 0))
-        #expect(state.black == PlayerClock(remaining: .seconds(300), moveCount: 0))
+        #expect(snapshot.isAwaitingStart)
+        #expect(snapshot.white.remaining == .seconds(300))
+        #expect(snapshot.white.moveCount == 0)
+        #expect(snapshot.black.remaining == .seconds(300))
+        #expect(snapshot.black.moveCount == 0)
     }
 
     @Test
@@ -21,11 +23,12 @@ struct GameServiceTests {
 
         service.start()
         timeSource.advance(by: .seconds(10))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .running(player: .white))
-        #expect(state.white.remaining == .seconds(290))
-        #expect(state.black.remaining == .seconds(300))
+        #expect(snapshot.isRunning)
+        #expect(snapshot.playerToMove == .white)
+        #expect(snapshot.white.remaining == .seconds(290))
+        #expect(snapshot.black.remaining == .seconds(300))
     }
 
     @Test
@@ -35,11 +38,12 @@ struct GameServiceTests {
         service.start()
         timeSource.advance(by: .seconds(10))
         service.endTurn()
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.white.remaining == .seconds(293))
-        #expect(state.black.remaining == .seconds(300))
-        #expect(state.phase == .running(player: .black))
+        #expect(snapshot.white.remaining == .seconds(293))
+        #expect(snapshot.black.remaining == .seconds(300))
+        #expect(snapshot.isRunning)
+        #expect(snapshot.playerToMove == .black)
     }
 
     @Test
@@ -54,10 +58,10 @@ struct GameServiceTests {
         timeSource.advance(by: .seconds(1))
         service.endTurn()
         timeSource.advance(by: .seconds(1))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.white.moveCount == 2)
-        #expect(state.black.moveCount == 1)
+        #expect(snapshot.white.moveCount == 2)
+        #expect(snapshot.black.moveCount == 1)
     }
 
     @Test
@@ -68,10 +72,11 @@ struct GameServiceTests {
         timeSource.advance(by: .seconds(10))
         service.pause()
         timeSource.advance(by: .seconds(3600))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .paused(player: .white))
-        #expect(state.white.remaining == .seconds(290))
+        #expect(snapshot.isPaused)
+        #expect(snapshot.playerToMove == .white)
+        #expect(snapshot.white.remaining == .seconds(290))
     }
 
     @Test
@@ -84,11 +89,12 @@ struct GameServiceTests {
         timeSource.advance(by: .seconds(3600))
         service.resume()
         timeSource.advance(by: .seconds(5))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .running(player: .white))
-        #expect(state.white.remaining == .seconds(285))
-        #expect(state.white.moveCount == 0)
+        #expect(snapshot.isRunning)
+        #expect(snapshot.playerToMove == .white)
+        #expect(snapshot.white.remaining == .seconds(285))
+        #expect(snapshot.white.moveCount == 0)
     }
 
     @Test
@@ -101,11 +107,13 @@ struct GameServiceTests {
         timeSource.advance(by: .seconds(10))
         service.reset()
         timeSource.advance(by: .seconds(10))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .notStarted)
-        #expect(state.white == PlayerClock(remaining: .seconds(300), moveCount: 0))
-        #expect(state.black == PlayerClock(remaining: .seconds(300), moveCount: 0))
+        #expect(snapshot.isAwaitingStart)
+        #expect(snapshot.white.remaining == .seconds(300))
+        #expect(snapshot.white.moveCount == 0)
+        #expect(snapshot.black.remaining == .seconds(300))
+        #expect(snapshot.black.moveCount == 0)
     }
 
     @Test
@@ -114,10 +122,11 @@ struct GameServiceTests {
 
         service.start()
         timeSource.advance(by: .seconds(60))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .finished(winner: .black))
-        #expect(state.white.remaining == .zero)
+        #expect(snapshot.isFinished)
+        #expect(snapshot.winner == .black)
+        #expect(snapshot.white.remaining == .zero)
     }
 
     @Test
@@ -126,10 +135,11 @@ struct GameServiceTests {
 
         service.start()
         timeSource.advance(by: .milliseconds(59_900))
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .running(player: .white))
-        #expect(state.white.remaining == .milliseconds(100))
+        #expect(snapshot.isRunning)
+        #expect(snapshot.playerToMove == .white)
+        #expect(snapshot.white.remaining == .milliseconds(100))
     }
 
     @Test
@@ -140,8 +150,9 @@ struct GameServiceTests {
         timeSource.advanceWithoutTicking(by: .milliseconds(59_999))
         service.endTurn()
 
-        #expect(service.state.phase == .running(player: .black))
-        #expect(service.state.white.remaining == .milliseconds(1))
+        #expect(service.snapshot.isRunning)
+        #expect(service.snapshot.playerToMove == .black)
+        #expect(service.snapshot.white.remaining == .milliseconds(1))
     }
 
     @Test
@@ -151,7 +162,7 @@ struct GameServiceTests {
         service.start()
         timeSource.advance(by: .seconds(600))
 
-        #expect(service.state.white.remaining == .zero)
+        #expect(service.snapshot.white.remaining == .zero)
     }
 
     @Test
@@ -161,11 +172,12 @@ struct GameServiceTests {
         service.start()
         timeSource.advance(by: .seconds(60))
         service.endTurn()
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.phase == .finished(winner: .black))
-        #expect(state.white.remaining == .zero)
-        #expect(state.white.moveCount == 0)
+        #expect(snapshot.isFinished)
+        #expect(snapshot.winner == .black)
+        #expect(snapshot.white.remaining == .zero)
+        #expect(snapshot.white.moveCount == 0)
     }
 
     @Test
@@ -176,10 +188,11 @@ struct GameServiceTests {
         timeSource.advanceWithoutTicking(by: .seconds(60))
         service.endTurn()
 
-        #expect(service.state.phase == .finished(winner: .black))
-        #expect(service.state.white.remaining == .zero)
-        #expect(service.state.white.moveCount == 0)
-        #expect(service.state.black.remaining == .seconds(60))
+        #expect(service.snapshot.isFinished)
+        #expect(service.snapshot.winner == .black)
+        #expect(service.snapshot.white.remaining == .zero)
+        #expect(service.snapshot.white.moveCount == 0)
+        #expect(service.snapshot.black.remaining == .seconds(60))
     }
 
     @Test
@@ -190,7 +203,8 @@ struct GameServiceTests {
         timeSource.advanceWithoutTicking(by: .seconds(60))
         service.pause()
 
-        #expect(service.state.phase == .finished(winner: .black))
+        #expect(service.snapshot.isFinished)
+        #expect(service.snapshot.winner == .black)
     }
 
     @Test
@@ -204,11 +218,12 @@ struct GameServiceTests {
         service.resume()
         service.pause()
 
-        #expect(service.state.phase == .finished(winner: .black))
+        #expect(service.snapshot.isFinished)
+        #expect(service.snapshot.winner == .black)
 
         service.reset()
 
-        #expect(service.state.phase == .notStarted)
+        #expect(service.snapshot.isAwaitingStart)
     }
 
     @Test
@@ -225,12 +240,12 @@ struct GameServiceTests {
         let baseTime = Duration.seconds(5_400)
         let timeSpent = Duration.milliseconds(1_500 * 50)
         let incrementEarned = Duration.seconds(30 * 50)
-        let state = service.state
+        let snapshot = service.snapshot
 
-        #expect(state.white.remaining == baseTime - timeSpent + incrementEarned)
-        #expect(state.black.remaining == baseTime - timeSpent + incrementEarned)
-        #expect(state.white.moveCount == 50)
-        #expect(state.black.moveCount == 50)
+        #expect(snapshot.white.remaining == baseTime - timeSpent + incrementEarned)
+        #expect(snapshot.black.remaining == baseTime - timeSpent + incrementEarned)
+        #expect(snapshot.white.moveCount == 50)
+        #expect(snapshot.black.moveCount == 50)
     }
 
     private func makeService(baseMinutes: Int, incrementSeconds: Int = 0) -> GameService {

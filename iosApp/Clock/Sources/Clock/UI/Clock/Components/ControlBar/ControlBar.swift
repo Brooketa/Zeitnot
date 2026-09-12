@@ -47,7 +47,12 @@ struct ControlBar: View {
 
 extension ControlBar {
 
-    typealias Model = ControlBarModel
+    struct Model {
+
+        let canPause: Bool
+        let canReset: Bool
+
+    }
 
     enum Action {
 
