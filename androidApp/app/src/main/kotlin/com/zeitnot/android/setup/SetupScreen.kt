@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.zeitnot.android.LockOrientation
 import com.zeitnot.android.R
 import com.zeitnot.android.bridge.PresetCatalogue
 import com.zeitnot.android.coreui.ColorPalette
@@ -38,6 +39,8 @@ fun SetupScreen(onStartGame: (GameConfiguration) -> Unit) {
     val presenter = rememberSaveable(saver = SetupPresenterSaver) { SetupPresenter(PresetCatalogue()) }
 
     var selectedRulesetId by rememberSaveable { mutableStateOf(presenter.selectedRulesetId) }
+
+    LockOrientation(isLandscape = false)
 
     val rulesets = remember(selectedRulesetId) { presenter.rulesetModels }
     val configuration = remember(selectedRulesetId) { presenter.gameConfiguration }

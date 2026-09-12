@@ -3,14 +3,8 @@ package com.zeitnot.android.clock
 import com.zeitnot.android.domain.ClockStatus
 import com.zeitnot.android.domain.GameServiceContract
 import com.zeitnot.android.domain.Player
-
-enum class ClockFaceState {
-    AWAITING_START,
-    TO_MOVE,
-    LOW_TIME,
-    WAITING,
-    FLAGGED
-}
+import com.zeitnot.android.domain.RulesetCategory
+import com.zeitnot.android.setup.GameConfiguration
 
 enum class DisplayMode {
     DIGITAL,
@@ -21,42 +15,66 @@ data class DialHands(val minuteDegrees: Float, val secondDegrees: Float)
 
 data class ClockFaceModel(
     val side: Player,
-    val state: ClockFaceState,
+    val status: ClockStatus,
     val reading: String,
     val hands: DialHands
 )
 
-data class ClockModel(
-    val white: ClockFaceModel,
-    val black: ClockFaceModel,
+data class HeaderModel(
+    val category: RulesetCategory,
+    val baseMinutes: Int,
+    val incrementSeconds: Int,
     val moveNumber: Int,
-    val canPause: Boolean,
-    val canReset: Boolean,
-    val isRunning: Boolean,
-    val showPauseDialog: Boolean,
-    val showResetDialog: Boolean,
-    val playerToMove: Player
+    val isRunning: Boolean
 )
 
-class ClockPresenter(private val game: GameServiceContract) : AutoCloseable {
+data class ControlBarModel(
+    val canPause: Boolean,
+    val canReset: Boolean
+)
 
-    var displayMode: DisplayMode = DisplayMode.DIGITAL
+data class ClockModel(
+    val header: HeaderModel,
+    val white: ClockFaceModel,
+    val black: ClockFaceModel,
+    val controlBar: ControlBarModel,
+    val displayMode: DisplayMode,
+    val playerToMove: Player,
+    val isRunning: Boolean,
+    val showPauseDialog: Boolean,
+    val showResetDialog: Boolean
+)
 
+class ClockPresenter(
+    private val configuration: GameConfiguration,
+    private val game: GameServiceContract
+) : AutoCloseable {
+
+    private var displayMode = DisplayMode.DIGITAL
     private var showResetDialog = false
 
     fun model(): ClockModel {
         val snapshot = game.snapshot()
 
         return ClockModel(
+            header = HeaderModel(
+                category = configuration.category,
+                baseMinutes = configuration.baseMinutes,
+                incrementSeconds = configuration.incrementSeconds,
+                moveNumber = snapshot.moveNumber,
+                isRunning = snapshot.isRunning
+            ),
             white = faceModel(Player.WHITE),
             black = faceModel(Player.BLACK),
-            moveNumber = snapshot.moveNumber,
-            canPause = snapshot.isRunning,
-            canReset = snapshot.isRunning || snapshot.isFinished,
+            controlBar = ControlBarModel(
+                canPause = snapshot.isRunning,
+                canReset = snapshot.isRunning || snapshot.isFinished
+            ),
+            displayMode = displayMode,
+            playerToMove = snapshot.playerToMove,
             isRunning = snapshot.isRunning,
             showPauseDialog = snapshot.isPaused,
-            showResetDialog = showResetDialog,
-            playerToMove = snapshot.playerToMove
+            showResetDialog = showResetDialog
         )
     }
 
@@ -65,6 +83,10 @@ class ClockPresenter(private val game: GameServiceContract) : AutoCloseable {
     fun pause() = game.pause()
 
     fun resume() = game.resume()
+
+    fun select(displayMode: DisplayMode) {
+        this.displayMode = displayMode
+    }
 
     fun reset() {
         if (game.snapshot().isInProgress) {
@@ -91,18 +113,10 @@ class ClockPresenter(private val game: GameServiceContract) : AutoCloseable {
 
         return ClockFaceModel(
             side = player,
-            state = faceState(clock.status),
+            status = clock.status,
             reading = game.reading(player),
             hands = hands(clock.remainingMillis)
         )
-    }
-
-    private fun faceState(status: ClockStatus) = when (status) {
-        ClockStatus.AWAITING_START -> ClockFaceState.AWAITING_START
-        ClockStatus.TO_MOVE -> ClockFaceState.TO_MOVE
-        ClockStatus.LOW_TIME -> ClockFaceState.LOW_TIME
-        ClockStatus.WAITING -> ClockFaceState.WAITING
-        ClockStatus.FLAGGED -> ClockFaceState.FLAGGED
     }
 
     private fun hands(remainingMillis: Long): DialHands {
