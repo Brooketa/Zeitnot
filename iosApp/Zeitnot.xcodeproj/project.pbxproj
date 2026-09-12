@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7026E3C23035A9A700ED9FBC /* CoreUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3C13035A9A700ED9FBC /* CoreUI */; };
 		7026E3E23035A9A700ED9FBC /* Shared in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3E13035A9A700ED9FBC /* Shared */; };
+		70C94A013101000000000002 /* Shared in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3E13035A9A700ED9FBC /* Shared */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7026E3F23035A9A700ED9FBC /* Clock in Frameworks */ = {isa = PBXBuildFile; productRef = 7026E3F13035A9A700ED9FBC /* Clock */; };
 		70EA1D093037427E002F205B /* Setup in Frameworks */ = {isa = PBXBuildFile; productRef = 70EA1D083037427E002F205B /* Setup */; };
 /* End PBXBuildFile section */
@@ -17,7 +18,6 @@
 		7026E3A43035A9A700ED9FBC /* Zeitnot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zeitnot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7026E3C43035A9A700ED9FBC /* CoreUI */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = CoreUI; sourceTree = "<group>"; };
 		7026E3D03035A9A700ED9FBC /* Setup */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Setup; sourceTree = "<group>"; };
-		7026E3E03035A9A700ED9FBC /* Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ../Shared; sourceTree = "<group>"; };
 		7026E3F43035A9A700ED9FBC /* Clock */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Clock; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -28,6 +28,20 @@
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		70C94A013101000000000001 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				70C94A013101000000000002 /* Shared in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		7026E3A13035A9A700ED9FBC /* Frameworks */ = {
@@ -49,7 +63,6 @@
 			children = (
 				7026E3A63035A9A700ED9FBC /* Zeitnot */,
 				7026E3A53035A9A700ED9FBC /* Products */,
-				7026E3E03035A9A700ED9FBC /* Shared */,
 				7026E3C43035A9A700ED9FBC /* CoreUI */,
 				7026E3D03035A9A700ED9FBC /* Setup */,
 				7026E3F43035A9A700ED9FBC /* Clock */,
@@ -82,6 +95,7 @@
 				7026E3A03035A9A700ED9FBC /* Sources */,
 				7026E3A13035A9A700ED9FBC /* Frameworks */,
 				7026E3A23035A9A700ED9FBC /* Resources */,
+				70C94A013101000000000001 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

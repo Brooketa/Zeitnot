@@ -26,8 +26,8 @@ App  ──▶  Setup / Clock  ──▶  Shared + CoreUI
 
 Feature modules never import each other, and the two base modules never import each other either —
 `Shared` knows the game, `CoreUI` knows how things are drawn. Each module is a local Swift package.
-`Shared` sits at the repository root and builds for iOS and for
-`aarch64-unknown-linux-android28`; everything else is iOS-only and lives in `iosApp/`.
+`Shared` sits at the repository root and builds for iOS and for Android's `arm64-v8a` and `x86_64`;
+everything else belongs to one platform and lives in `iosApp/` or `androidApp/`.
 
 | Module | Holds |
 |---|---|
