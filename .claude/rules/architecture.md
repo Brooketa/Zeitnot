@@ -28,24 +28,53 @@ ceremony.
 
 ### Where each layer lives
 
-The chain is cut once, between the View and the Presenter:
+The chain is cut once, between the Presenter and the Service:
 
 ```
-platform    View  ·  its words  ·  its images
-              │
-Shared        └──▶  Presenter  ──▶  Service  ──▶  seam
-                        │
-                        └──▶  Routing protocol  ──▶  the app's router
+platform    View  ·  Presenter  ·  its view models  ·  its words  ·  its images
+                         │
+                         ├──▶  Routing protocol  ──▶  the app's router
+                         │
+Shared                   └──▶  Service  ──▶  seam
 ```
 
-**From the Presenter down is `Shared`**, and every platform runs the same one: the domain, the game
-rules, the presenters and the pure view models they hand out. **The View and everything that carries
-copy is the platform's** — SwiftUI views, String Catalogs and images stay in `Clock`, `Setup` and
-`CoreUI`.
+**From the Service down is `Shared`**, and every platform runs the same one: the domain, the game
+rules, and the snapshot a screen reads. **The whole presentation layer is the platform's** — views,
+presenters, view models, routing protocols, String Catalogs and images stay in `Clock`, `Setup` and
+`CoreUI`, and Android writes its own in Kotlin.
 
-The line falls there because `Shared` must build for Android as well as iOS. SwiftUI does not run
-there and `LocalizedStringResource` does not exist there, so a shared layer holding either would not
-compile. The rules below follow from that constraint rather than from taste.
+The line falls there because a presenter is presentation. What two apps must agree about is the game;
+what they draw with it is theirs. SwiftUI observes a presenter and Compose reads snapshot state, so a
+shared presenter serves neither well, and it drags UI state — a display mode, a dialog flag — across
+a language boundary for no reason.
+
+**A rule that decides what is true is domain, wherever it used to live.** When the presenters moved
+out, the decisions they were making moved *down* rather than out: the low-time threshold
+(`remaining <= min(10s, baseTime / 10)`), the convention that only Black may start, the move number,
+and the five-case status of a clock — awaiting start, to move, low time, waiting, flagged. Each has
+exactly one home, in `Shared`. A platform maps a status to a colour; it does not decide when a clock
+is in trouble.
+
+`Shared` still holds no copy and no SwiftUI, because it must build for Android, where
+`LocalizedStringResource` does not exist.
+
+### Both platforms layer the same way
+
+The chain above is the *app's* shape, not Swift's. Android repeats it in Kotlin: a Compose screen
+holds a presenter, the presenter holds a service behind an abstraction, and the implementation of
+that abstraction is what crosses into `Shared`.
+
+| Concept | iOS | Android |
+|---|---|---|
+| Abstraction | `GameServiceProtocol` | `GameServiceContract` |
+| Implementation | `GameService` | `GameService`, over JNI |
+| Observation | `@Observable`, SwiftUI observes | The screen re-reads after an action, and per frame while running |
+
+**An abstraction is suffixed for the language reading it** — `Protocol` in Swift, `Contract` in
+Kotlin — so which type is the abstraction stays visible at a glance on both sides.
+
+Compose cannot observe Swift, so Android pulls where iOS is pushed to. That difference is confined to
+the presentation layer, which is why it belongs to the platform.
 
 ---
 
@@ -184,9 +213,9 @@ struct HeaderModel {
 Text(.rulesetTitle(String(localized: model.category.name), …))
 ```
 
-The presenter picks *which* category, the way it picks which number. It does not pick the word, and
-it cannot: `Shared` builds for Android, where `LocalizedStringResource` does not exist. A shared type
-carrying copy would not compile.
+The presenter picks *which* category, the way it picks which number. It does not pick the word: the
+token it hands over comes from `Shared`, which builds for Android, where `LocalizedStringResource`
+does not exist. A shared type carrying copy would not compile.
 
 So **the words live with the platform.** Each feature module names the four categories in its own
 String Catalog through an extension on the token, and uppercases as its design asks. That the same
@@ -288,9 +317,11 @@ string factory, and the format string stops being whole for a translator.
 
 **A presenter names nothing.** Not the sentence, and not the word inside it — it hands over a token
 and the view says what it is called. `BLITZ · 3 | 2` is the header's phrasing of a category the
-presenter only classified. A presenter holding a `LocalizedStringResource` at all is the error, not
-just one that calls `String(localized:)`: presenters live in `Shared`, and that type does not exist
-on every platform `Shared` builds for.
+presenter only classified.
+
+Presenters are platform code now, so this is a design rule rather than a compiler one: a presenter
+that returns a finished sentence has become a string factory, and the format string stops being whole
+for a translator. The token it classifies still comes from `Shared`, which carries no copy at all.
 
 ---
 
@@ -299,7 +330,9 @@ on every platform `Shared` builds for.
 ### Service
 
 Anything that **holds state or owns rules** is a Service. Services live in `Shared`, under
-`Sources/Shared/<Screen>/Services/`, because the rules are the same on every platform.
+`Sources/Shared/<Screen>/Services/`, because the rules are the same on every platform — and a
+platform reads them through a **snapshot**: one value carrying what is true right now, per-clock
+remaining time and status, whose turn it is, the move number and the winner.
 
 - Implements a protocol (`GameServiceProtocol`) — only the protocol is visible to the Presenter.
 - Owns the feature's state and the rules that mutate it. `GameService` owns the two clocks, whose
@@ -359,7 +392,12 @@ can satisfy its protocol.
 - Never leak a domain type that carries behaviour or state into a View's `Model` or `Action`. A name
   crosses as a token the view resolves, an identity as its id; see the two sections above.
 - Nothing in `Shared` imports `SwiftUI` or `CoreUI`, or references `LocalizedStringResource`.
-- Single source of truth at every layer. A Presenter computes from the Service's state rather than
+- **`Shared` holds no presentation.** No presenter, no view model, no routing protocol, no UI state.
+  Each platform writes its own over the same domain.
+- **A rule that decides what is true belongs in `Shared`**, even when a presenter is what used to ask
+  it — the low-time threshold, who may start, the move number, a clock's status. If two platforms
+  would otherwise have to agree by hand, it is domain.
+- Single source of truth at every layer. A Presenter computes from the Service's snapshot rather than
   keeping its own copy.
 - One Presenter per View. Do not share Presenters between Views.
 - State-holding components are Services in `Services/`, not UseCases.

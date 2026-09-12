@@ -51,8 +51,18 @@ struct PauseDialog: View {
 
 extension PauseDialog {
 
-    typealias Model = PauseDialogModel
-    typealias Player = PauseDialogPlayer
+    struct Model {
+
+        let playerToMove: Player
+
+    }
+
+    enum Player {
+
+        case white
+        case black
+
+    }
 
 }
 

@@ -51,7 +51,11 @@ struct AnalogFace: View {
 
 extension AnalogFace {
 
-    typealias Model = AnalogFaceModel
+    struct Model: Equatable {
+
+        let hands: DialHands
+
+    }
 
 }
 

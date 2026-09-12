@@ -58,7 +58,15 @@ struct Header: View {
 
 extension Header {
 
-    typealias Model = HeaderModel
+    struct Model {
+
+        let category: RulesetCategory
+        let baseMinutes: Int
+        let incrementSeconds: Int
+        let moveNumber: Int
+        let isRunning: Bool
+
+    }
 
 }
 
