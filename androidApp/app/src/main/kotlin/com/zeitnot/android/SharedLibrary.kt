@@ -1,9 +1,11 @@
 package com.zeitnot.android
 
-object SharedLibrary {
+internal object SharedLibrary {
 
-    fun load() {
+    init {
         System.loadLibrary("Shared")
     }
+
+    fun ensureLoaded() = Unit
 
 }
