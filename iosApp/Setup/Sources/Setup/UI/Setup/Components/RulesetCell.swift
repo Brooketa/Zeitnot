@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct RulesetCell: View {
 
@@ -64,5 +65,21 @@ extension RulesetCell {
 		case select
 
 	}
+
+}
+
+extension RulesetCell.Model {
+
+    init?(_ ruleset: RulesetModel) {
+        guard let preset = PresetRuleset(rawValue: ruleset.id) else { return nil }
+
+        self.init(
+            id: ruleset.id,
+            category: ruleset.category.name,
+            description: preset.description,
+            baseMinutes: ruleset.baseMinutes,
+            incrementSeconds: ruleset.incrementSeconds,
+            isSelected: ruleset.isSelected)
+    }
 
 }

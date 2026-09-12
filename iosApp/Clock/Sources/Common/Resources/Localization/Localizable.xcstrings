@@ -49,6 +49,30 @@
         }
       }
     },
+    "blitzCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blitz"
+          }
+        }
+      }
+    },
+    "bulletCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bullet"
+          }
+        }
+      }
+    },
     "cancelButton": {
       "comment": "Button on the reset dialog that dismisses it and keeps the game. Uppercased for display.",
       "extractionState": "manual",
@@ -57,6 +81,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cancel"
+          }
+        }
+      }
+    },
+    "classicalCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classical"
           }
         }
       }
@@ -141,6 +177,18 @@
           "stringUnit": {
             "state": "translated",
             "value": "Press to start"
+          }
+        }
+      }
+    },
+    "rapidCategory": {
+      "comment": "Ruleset category name. Uppercased for display by the view.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rapid"
           }
         }
       }

@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct PauseDialog: View {
 
@@ -50,18 +51,8 @@ struct PauseDialog: View {
 
 extension PauseDialog {
 
-    struct Model {
-
-        let playerToMove: Player
-
-    }
-
-    enum Player {
-
-        case white
-        case black
-
-    }
+    typealias Model = PauseDialogModel
+    typealias Player = PauseDialogPlayer
 
 }
 

@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct Clocks: View {
 
@@ -18,12 +19,7 @@ struct Clocks: View {
 
 extension Clocks {
 
-    struct Model {
-
-        let white: ClockFace.Model
-        let black: ClockFace.Model
-
-    }
+    typealias Model = ClocksModel
 
     enum Action {
 

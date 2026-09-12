@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct AnalogFace: View {
 
@@ -50,11 +51,7 @@ struct AnalogFace: View {
 
 extension AnalogFace {
 
-    struct Model: Equatable {
-
-        let hands: DialHands
-
-    }
+    typealias Model = AnalogFaceModel
 
 }
 

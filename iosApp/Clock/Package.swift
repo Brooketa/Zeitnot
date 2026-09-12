@@ -14,13 +14,13 @@ let package = Package(
             targets: ["Clock"])
     ],
     dependencies: [
-        .package(name: "GameDomain", path: "../GameDomain"),
-        .package(name: "CoreUI", path: "../CoreUI")
+        .package(name: "CoreUI", path: "../CoreUI"),
+        .package(name: "Shared", path: "../../Shared")
     ],
     targets: [
         .target(
             name: "Clock",
-            dependencies: ["GameDomain", "CoreUI"],
+            dependencies: ["CoreUI", "Shared"],
             path: "Sources",
             resources: [
                 .process("Common/Resources/Localization"),
@@ -32,7 +32,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "ClockTests",
-            dependencies: ["Clock"],
+            dependencies: ["Clock", "Shared"],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
                 .defaultIsolation(MainActor.self)

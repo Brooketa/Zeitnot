@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct StartGameBar: View {
 
@@ -83,6 +84,17 @@ extension StartGameBar {
 
         case start
 
+    }
+
+}
+
+extension StartGameBar.Model {
+
+    init(_ model: StartGameModel) {
+        self.init(
+            category: model.category.name,
+            baseMinutes: model.baseMinutes,
+            incrementSeconds: model.incrementSeconds)
     }
 
 }

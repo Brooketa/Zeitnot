@@ -1,7 +1,5 @@
 import Observation
-import GameDomain
-import Clock
-import Setup
+import Shared
 
 @Observable
 final class AppRouter {

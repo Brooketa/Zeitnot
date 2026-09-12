@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import Shared
 @testable import Setup
 
 struct PresetRulesetCopyTests {

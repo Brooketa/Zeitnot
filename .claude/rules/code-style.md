@@ -66,7 +66,7 @@ This is the only exemption. It does not license speculative API in general:
 
 - The set must be **closed and obvious** — an enumeration of positions, states or directions the
   platform already defines, not a guess at what a future screen might want.
-- It must live in `CoreUI` (or `GameDomain`) as shared vocabulary, never in a feature module.
+- It must live in `CoreUI` (or `Shared`) as shared vocabulary, never in a feature module.
 - A partially-populated set is worse than none, because the gaps get filled one-off per screen,
   which is exactly what the set exists to prevent.
 
@@ -113,7 +113,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 import CoreUI
-import GameDomain
+import Shared
 ```
 
 ### Namespacing

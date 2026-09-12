@@ -14,13 +14,13 @@ let package = Package(
             targets: ["Setup"])
     ],
     dependencies: [
-        .package(name: "GameDomain", path: "../GameDomain"),
-        .package(name: "CoreUI", path: "../CoreUI")
+        .package(name: "CoreUI", path: "../CoreUI"),
+        .package(name: "Shared", path: "../../Shared")
     ],
     targets: [
         .target(
             name: "Setup",
-            dependencies: ["GameDomain", "CoreUI"],
+            dependencies: ["CoreUI", "Shared"],
             path: "Sources",
             resources: [.process("Common/Resources/Localization")],
             swiftSettings: [
@@ -29,7 +29,7 @@ let package = Package(
             ]),
         .testTarget(
             name: "SetupTests",
-            dependencies: ["Setup", "GameDomain", "CoreUI"],
+            dependencies: ["Setup", "CoreUI", "Shared"],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
                 .defaultIsolation(MainActor.self)

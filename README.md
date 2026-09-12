@@ -69,7 +69,7 @@ The waiting half greys out; the half to move carries the accent ring.
 One local Swift package per module, and a screen is layered View → Presenter → Service.
 
 ```
-App  ──▶  Setup · Clock  ──▶  GameDomain + CoreUI
+App  ──▶  Setup · Clock  ──▶  Shared + CoreUI
 ```
 
 Each platform gets a folder holding its app and the packages only it builds; anything every platform
@@ -77,12 +77,17 @@ builds sits at the repository root. Open `iosApp/Zeitnot.xcodeproj` to build.
 
 ```
 Zeitnot/
+├── Shared/                            # local Swift package — every platform builds it
 └── iosApp/
     ├── Zeitnot.xcodeproj
     ├── Zeitnot/                       # app target
-    └── GameDomain/  CoreUI/         # local Swift packages, iOS only
-        Setup/  Clock/
+    └── CoreUI/  Setup/  Clock/        # local Swift packages, iOS only
 ```
+
+`Shared` holds the domain, the game rules and both presenters, and builds for iOS and for
+`aarch64-unknown-linux-android28`. It imports `Observation` and nothing else — no SwiftUI, and no
+copy, since `LocalizedStringResource` does not exist on every platform it targets. The views, the
+String Catalogs and the images stay in the iOS packages.
 
 - **The Service holds the game.** `GameService` owns the two clocks, whose turn it is, and what starting, passing, pausing and resetting mean. The Presenter turns that into the strings a view renders; the View only reports taps back
 - **Remaining time is computed from a monotonic instant**, never accumulated tick by tick, so a 90-minute game doesn't drift and backgrounding can't cheat

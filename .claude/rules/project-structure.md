@@ -9,37 +9,38 @@ Modules are organized in a strict dependency hierarchy. A module may only depend
 ```
 App (main target)
  └── Feature Modules  (e.g. Authentication, Dashboard, Settings)
-      ├── GameDomain   (what the game is — no UI)
-      └── CoreUI       (how anything is drawn — no domain)
+      ├── Shared       (what the game is and how it behaves — no UI, every platform)
+      └── CoreUI       (how anything is drawn — no domain, iOS only)
 ```
 
 The two base modules are **independent of each other**, not a chain: one knows the game and nothing about drawing, the other knows drawing and nothing about the game. Neither imports the other, and a feature takes both.
 
-No circular dependencies are permitted. Feature modules must not import each other directly — shared communication should be done through protocols defined in `GameDomain` or via the App target as a coordinator.
+No circular dependencies are permitted. Feature modules must not import each other directly — shared communication should be done through protocols defined in `Shared` or via the App target as a coordinator.
 
 ---
 
 ## Module Hierarchy
 
-### GameDomain
+### Shared
 
-The `GameDomain` module is the **game's shared vocabulary** — the types every feature means the same thing by, together with the words for them. It is non-UI: `Foundation` only.
+The `Shared` module is **the game itself** — the vocabulary every feature means the same thing by, the rules that govern play, and the presenters that turn game state into what a screen shows. Every platform builds it, so it sits at the repository root. Its only import is `Observation`.
 
 **What belongs here:**
-- Domain value types and tokens used by **more than one feature** (`TimeControl`, `RulesetCategory`, `GameConfiguration`)
-- The **copy naming those types** — its own String Catalog, reached through generated symbols
+- Domain value types and tokens used by **more than one feature** (`TimeControl`, `RulesetCategory`, `GameConfiguration`, `PresetRuleset`)
 - Domain formatting every screen must agree on (the shared time reading)
-- Shared protocols and interfaces used across features
+- Services that hold state and own rules (`GameService`), with the seams they inject (`TimeSourceProtocol`, `TickerProtocol`)
+- Presenters, and the **pure view models** they hand out — a side, a state, a time reading, degrees, a category token
+- Each feature's routing protocol, because the presenter that calls it lives here
 
 **What does NOT belong here:**
-- Anything that imports `SwiftUI` or `UIKit`
-- A type only one feature uses, however domain-shaped it looks. `PresetRuleset` is the setup screen's and lives there, its descriptions with it
-- Sentences a *screen* writes. A category's name is the category's; `BLITZ · 3 | 2` is the clock header's
-- Business logic or state specific to a single feature — a Service lives with its feature
+- Anything that imports `SwiftUI`, `UIKit` or `CoreUI`
+- **Any copy at all.** No String Catalog, no `LocalizedStringResource`, no `String(localized:)` — the type does not exist on every platform this module builds for
+- A view model that carries words. `RulesetCell.Model` and `StartGameBar.Model` carry copy and stay in `Setup`
+- Anything drawn: views, images, colours, spacing
 
-**Dependencies:** None. `GameDomain` is a zero-dependency module.
+**Dependencies:** None. `Shared` is a zero-dependency module.
 
-**There is no generic `Core`.** Nothing in the app today is a non-UI utility without game meaning, and a module holding nothing is ceremony. If one appears — a `String` extension, a `Debouncer` — add `Core` beneath both base modules then, rather than parking it in `GameDomain` because it has nowhere else to go.
+**There is no generic `Core`.** Nothing in the app today is a non-UI utility without game meaning, and a module holding nothing is ceremony. If one appears — a `String` extension, a `Debouncer` — add `Core` beneath both base modules then, rather than parking it in `Shared` because it has nowhere else to go.
 
 ---
 
@@ -70,7 +71,9 @@ The `CoreUI` module contains all **reusable UI building blocks** — anything Sw
 
 Each feature module represents **one large, user-facing product area**. Examples: `Authentication`, `Dashboard`, `Settings`, `Onboarding`, `Profile`.
 
-**Dependencies:** `GameDomain` and `CoreUI`. Never another feature module.
+**Dependencies:** `Shared` and `CoreUI`. Never another feature module.
+
+A feature holds its screens' **views**, its **String Catalog** and its **images** — including the words for any token `Shared` hands it, such as the ruleset category names.
 
 ---
 
@@ -95,6 +98,27 @@ whichever home it has, a package sits directly there, side by side with its sibl
 Zeitnot/
 ├── CLAUDE.md
 ├── Shared/                             # Local Swift package — every platform builds it
+│   ├── Package.swift
+│   ├── Docs/
+│   │   └── Shared.md
+│   └── Sources/
+│       ├── Common/
+│       │   └── Navigation/             # Every feature's routing protocol
+│       │       ├── ClockRoutingProtocol.swift
+│       │       └── SetupRoutingProtocol.swift
+│       └── Shared/
+│           ├── Types/                  # TimeControl, RulesetCategory, GameConfiguration, PresetRuleset
+│           ├── Extensions/
+│           │   └── Duration+TimeReading.swift
+│           ├── Clock/
+│           │   ├── ClockPresenter.swift
+│           │   ├── Models/             # Player, PlayerClock, GameState, DisplayMode
+│           │   ├── Services/           # GameService, Ticker, TimeSource
+│           │   └── ViewModels/         # HeaderModel, ClockFaceModel, DialHands, ...
+│           └── Setup/
+│               ├── SetupPresenter.swift
+│               └── ViewModels/         # RulesetModel, StartGameModel
+│
 ├── iosApp/                             # The iOS app and its iOS-only packages
 │   ├── Zeitnot.xcodeproj
 │   ├── Zeitnot/                        # Main app target
@@ -108,23 +132,6 @@ Zeitnot/
 │   │   │       └── DependenciesContainer.swift
 │   │   ├── Services/                   # App-level services
 │   │   └── Assets.xcassets/            # App-level assets (app icon, accent colour)
-│   │
-│   ├── GameDomain/                     # Local Swift package — iOS only
-│   │   ├── Package.swift
-│   │   ├── Docs/
-│   │   │   └── GameDomain.md
-│   │   └── Sources/
-│   │       └── GameDomain/
-│   │           ├── Extensions/
-│   │           │   ├── Duration+TimeReading.swift
-│   │           │   └── ...
-│   │           ├── Types/
-│   │           │   ├── RulesetCategory.swift
-│   │           │   ├── RulesetCategory+Name.swift
-│   │           │   └── ...
-│   │           └── Resources/
-│   │               └── Localization/
-│   │                   └── Localizable.xcstrings
 │   │
 │   ├── CoreUI/                         # Local Swift package — iOS only
 │   │   ├── Package.swift
@@ -438,15 +445,16 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 
 | Module | Can depend on |
 |---|---|
-| `GameDomain` | Nothing |
+| `Shared` | Nothing |
 | `CoreUI` | Nothing |
-| Feature Module | `GameDomain`, `CoreUI` |
+| Feature Module | `Shared`, `CoreUI` |
 | App Target | All modules |
 
-- **The two base modules never import each other.** `CoreUI` importing `GameDomain` would make the design system game-aware; `GameDomain` importing `CoreUI` would make the domain drawable. Either one collapses the split.
-- **No feature-to-feature imports.** If two features need to share something, move it into `GameDomain` (non-UI) or `CoreUI` (UI), or define a protocol in `GameDomain` and inject the implementation from the App target.
+- **The two base modules never import each other.** `CoreUI` importing `Shared` would make the design system game-aware; `Shared` importing `CoreUI` would make the domain drawable — and would stop `Shared` building for Android at all. Either one collapses the split.
+- **No feature-to-feature imports.** If two features need to share something, move it into `Shared` (non-UI) or `CoreUI` (UI), or define a protocol in `Shared` and inject the implementation from the App target.
+- **Nothing in `Shared` carries copy.** A feature naming a `Shared` token does so in its own String Catalog, which is why `Clock` and `Setup` each name the ruleset categories.
 - **No upward dependencies.** Lower modules must never import higher ones.
-- All new cross-cutting utilities must be evaluated: game vocabulary → `GameDomain`, UI → `CoreUI`, feature-specific → stays in the feature module.
+- All new cross-cutting utilities must be evaluated: game vocabulary, rules or presentation logic → `Shared`, UI → `CoreUI`, feature-specific or copy-carrying → stays in the feature module.
 
 ---
 
@@ -457,8 +465,8 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 | Screen's `Components/` | Another screen in the same feature | `Sources/Common/Components/` |
 | Screen's layer (`UseCase/`, `Client/`, etc.) | Another screen in the same feature | `Sources/Common/` |
 | `Common/Components/` | Another feature module | `CoreUI/Components/` |
-| `Common/Extensions/` | Another feature module | `GameDomain/Extensions/` |
-| A type's own copy | The type moved to `GameDomain` | `GameDomain/Resources/Localization/` |
+| `Common/Extensions/` | Another feature module | `Shared/Extensions/` |
+| A type's own copy | The type moved to `Shared` | Stays in each feature's `Resources/Localization/` |
 | `Common/Images/` | Another feature module | `CoreUI/Images/` |
 
 ---
