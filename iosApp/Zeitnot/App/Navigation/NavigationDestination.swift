@@ -1,4 +1,4 @@
-import GameDomain
+import Shared
 
 enum NavigationDestination: Hashable {
 

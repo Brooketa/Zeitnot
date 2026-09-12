@@ -17,12 +17,12 @@ If unsure about the right architectural approach, do not guess and implement. In
 
 ## Reusing Existing Code
 
-When building a new view or feature, always search `GameDomain` and `CoreUI` first for reusable types, copy, components or styles before writing new code.
+When building a new view or feature, always search `Shared` and `CoreUI` first for reusable types, rules, components or styles before writing new code.
 
-## Extending GameDomain / CoreUI
+## Extending Shared / CoreUI
 
-If something is missing from `GameDomain` or `CoreUI` but would logically belong there (i.e., it will be used across the codebase), do not add it unilaterally. Instead:
-- Explain what you want to add and why it belongs in `GameDomain`/`CoreUI`
+If something is missing from `Shared` or `CoreUI` but would logically belong there (i.e., it will be used across the codebase), do not add it unilaterally. Instead:
+- Explain what you want to add and why it belongs in `Shared`/`CoreUI`
 - Ask for permission
 - Wait for approval before making any changes
 

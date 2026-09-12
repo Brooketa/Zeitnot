@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 public struct SetupView: View {
 
@@ -14,7 +15,7 @@ public struct SetupView: View {
             VStack(alignment: .leading, spacing: .jumbo) {
                 subtitle
 
-                PresetRulesetSection(models: presenter.rulesetModels, action: onPresetRulesetSectionAction)
+                PresetRulesetSection(models: rulesetModels, action: onPresetRulesetSectionAction)
             }
             .padding(.horizontal, .large)
             .padding(.bottom, .jumbo)
@@ -23,7 +24,7 @@ public struct SetupView: View {
         .navigationTitle(Text(.setTheClocks))
         .navigationBarTitleDisplayMode(.large)
         .safeAreaBar(edge: .bottom) {
-            StartGameBar(model: presenter.startGameModel, action: onStartGameBarAction)
+            StartGameBar(model: StartGameBar.Model(presenter.startGameModel), action: onStartGameBarAction)
         }
     }
 
@@ -35,6 +36,10 @@ public struct SetupView: View {
 }
 
 private extension SetupView {
+
+    var rulesetModels: [RulesetCell.Model] {
+        presenter.rulesetModels.compactMap(RulesetCell.Model.init)
+    }
 
     func onPresetRulesetSectionAction(_ action: PresetRulesetSection.Action) {
         switch action {

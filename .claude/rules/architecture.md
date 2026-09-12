@@ -26,6 +26,27 @@ Client** anywhere in this project, because there is no data to fetch: the app is
 no network, no database and no persistence. Inventing those layers to hold nothing would be
 ceremony.
 
+### Where each layer lives
+
+The chain is cut once, between the View and the Presenter:
+
+```
+platform    View  ·  its words  ·  its images
+              │
+Shared        └──▶  Presenter  ──▶  Service  ──▶  seam
+                        │
+                        └──▶  Routing protocol  ──▶  the app's router
+```
+
+**From the Presenter down is `Shared`**, and every platform runs the same one: the domain, the game
+rules, the presenters and the pure view models they hand out. **The View and everything that carries
+copy is the platform's** — SwiftUI views, String Catalogs and images stay in `Clock`, `Setup` and
+`CoreUI`.
+
+The line falls there because `Shared` must build for Android as well as iOS. SwiftUI does not run
+there and `LocalizedStringResource` does not exist there, so a shared layer holding either would not
+compile. The rules below follow from that constraint rather than from taste.
+
 ---
 
 ## Dependency Injection
@@ -148,35 +169,43 @@ extension ClockFace {
 }
 ```
 
-### A name crosses as a resource, not as a token
+### A name crosses as a token, and the view names it
 
-**No `GameDomain` type reaches a view model.** Where a view needs to show the name of a domain thing,
-the `Model` carries a `LocalizedStringResource` and the Presenter supplies it from the token:
+Where a view needs to show the name of a domain thing, the `Model` carries the **token** and the view
+resolves the name itself:
 
 ```swift
-struct Model {
+struct HeaderModel {
 
-    let category: LocalizedStringResource
+    let category: RulesetCategory
 
 }
 
-Header.Model(category: gameConfiguration.category.name, …)
+Text(.rulesetTitle(String(localized: model.category.name), …))
 ```
 
-That is the whole rule — the view is handed the words, never the thing they name.
+The presenter picks *which* category, the way it picks which number. It does not pick the word, and
+it cannot: `Shared` builds for Android, where `LocalizedStringResource` does not exist. A shared type
+carrying copy would not compile.
 
-A resource rather than a `String` matters: it is **unresolved**, so the Presenter has chosen nothing.
-It picks *which* name, the way it picks which number; the view still decides casing, phrasing and
-whether the name lands in a sentence. A Presenter that calls `String(localized:)` has resolved the
-copy early and is back to being a string factory.
+So **the words live with the platform.** Each feature module names the four categories in its own
+String Catalog through an extension on the token, and uppercases as its design asks. That the same
+four names are spelled out in both `Clock` and `Setup` is the deliberate price of the split — the
+alternative is a shared module that only iOS can build.
 
-Tests stay structural, because the resource compares equal by key:
+Tests stay structural, because a token compares by case:
 
 ```swift
-#expect(presenter.headerModel.category == RulesetCategory.classical.name)
+#expect(presenter.headerModel.category == .classical)
 ```
 
-The generated catalog symbols (`.classicalCategory`) are **internal to the module that owns the
+and the words are tested where they live, against the catalog that holds them:
+
+```swift
+#expect(String(localized: RulesetCategory.blitz.name) == "Blitz")
+```
+
+The generated catalog symbols (`.blitzCategory`) are **internal to the module that owns the
 catalog**, so a consumer names the accessor, never the symbol.
 
 ### Identity crosses as an id
@@ -209,6 +238,12 @@ func selectRuleset(id: String) {
     select(ruleset)
 }
 ```
+
+Where a model needs copy, it is built in **two steps**. The Presenter exposes a pure model carrying
+the id, the tokens and the numbers; the feature's view turns that into the model its subview takes,
+adding the words. `SetupPresenter` hands out a `RulesetModel`, and `SetupView` makes the
+`RulesetCell.Model` above from it. The Presenter still decides what is on screen and in what order —
+it just does not decide what any of it is called.
 
 This is why a preset's raw values are **stable keys** rather than derived from its numbers — the id
 is the identity the view round-trips, so it has to survive a preset's values being revised.
@@ -251,10 +286,11 @@ Localization belongs to the **view**, not the presenter: the `Model` carries the
 needs, and the view builds the copy. A presenter that returns a finished sentence has become a
 string factory, and the format string stops being whole for a translator.
 
-Forwarding an unresolved `LocalizedStringResource` is not that. The **sentence** is the view's; the
-**name of a domain thing** is not, and the presenter hands the name over without resolving it —
-`BLITZ · 3 | 2` is the header's phrasing of a word it did not choose. The line is `String(localized:)`:
-the moment a presenter calls it, the copy is settled too early.
+**A presenter names nothing.** Not the sentence, and not the word inside it — it hands over a token
+and the view says what it is called. `BLITZ · 3 | 2` is the header's phrasing of a category the
+presenter only classified. A presenter holding a `LocalizedStringResource` at all is the error, not
+just one that calls `String(localized:)`: presenters live in `Shared`, and that type does not exist
+on every platform `Shared` builds for.
 
 ---
 
@@ -262,7 +298,8 @@ the moment a presenter calls it, the copy is settled too early.
 
 ### Service
 
-Anything that **holds state or owns rules** is a Service. It lives in `Sources/<Module>/Services/`.
+Anything that **holds state or owns rules** is a Service. Services live in `Shared`, under
+`Sources/Shared/<Screen>/Services/`, because the rules are the same on every platform.
 
 - Implements a protocol (`GameServiceProtocol`) — only the protocol is visible to the Presenter.
 - Owns the feature's state and the rules that mutate it. `GameService` owns the two clocks, whose
@@ -319,8 +356,9 @@ can satisfy its protocol.
 - All dependencies are injected through the constructor. The only components that construct their
   own are the composition root and services whose consumer UIKit owns — see the two exceptions above.
 - Never skip layers. A View does not talk to a Service.
-- Never leak a domain type into a View's `Model` or `Action` — not another module's, not the feature's
-  own. A name crosses as a `LocalizedStringResource`, an identity as its id; see the two sections above.
+- Never leak a domain type that carries behaviour or state into a View's `Model` or `Action`. A name
+  crosses as a token the view resolves, an identity as its id; see the two sections above.
+- Nothing in `Shared` imports `SwiftUI` or `CoreUI`, or references `LocalizedStringResource`.
 - Single source of truth at every layer. A Presenter computes from the Service's state rather than
   keeping its own copy.
 - One Presenter per View. Do not share Presenters between Views.

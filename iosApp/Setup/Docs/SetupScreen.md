@@ -48,12 +48,13 @@ part of it.
 - **Presets are not editable.** They are cases of an enum; the guarantee is structural, not enforced.
 - Each carries a **stable id** (`"blitz-3-2"`) that is deliberately not derived from its numbers, so
   changing a preset's values cannot orphan anything that stored the id.
-- **A preset carries its words.** The six presets and their descriptions are this screen's — nothing
-  else in the app knows presets exist. Only the **category** is shared, as a `GameDomain` token whose
-  name that module supplies, so this list and the clock header cannot disagree about what a category
-  is called.
-- **A preset never reaches the view.** The presenter hands each row finished words and a stable id;
-  tapping a row sends that id back, and the presenter turns it into the preset again.
+- **The presets are shared; their words are not.** The six presets live in `Shared`, so both
+  platforms offer the same list in the same order. Their descriptions are this screen's, and so is
+  the name of a **category** — `Shared` supplies the category as a bare token and this module says
+  what it is called.
+- **A preset never reaches the view.** The presenter hands each row a category token, the numbers and
+  a stable id; this screen adds the words. Tapping a row sends the id back, and the presenter turns
+  it into the preset again.
 - **Classical's copy is accurate to what the app does**, which is base time plus increment. That is
   not the standard two-stage Classical format, and the copy does not claim to be.
 
@@ -123,9 +124,9 @@ Starting a game leaves the selection untouched, so returning finds the screen ex
 ## Localization
 
 Every user-facing string resolves from a String Catalog through a generated symbol. This module's
-catalog holds the screen's copy, the preset descriptions included; only the four category names come
-from `GameDomain`. Copy is stored in **natural casing** and views uppercase for display, so it is
-still spoken as words.
+catalog holds every word the screen says — the preset descriptions and the four category names
+included. Copy is stored in **natural casing** and views uppercase for display, so it is still spoken
+as words.
 
 The time control notation (`1 | 0`) and the bar's subtitle are single phrase keys taking the numbers
 as parameters, rather than strings concatenated in the Presenter — so a translation can reorder them.

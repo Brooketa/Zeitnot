@@ -25,6 +25,18 @@
         }
       }
     },
+    "blitzCategory" : {
+      "comment" : "Ruleset category name. Uppercased for display by the view.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blitz"
+          }
+        }
+      }
+    },
     "bullet1Plus0Description" : {
       "comment" : "Description of the 1 | 0 bullet preset.",
       "extractionState" : "manual",
@@ -33,6 +45,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "One minute each. Sudden death."
+          }
+        }
+      }
+    },
+    "bulletCategory" : {
+      "comment" : "Ruleset category name. Uppercased for display by the view.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bullet"
           }
         }
       }
@@ -56,6 +80,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "90 minutes each, plus 30s per move."
+          }
+        }
+      }
+    },
+    "classicalCategory" : {
+      "comment" : "Ruleset category name. Uppercased for display by the view.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classical"
           }
         }
       }
@@ -92,6 +128,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fifteen minutes, plus 10s per move."
+          }
+        }
+      }
+    },
+    "rapidCategory" : {
+      "comment" : "Ruleset category name. Uppercased for display by the view.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rapid"
           }
         }
       }

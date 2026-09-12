@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct DigitalFace: View {
 
@@ -23,11 +24,7 @@ struct DigitalFace: View {
 
 extension DigitalFace {
 
-    struct Model: Equatable {
-
-        let reading: String
-
-    }
+    typealias Model = DigitalFaceModel
 
 }
 

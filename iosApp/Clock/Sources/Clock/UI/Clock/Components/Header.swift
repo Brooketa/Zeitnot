@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct Header: View {
 
@@ -41,7 +42,7 @@ struct Header: View {
                 .frame(width: Constants.dotDiameter, height: Constants.dotDiameter)
                 .animation(.easeOut(duration: Constants.dotDuration), value: model.isRunning)
 
-            Text(.rulesetTitle(String(localized: model.category), model.baseMinutes, model.incrementSeconds))
+            Text(.rulesetTitle(String(localized: model.category.name), model.baseMinutes, model.incrementSeconds))
                 .label(ColorPalette.ink)
                 .textCase(.uppercase)
         }
@@ -57,15 +58,7 @@ struct Header: View {
 
 extension Header {
 
-    struct Model {
-
-        let category: LocalizedStringResource
-        let baseMinutes: Int
-        let incrementSeconds: Int
-        let moveNumber: Int
-        let isRunning: Bool
-
-    }
+    typealias Model = HeaderModel
 
 }
 

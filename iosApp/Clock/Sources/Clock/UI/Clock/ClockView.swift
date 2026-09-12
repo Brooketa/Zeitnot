@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 public struct ClockView: View {
 

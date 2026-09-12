@@ -28,10 +28,11 @@ they count, and `playerName`, small and widely tracked.
 
 `CoreUI` owns **no strings** and has no String Catalog. It styles words; it does not choose them.
 
-Copy belongs either to the screen that writes the sentence or to the module that owns the thing being
-named — the ruleset category names sit in `GameDomain`, beside the type they describe, and the preset
-descriptions sit in `Setup`, beside theirs. A design system that also holds wording ends up as the place any string goes when nobody
-wants to decide where it belongs.
+Copy belongs to the feature that draws it. `Shared` hands a screen tokens — a category, a side, a
+state — and the feature says what they are called: `Clock` and `Setup` each name the four ruleset
+categories in their own catalog, and the preset descriptions sit in `Setup`. A design system that
+also holds wording ends up as the place any string goes when nobody wants to decide where it
+belongs.
 
 ---
 

@@ -1,6 +1,4 @@
-import Clock
-import GameDomain
-import Setup
+import Shared
 
 struct Dependencies {
 

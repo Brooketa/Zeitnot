@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct ClockFace: View {
 
@@ -82,37 +83,10 @@ struct ClockFace: View {
 
 extension ClockFace {
 
-    struct Model {
-
-        let side: Side
-        let state: State
-        let timeDisplay: TimeDisplay
-
-    }
-
-    enum Side {
-
-        case white
-        case black
-
-    }
-
-    enum State {
-
-        case awaitingStart
-        case toMove
-        case lowTime
-        case waiting
-        case flagged
-
-    }
-
-    enum TimeDisplay: Equatable {
-
-        case digital(DigitalFace.Model)
-        case analog(AnalogFace.Model)
-
-    }
+    typealias Model = ClockFaceModel
+    typealias Side = ClockFaceSide
+    typealias State = ClockFaceState
+    typealias TimeDisplay = ClockFaceTimeDisplay
 
     enum Action {
 

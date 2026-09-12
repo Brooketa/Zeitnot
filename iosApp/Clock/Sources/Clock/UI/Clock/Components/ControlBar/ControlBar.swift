@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreUI
+import Shared
 
 struct ControlBar: View {
 
@@ -46,12 +47,7 @@ struct ControlBar: View {
 
 extension ControlBar {
 
-    struct Model {
-
-        let canPause: Bool
-        let canReset: Bool
-
-    }
+    typealias Model = ControlBarModel
 
     enum Action {
 

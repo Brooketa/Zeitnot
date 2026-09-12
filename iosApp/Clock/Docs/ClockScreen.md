@@ -106,7 +106,7 @@ The presenter supplies data only; each face derives its own colours from the sta
 
 | Face | Shows |
 |---|---|
-| Digital | The shared reading from `GameDomain` — `h:mm:ss` from an hour up, `m:ss` below, whole seconds, truncating towards zero |
+| Digital | The shared reading from `Shared` — `h:mm:ss` from an hour up, `m:ss` below, whole seconds, truncating towards zero |
 | Analog | A dial: supplied artwork under a minute hand and a second hand |
 
 The mode is chosen with the `DIGITAL | ANALOG` control in the control bar. **Digital is the
@@ -241,6 +241,7 @@ every orientation is allowed everywhere.
 ## Localization
 
 Every user-facing string resolves from a String Catalog through a generated symbol. The screen's own
-copy lives in this module; the ruleset category the header names comes from `GameDomain`'s catalog.
+copy lives in this module, the four ruleset category names included — `Shared` hands the header a
+category token, and this module names it.
 No view writes display copy as a Swift literal, and no `|`, `·` or `●` appears in the copy — those
 are presentation applied by the view.
