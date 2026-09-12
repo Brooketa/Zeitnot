@@ -180,12 +180,15 @@ Zeitnot/
     ├── settings.gradle.kts
     ├── gradle/
     │   └── libs.versions.toml          # Plugin and library versions
-    └── app/
-        ├── build.gradle.kts            # Also cross-compiles Shared and stages it into jniLibs
-        └── src/main/
-            ├── AndroidManifest.xml
-            ├── kotlin/                 # Compose UI
-            └── res/
+    ├── app/
+    │   ├── build.gradle.kts            # Also cross-compiles Shared and stages it into jniLibs
+    │   └── src/main/
+    │       ├── AndroidManifest.xml
+    │       ├── kotlin/                 # Compose UI
+    │       └── res/
+    └── core-ui/                        # Design tokens — the Compose CoreUI
+        ├── Docs/
+        └── src/main/kotlin/
 ```
 
 Notes on the tree:
