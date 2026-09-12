@@ -8,8 +8,8 @@ This document describes what the screen does today.
 ## Layout
 
 ```
-Chess Clock
-Choose how long you both want to play.
+Set the clocks
+Choose a ruleset.
 
 PRESET RULESETS
 ┌────────────────────────────────────┐
@@ -26,7 +26,8 @@ PRESET RULESETS
 └────────────────────────────────────┘
 ```
 
-Title, subtitle and the list scroll as one. The START GAME bar is pinned.
+The title is the navigation bar's large title; it, the subtitle and the list scroll as one. The
+START GAME bar is pinned.
 
 ---
 

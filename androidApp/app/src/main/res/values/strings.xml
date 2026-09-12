@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Zeitnot</string>
-    <string name="bullet_category">BULLET</string>
-    <string name="blitz_category">BLITZ</string>
-    <string name="rapid_category">RAPID</string>
-    <string name="classical_category">CLASSICAL</string>
-    <string name="ruleset_time_control">%1$d | %2$d</string>
-    <string name="start_game">START GAME</string>
+
+    <string name="set_the_clocks">Set the clocks</string>
+    <string name="choose_a_ruleset">Choose a ruleset.</string>
+    <string name="preset_rulesets">Preset Rulesets</string>
+    <string name="start_game">Start Game</string>
+    <string name="time_control_notation">%1$d | %2$d</string>
+    <string name="selected_ruleset">%1$s %2$d | %3$d</string>
+
+    <string name="bullet_category">Bullet</string>
+    <string name="blitz_category">Blitz</string>
+    <string name="rapid_category">Rapid</string>
+    <string name="classical_category">Classical</string>
+
+    <string name="bullet_1_0_description">One minute each. Sudden death.</string>
+    <string name="blitz_3_2_description">Three minutes, plus 2s per move.</string>
+    <string name="blitz_5_0_description">Five minutes each, classic blitz game.</string>
+    <string name="rapid_10_0_description">Ten minutes each, no increment.</string>
+    <string name="rapid_15_10_description">Fifteen minutes, plus 10s per move.</string>
+    <string name="classical_90_30_description">90 minutes each, plus 30s per move.</string>
+
     <string name="move_number">MOVE %1$d</string>
     <string name="press_to_start">PRESS TO START</string>
     <string name="flag_fell">FLAG FELL</string>
