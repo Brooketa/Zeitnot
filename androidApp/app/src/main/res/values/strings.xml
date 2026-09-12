@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Zeitnot</string>
-    <string name="shared_library_loaded">Shared is loaded</string>
+    <string name="bullet_category">BULLET</string>
+    <string name="blitz_category">BLITZ</string>
+    <string name="rapid_category">RAPID</string>
+    <string name="classical_category">CLASSICAL</string>
+    <string name="ruleset_time_control">%1$d | %2$d</string>
+    <string name="start_game">START GAME</string>
+    <string name="move_number">MOVE %1$d</string>
+    <string name="press_to_start">PRESS TO START</string>
+    <string name="flag_fell">FLAG FELL</string>
+    <string name="pause">PAUSE</string>
+    <string name="resume">RESUME</string>
+    <string name="reset">RESET</string>
+    <string name="confirm_reset">RESET GAME</string>
+    <string name="cancel_reset">KEEP PLAYING</string>
+    <string name="back">BACK</string>
 </resources>
