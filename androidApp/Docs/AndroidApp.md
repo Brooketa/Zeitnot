@@ -23,7 +23,7 @@ while the Activity is alive. It is the reason any Swift async works in this app.
 
 | Screen | Behaviour |
 |---|---|
-| Setup | Lists the six presets, one selected at a time, and starts a game with it |
+| Setup | Lists the six presets, one selected at a time, and starts a game with it — see `SetupScreen.md` |
 | Clock | Two halves that count down, a move number, pause, resume and reset |
 
 A half reads `PRESS TO START` until Black begins, pulses on the accent tint below the warning

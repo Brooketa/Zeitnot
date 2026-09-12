@@ -34,6 +34,9 @@ class SetupPresenter(catalogue: PresetCatalogueContract) {
             )
         }
 
+    val selectedRulesetId: String
+        get() = selection.id
+
     val gameConfiguration: GameConfiguration
         get() = GameConfiguration(
             category = selection.category,
