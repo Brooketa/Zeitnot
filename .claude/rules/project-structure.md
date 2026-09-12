@@ -174,7 +174,18 @@ Zeitnot/
 │           └── Clock/
 │               └── ...
 │
-└── androidApp/                         # The Android app and its Android-only modules
+└── androidApp/                         # The Android app — Gradle, Kotlin, Compose
+    ├── Docs/
+    │   └── AndroidApp.md
+    ├── settings.gradle.kts
+    ├── gradle/
+    │   └── libs.versions.toml          # Plugin and library versions
+    └── app/
+        ├── build.gradle.kts            # Also cross-compiles Shared and stages it into jniLibs
+        └── src/main/
+            ├── AndroidManifest.xml
+            ├── kotlin/                 # Compose UI
+            └── res/
 ```
 
 Notes on the tree:
@@ -243,6 +254,20 @@ It is listed in the target's `packageProductDependencies`.
 ```
 
 After adding a module, confirm `packageReferences` still contains no local package.
+
+**5. `PBXCopyFilesBuildPhase`** — only for a module whose product is **dynamic**. Xcode builds such a
+product as a framework but does not put it in the app bundle, so the target needs an **Embed
+Frameworks** phase or the app links something it does not ship:
+
+```
+<UUID_D> /* Embed Frameworks */ = {isa = PBXCopyFilesBuildPhase; dstSubfolderSpec = 10; name = "Embed Frameworks"; files = (<UUID_E> /* <Module> in Embed Frameworks */, ); ... };
+<UUID_E> /* <Module> in Embed Frameworks */ = {isa = PBXBuildFile; productRef = <UUID_B> /* <Module> */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+```
+
+`Shared` is the only such module today: Android packages it as `libShared.so`, which requires a
+dynamic product, and the same product is what iOS links. Without the phase the app builds and then
+dies at launch — a Debug build hides it, because Xcode adds an absolute DerivedData search path that
+exists only on the machine that built it.
 
 **Cross-package dependencies** are declared by relative path. Packages in the same home are
 siblings, so they reach each other with `../`; a platform-only package reaches a shared one at the

@@ -78,14 +78,15 @@ builds sits at the repository root. Open `iosApp/Zeitnot.xcodeproj` to build.
 ```
 Zeitnot/
 ├── Shared/                            # local Swift package — every platform builds it
-└── iosApp/
-    ├── Zeitnot.xcodeproj
-    ├── Zeitnot/                       # app target
-    └── CoreUI/  Setup/  Clock/        # local Swift packages, iOS only
+├── iosApp/
+│   ├── Zeitnot.xcodeproj
+│   ├── Zeitnot/                       # app target
+│   └── CoreUI/  Setup/  Clock/        # local Swift packages, iOS only
+└── androidApp/                        # Gradle project, Kotlin and Compose
 ```
 
-`Shared` holds the domain, the game rules and both presenters, and builds for iOS and for
-`aarch64-unknown-linux-android28`. It imports `Observation` and nothing else — no SwiftUI, and no
+`Shared` holds the domain, the game rules and both presenters, and builds for iOS and for Android's
+`arm64-v8a` and `x86_64`. It imports `Observation` and nothing else — no SwiftUI, and no
 copy, since `LocalizedStringResource` does not exist on every platform it targets. The views, the
 String Catalogs and the images stay in the iOS packages.
 
@@ -94,6 +95,27 @@ String Catalogs and the images stay in the iOS packages.
 - **Features never import each other.** Each declares a routing protocol; `AppRouter` satisfies both
 
 The clock screen carries a custom header and disables back-swipe, so a stray gesture can't abandon a game. Every other screen uses native navigation.
+
+## Running on Android
+
+The Android app builds `Shared` with the Swift SDK for Android and loads it on launch. It needs a
+Swift 6.3 toolchain with the Android SDK installed, and an Android SDK with API 37.
+
+```
+cd androidApp
+echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties
+./gradlew :app:runDebug
+```
+
+With an emulator running or a device attached, `runDebug` builds, installs and launches in one step;
+`:app:assembleDebug` builds the APK alone. Either way `Shared` is cross-compiled for both packaged
+ABIs and staged into the APK with the Swift runtime libraries it depends on, so there is no separate
+Swift step. The screen reads `Shared is loaded`; anything missing from the packaging crashes the app
+on launch instead of failing quietly.
+
+Opening `androidApp/` in Android Studio works too — it creates the `app` run configuration itself.
+
+`androidApp/Docs/AndroidApp.md` covers what ships and why.
 
 ## Design
 

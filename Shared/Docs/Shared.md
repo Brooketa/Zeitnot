@@ -162,5 +162,7 @@ Whatever hosts the presenters implements them. On iOS that is the app's router.
 - **No `SwiftUI`, no `CoreUI`, no `UIKit`.** The only import in the module is `Observation`.
 - **No `LocalizedStringResource`, and no `String(localized:)`.** A presenter that resolved copy would
   have chosen words for a platform it cannot see.
-- The module builds for iOS and for `aarch64-unknown-linux-android28`, and presenter isolation is the
-  same on both.
+- The module builds for iOS and for Android's `aarch64-unknown-linux-android28` and
+  `x86_64-unknown-linux-android28`, and presenter isolation is the same on all three.
+- It ships as a **dynamic** library, because Android loads it as `libShared.so` at runtime. iOS embeds
+  the same product as a framework.
