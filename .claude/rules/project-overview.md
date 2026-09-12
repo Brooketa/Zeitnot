@@ -21,17 +21,20 @@ Setup pushes Clock; the clock's back control returns. The selection survives for
 ## Modules
 
 ```
-App  ──▶  Setup / Clock  ──▶  CoreUI  ──▶  Core
+App  ──▶  Setup / Clock  ──▶  Shared + CoreUI
 ```
 
-Feature modules never import each other. Each is a local Swift package at the repository root.
+Feature modules never import each other, and the two base modules never import each other either —
+`Shared` knows the game, `CoreUI` knows how things are drawn. Each module is a local Swift package.
+`Shared` sits at the repository root and builds for iOS and for Android's `arm64-v8a` and `x86_64`;
+everything else belongs to one platform and lives in `iosApp/` or `androidApp/`.
 
 | Module | Holds |
 |---|---|
-| `Core` | Time control, game configuration, the shared time reading. No UI. |
+| `Shared` | Time control, ruleset category, presets, game configuration, the shared time reading, the game rules and both presenters. No UI, and no words. |
 | `CoreUI` | Colours, typography, spacing, view helpers, orientation support |
-| `Setup` | The setup screen |
-| `Clock` | The clock screen and the game rules |
+| `Setup` | The setup screen — its views and its words |
+| `Clock` | The clock screen — its views and its words |
 
 ---
 
@@ -53,7 +56,7 @@ Feature modules never import each other. Each is a local Swift package at the re
 
 - **Time reads in whole seconds**, truncating towards zero — `1:30:00 · 59:59 · 3:07 · 0:00`. Never
   rounds up, because showing a player time they do not have is the one error a clock must not make.
-  One implementation, in `Core`.
+  One implementation, in `Shared`.
 - **Elapsed real time is the source of truth.** Remaining time is computed from a monotonic instant,
   never accumulated tick by tick, so a 90 minute game does not drift and backgrounding cannot cheat.
 - **Portrait everywhere except the clock screen.** A screen declares landscape with one `CoreUI`

@@ -17,12 +17,12 @@ If unsure about the right architectural approach, do not guess and implement. In
 
 ## Reusing Existing Code
 
-When building a new view or feature, always search `Core` and `CoreUI` first for reusable components, utilities, or styles before writing new code.
+When building a new view or feature, always search `Shared` and `CoreUI` first for reusable types, rules, components or styles before writing new code.
 
-## Extending Core / CoreUI
+## Extending Shared / CoreUI
 
-If something is missing from `Core` or `CoreUI` but would logically belong there (i.e., it will be used across the codebase), do not add it unilaterally. Instead:
-- Explain what you want to add and why it belongs in `Core`/`CoreUI`
+If something is missing from `Shared` or `CoreUI` but would logically belong there (i.e., it will be used across the codebase), do not add it unilaterally. Instead:
+- Explain what you want to add and why it belongs in `Shared`/`CoreUI`
 - Ask for permission
 - Wait for approval before making any changes
 
@@ -58,6 +58,21 @@ done — **create a Jira issue** instead of letting it disappear.
 Each issue must carry a **type of work** (feature, bug, chore, refactor, etc.) — the same types that
 drive branch names (see Git → Branch Naming). Write a clear title and put the full context in the
 description. The Jira board is the single source of truth for deferred work — there is no `backlog.md`.
+
+### Ticket Structure
+
+Every issue is written the same way, so a reader knows where to look:
+
+- **Title** — understandable on its own, in the board's list, by someone who wasn't in the conversation.
+- **Description** — a short paragraph or two saying what this is and why. No implementation.
+- **Task details** — what to actually do. Bullets, sub-headings, code or trees where they say it faster.
+- **Acceptance criteria** — how we know it's done. Checkable statements, not restated task details.
+
+The type-of-work line sits above the Description. Epics follow the same shape and list their tickets
+in Task details.
+
+Acceptance criteria are the part most often skipped and the part most worth writing: a ticket that
+cannot say when it is finished will be finished by whoever gets bored first.
 
 ### Type Of Work Is A Label
 

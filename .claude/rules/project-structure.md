@@ -2,41 +2,45 @@
 
 ## Overview
 
-This project follows a **feature-first modular architecture**, where each module encapsulates one large, self-contained feature. All modules are managed as local Swift packages via **Swift Package Manager (SPM)** and referenced directly by the `Zeitnot` Xcode project (`Zeitnot.xcodeproj`) — there is no `.xcworkspace`.
+This project follows a **feature-first modular architecture**, where each module encapsulates one large, self-contained feature. All modules are managed as local Swift packages via **Swift Package Manager (SPM)** and referenced directly by the `Zeitnot` Xcode project (`iosApp/Zeitnot.xcodeproj`) — there is no `.xcworkspace`.
 
 Modules are organized in a strict dependency hierarchy. A module may only depend on modules **lower** in the hierarchy — never on sibling feature modules or modules above it.
 
 ```
 App (main target)
  └── Feature Modules  (e.g. Authentication, Dashboard, Settings)
-      └── CoreUI
-           └── Core
+      ├── Shared       (what the game is and how it behaves — no UI, every platform)
+      └── CoreUI       (how anything is drawn — no domain, iOS only)
 ```
 
-No circular dependencies are permitted. Feature modules must not import each other directly — shared communication should be done through protocols defined in `Core` or via the App target as a coordinator.
+The two base modules are **independent of each other**, not a chain: one knows the game and nothing about drawing, the other knows drawing and nothing about the game. Neither imports the other, and a feature takes both.
+
+No circular dependencies are permitted. Feature modules must not import each other directly — shared communication should be done through protocols defined in `Shared` or via the App target as a coordinator.
 
 ---
 
 ## Module Hierarchy
 
-### Core
+### Shared
 
-The `Core` module is the **lowest-level foundation**. It contains non-UI utilities, extensions, and lightweight services that are too small to justify their own module, but are useful in many places across the app.
+The `Shared` module is **the game itself** — the vocabulary every feature means the same thing by, the rules that govern play, and the presenters that turn game state into what a screen shows. Every platform builds it, so it sits at the repository root. Its only import is `Observation`.
 
 **What belongs here:**
-- Foundation type extensions (`String`, `Date`, `Array`, `Int`, `URL`, etc.)
-- Custom value types and enums used broadly (e.g. `AppError`, `LoadingState`)
-- Lightweight service abstractions (e.g. `LoggingService`, `AnalyticsEvent`)
-- Shared protocols and interfaces used across features
-- Generic utilities (e.g. `Debouncer`, `KeychainWrapper`)
-- Constants and configuration values
+- Domain value types and tokens used by **more than one feature** (`TimeControl`, `RulesetCategory`, `GameConfiguration`, `PresetRuleset`)
+- Domain formatting every screen must agree on (the shared time reading)
+- Services that hold state and own rules (`GameService`), with the seams they inject (`TimeSourceProtocol`, `TickerProtocol`)
+- Presenters, and the **pure view models** they hand out — a side, a state, a time reading, degrees, a category token
+- Each feature's routing protocol, because the presenter that calls it lives here
 
 **What does NOT belong here:**
-- Anything that imports `SwiftUI` or `UIKit`
-- Business logic specific to a single feature
-- Network or data layer logic large enough to be its own module
+- Anything that imports `SwiftUI`, `UIKit` or `CoreUI`
+- **Any copy at all.** No String Catalog, no `LocalizedStringResource`, no `String(localized:)` — the type does not exist on every platform this module builds for
+- A view model that carries words. `RulesetCell.Model` and `StartGameBar.Model` carry copy and stay in `Setup`
+- Anything drawn: views, images, colours, spacing
 
-**Dependencies:** None. `Core` is a zero-dependency module.
+**Dependencies:** None. `Shared` is a zero-dependency module.
+
+**There is no generic `Core`.** Nothing in the app today is a non-UI utility without game meaning, and a module holding nothing is ceremony. If one appears — a `String` extension, a `Debouncer` — add `Core` beneath both base modules then, rather than parking it in `Shared` because it has nowhere else to go.
 
 ---
 
@@ -59,7 +63,7 @@ The `CoreUI` module contains all **reusable UI building blocks** — anything Sw
 - Feature-specific UI that is only used in one module
 - Network or data models
 
-**Dependencies:** `Core` only.
+**Dependencies:** None. `CoreUI` knows nothing about the game — it holds no copy and no String Catalog.
 
 ---
 
@@ -67,95 +71,129 @@ The `CoreUI` module contains all **reusable UI building blocks** — anything Sw
 
 Each feature module represents **one large, user-facing product area**. Examples: `Authentication`, `Dashboard`, `Settings`, `Onboarding`, `Profile`.
 
-**Dependencies:** `Core` and `CoreUI`. Never another feature module.
+**Dependencies:** `Shared` and `CoreUI`. Never another feature module.
+
+A feature holds its screens' **views**, its **String Catalog** and its **images** — including the words for any token `Shared` hands it, such as the ruleset category names.
 
 ---
 
 ## Full Project Layout
 
-Every module is its own local Swift package folder at the **repository root**, sitting as a sibling
-of `Zeitnot.xcodeproj` and the app target folder. There is no `Packages/` container directory and no
-`Features/` grouping directory — `Core`, `CoreUI` and every feature package live side by side at the
-top level.
+**A package lives with the platforms that use it.** There are two homes, and which one a package
+gets is decided by one question — does more than one platform build it?
+
+| Package | Lives in |
+|---|---|
+| Built by every platform | The **repository root**, beside the platform folders |
+| Built by one platform only | That **platform's folder** — `iosApp/`, `androidApp/` |
+
+So the root holds only what is genuinely shared, and each platform folder owns everything that is
+its own: its app target, its project file and its platform-only packages. A reader can tell what is
+cross-platform by looking at the root, and nothing else has to be checked.
+
+There is still no `Packages/` container directory and no `Features/` grouping directory. Within
+whichever home it has, a package sits directly there, side by side with its siblings.
 
 ```
 Zeitnot/
-├── Zeitnot.xcodeproj
 ├── CLAUDE.md
-├── Zeitnot/                            # Main app target
-│   ├── ZeitnotApp.swift                # @main entry point (SwiftUI App struct)
-│   ├── App/
-│   │   ├── Navigation/
-│   │   │   ├── AppRouter.swift         # Owns the navigation path, conforms to each feature's Routing protocol
-│   │   │   └── NavigationDestination.swift
-│   │   └── DependencyInjection/
-│   │       ├── Dependencies.swift      # Composition root: owns the router, builds presenters
-│   │       └── DependenciesContainer.swift
-│   ├── Services/                       # App-level services
-│   └── Assets.xcassets/                # App-level assets (app icon, accent colour)
-│
-├── Core/                               # Local Swift package
+├── Shared/                             # Local Swift package — every platform builds it
 │   ├── Package.swift
 │   ├── Docs/
-│   │   └── Core.md
+│   │   └── Shared.md
 │   └── Sources/
-│       └── Core/
+│       ├── Common/
+│       │   └── Navigation/             # Every feature's routing protocol
+│       │       ├── ClockRoutingProtocol.swift
+│       │       └── SetupRoutingProtocol.swift
+│       └── Shared/
+│           ├── Types/                  # TimeControl, RulesetCategory, GameConfiguration, PresetRuleset
 │           ├── Extensions/
-│           │   ├── String+Extensions.swift
-│           │   ├── Date+Extensions.swift
-│           │   └── ...
-│           └── Types/
-│               ├── AppError.swift
-│               ├── LoadingState.swift
+│           │   └── Duration+TimeReading.swift
+│           ├── Clock/
+│           │   ├── ClockPresenter.swift
+│           │   ├── Models/             # Player, PlayerClock, GameState, DisplayMode
+│           │   ├── Services/           # GameService, Ticker, TimeSource
+│           │   └── ViewModels/         # HeaderModel, ClockFaceModel, DialHands, ...
+│           └── Setup/
+│               ├── SetupPresenter.swift
+│               └── ViewModels/         # RulesetModel, StartGameModel
+│
+├── iosApp/                             # The iOS app and its iOS-only packages
+│   ├── Zeitnot.xcodeproj
+│   ├── Zeitnot/                        # Main app target
+│   │   ├── ZeitnotApp.swift            # @main entry point (SwiftUI App struct)
+│   │   ├── App/
+│   │   │   ├── Navigation/
+│   │   │   │   ├── AppRouter.swift     # Owns the navigation path, conforms to each feature's Routing protocol
+│   │   │   │   └── NavigationDestination.swift
+│   │   │   └── DependencyInjection/
+│   │   │       ├── Dependencies.swift  # Composition root: owns the router, builds presenters
+│   │   │       └── DependenciesContainer.swift
+│   │   ├── Services/                   # App-level services
+│   │   └── Assets.xcassets/            # App-level assets (app icon, accent colour)
+│   │
+│   ├── CoreUI/                         # Local Swift package — iOS only
+│   │   ├── Package.swift
+│   │   ├── Docs/
+│   │   └── Sources/
+│   │       └── CoreUI/
+│   │           ├── Design/
+│   │           │   ├── Colors/
+│   │           │   │   ├── ColorPalette.swift
+│   │           │   │   └── Colors.xcassets/
+│   │           │   ├── Typography/
+│   │           │   │   ├── Typography.swift
+│   │           │   │   └── Text+Typography.swift
+│   │           │   └── Spacing/
+│   │           │       └── CGFloat+Spacing.swift
+│   │           ├── Components/
+│   │           │   ├── PrimaryButton.swift
+│   │           │   └── ...
+│   │           ├── Modifiers/
+│   │           │   ├── ReadHeightModifier.swift
+│   │           │   └── ...
+│   │           ├── Extensions/
+│   │           │   └── View+Extensions.swift
+│   │           └── Images/
+│   │               └── AppImages.swift
+│   │
+│   ├── Setup/                          # Feature package — iOS only
+│   │   ├── Package.swift
+│   │   ├── Docs/
+│   │   │   └── SetupScreen.md
+│   │   └── Sources/
+│   │       └── Setup/
+│   │           └── ...
+│   │
+│   └── Clock/                          # Feature package — iOS only
+│       ├── Package.swift
+│       ├── Docs/
+│       │   └── ClockScreen.md
+│       └── Sources/
+│           └── Clock/
 │               └── ...
 │
-├── CoreUI/                             # Local Swift package
-│   ├── Package.swift
-│   ├── Docs/
-│   └── Sources/
-│       └── CoreUI/
-│           ├── Design/
-│           │   ├── Colors/
-│           │   │   ├── ColorPalette.swift
-│           │   │   └── Colors.xcassets/
-│           │   ├── Typography/
-│           │   │   ├── Typography.swift
-│           │   │   └── Text+Typography.swift
-│           │   └── Spacing/
-│           │       └── CGFloat+Spacing.swift
-│           ├── Components/
-│           │   ├── PrimaryButton.swift
-│           │   └── ...
-│           ├── Modifiers/
-│           │   ├── ReadHeightModifier.swift
-│           │   └── ...
-│           ├── Extensions/
-│           │   └── View+Extensions.swift
-│           └── Images/
-│               └── AppImages.swift
-│
-├── Setup/                              # Feature package
-│   ├── Package.swift
-│   ├── Docs/
-│   │   └── SetupScreen.md
-│   └── Sources/
-│       └── Setup/
-│           └── ...
-│
-└── Clock/                              # Feature package
-    ├── Package.swift
+└── androidApp/                         # The Android app — Gradle, Kotlin, Compose
     ├── Docs/
-    │   └── ClockScreen.md
-    └── Sources/
-        └── Clock/
-            └── ...
+    │   └── AndroidApp.md
+    ├── settings.gradle.kts
+    ├── gradle/
+    │   └── libs.versions.toml          # Plugin and library versions
+    └── app/
+        ├── build.gradle.kts            # Also cross-compiles Shared and stages it into jniLibs
+        └── src/main/
+            ├── AndroidManifest.xml
+            ├── kotlin/                 # Compose UI
+            └── res/
 ```
-
-`CoreUI` and the app target are what exist today; `Core`, `Setup` and `Clock` above show where
-modules land as they are added.
 
 Notes on the tree:
 
+- A package shared by every platform sits at the repository root; a package only one platform
+  builds sits inside that platform's folder. Nothing else decides where a package goes.
+- A platform folder holds its app target, its project file and its platform-only packages, so it
+  can be read on its own without chasing references out to the root.
 - The package folder name, the `Package.swift` product name, the target name and the
   `Sources/<Module>/` folder all carry the **same** module name.
 - Sources always sit under `Sources/<ModuleName>/`, never directly under `Sources/`.
@@ -178,13 +216,16 @@ the Package Dependencies node. It is the more obvious route in Xcode's UI and it
 `packageReferences` is reserved for *remote* dependencies (`XCRemoteSwiftPackageReference`) — no
 local package ever appears there.
 
-Adding a module means four entries in `Zeitnot.xcodeproj/project.pbxproj`. Substitute the module
-name for `<Module>` throughout:
+Adding a module means four entries in `iosApp/Zeitnot.xcodeproj/project.pbxproj`. Substitute the
+module name for `<Module>` throughout:
 
-**1. `PBXFileReference`** — the package folder itself, typed as a `wrapper`:
+**1. `PBXFileReference`** — the package folder itself, typed as a `wrapper`. An iOS-only package
+sits beside the project inside `iosApp/`, so its path is bare; a shared package lives at the
+repository root and is reached with `../`:
 
 ```
 <UUID_A> /* <Module> */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = <Module>; sourceTree = "<group>"; };
+<UUID_A> /* Shared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = ../Shared; sourceTree = "<group>"; };
 ```
 
 **2. Main group `children`** — so the folder shows in the navigator:
@@ -214,18 +255,33 @@ It is listed in the target's `packageProductDependencies`.
 
 After adding a module, confirm `packageReferences` still contains no local package.
 
-**Cross-package dependencies** are declared by relative path, since every package folder is a
-sibling at the repository root:
+**5. `PBXCopyFilesBuildPhase`** — only for a module whose product is **dynamic**. Xcode builds such a
+product as a framework but does not put it in the app bundle, so the target needs an **Embed
+Frameworks** phase or the app links something it does not ship:
+
+```
+<UUID_D> /* Embed Frameworks */ = {isa = PBXCopyFilesBuildPhase; dstSubfolderSpec = 10; name = "Embed Frameworks"; files = (<UUID_E> /* <Module> in Embed Frameworks */, ); ... };
+<UUID_E> /* <Module> in Embed Frameworks */ = {isa = PBXBuildFile; productRef = <UUID_B> /* <Module> */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+```
+
+`Shared` is the only such module today: Android packages it as `libShared.so`, which requires a
+dynamic product, and the same product is what iOS links. Without the phase the app builds and then
+dies at launch — a Debug build hides it, because Xcode adds an absolute DerivedData search path that
+exists only on the machine that built it.
+
+**Cross-package dependencies** are declared by relative path. Packages in the same home are
+siblings, so they reach each other with `../`; a platform-only package reaches a shared one at the
+repository root with `../../`:
 
 ```swift
 dependencies: [
-    .package(name: "Core", path: "../Core"),
-    .package(name: "CoreUI", path: "../CoreUI")
+    .package(name: "CoreUI", path: "../CoreUI"),
+    .package(name: "Shared", path: "../../Shared")
 ],
 targets: [
     .target(
         name: "Setup",
-        dependencies: ["Core", "CoreUI"])
+        dependencies: ["CoreUI", "Shared"])
 ]
 ```
 ---
@@ -414,14 +470,16 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 
 | Module | Can depend on |
 |---|---|
-| `Core` | Nothing |
-| `CoreUI` | `Core` |
-| Feature Module | `Core`, `CoreUI` |
+| `Shared` | Nothing |
+| `CoreUI` | Nothing |
+| Feature Module | `Shared`, `CoreUI` |
 | App Target | All modules |
 
-- **No feature-to-feature imports.** If two features need to share something, move it into `Core` (non-UI) or `CoreUI` (UI), or define a protocol in `Core` and inject the implementation from the App target.
+- **The two base modules never import each other.** `CoreUI` importing `Shared` would make the design system game-aware; `Shared` importing `CoreUI` would make the domain drawable — and would stop `Shared` building for Android at all. Either one collapses the split.
+- **No feature-to-feature imports.** If two features need to share something, move it into `Shared` (non-UI) or `CoreUI` (UI), or define a protocol in `Shared` and inject the implementation from the App target.
+- **Nothing in `Shared` carries copy.** A feature naming a `Shared` token does so in its own String Catalog, which is why `Clock` and `Setup` each name the ruleset categories.
 - **No upward dependencies.** Lower modules must never import higher ones.
-- All new cross-cutting utilities must be evaluated: non-UI → `Core`, UI → `CoreUI`, feature-specific → stays in the feature module.
+- All new cross-cutting utilities must be evaluated: game vocabulary, rules or presentation logic → `Shared`, UI → `CoreUI`, feature-specific or copy-carrying → stays in the feature module.
 
 ---
 
@@ -432,18 +490,21 @@ The screen folder name (`MovieList`, `MovieDetail`) describes **the screen's pur
 | Screen's `Components/` | Another screen in the same feature | `Sources/Common/Components/` |
 | Screen's layer (`UseCase/`, `Client/`, etc.) | Another screen in the same feature | `Sources/Common/` |
 | `Common/Components/` | Another feature module | `CoreUI/Components/` |
-| `Common/Extensions/` | Another feature module | `Core/Extensions/` |
+| `Common/Extensions/` | Another feature module | `Shared/Extensions/` |
+| A type's own copy | The type moved to `Shared` | Stays in each feature's `Resources/Localization/` |
 | `Common/Images/` | Another feature module | `CoreUI/Images/` |
 
 ---
 
 ## Adding a New Module Checklist
 
-1. Create the package folder at the **repository root**, `FeatureName/`, as a sibling of
-   `Zeitnot.xcodeproj` — not under a `Packages/` or `Features/` directory.
+1. Decide the package's home: the **repository root** if every platform builds it, otherwise the
+   folder of the one platform that does (`iosApp/FeatureName/`). Not under a `Packages/` or
+   `Features/` directory either way.
 2. Add `Package.swift` with the product, target and `Sources/FeatureName/` folder all named after the
-   module, declaring `Core` and `CoreUI` by relative path (`.package(name: "Core", path: "../Core")`).
-3. Reference the package folder in `Zeitnot.xcodeproj` as a **wrapper folder reference** off the
+   module, declaring its dependencies by relative path — `../CoreUI` for a sibling, `../../Shared`
+   for a shared package at the root.
+3. Reference the package folder in `iosApp/Zeitnot.xcodeproj` as a **wrapper folder reference** off the
    project's main group — **not** through _Package Dependencies_. See Referencing A Package In The
    Xcode Project for the exact `project.pbxproj` entries.
 4. Link the module product to the App target: an `XCSwiftPackageProductDependency` with only
