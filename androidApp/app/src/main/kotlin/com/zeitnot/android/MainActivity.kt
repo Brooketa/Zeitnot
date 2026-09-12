@@ -3,15 +3,18 @@ package com.zeitnot.android
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.zeitnot.android.coreui.ColorPalette
+import com.zeitnot.android.coreui.Spacing
+import com.zeitnot.android.coreui.Typography
 
 class MainActivity : ComponentActivity() {
 
@@ -21,11 +24,7 @@ class MainActivity : ComponentActivity() {
         SharedLibrary.load()
 
         setContent {
-            MaterialTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    SharedLibraryStatus()
-                }
-            }
+            SharedLibraryStatus()
         }
     }
 
@@ -34,10 +33,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun SharedLibraryStatus() {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ColorPalette.background)
+            .padding(Spacing.large),
         contentAlignment = Alignment.Center) {
-        Text(
+        BasicText(
             text = stringResource(R.string.shared_library_loaded),
-            style = MaterialTheme.typography.titleMedium)
+            style = Typography.label)
     }
 }

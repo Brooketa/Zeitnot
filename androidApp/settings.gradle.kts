@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 rootProject.name = "Zeitnot"
 
 include(":app")
+include(":core-ui")
