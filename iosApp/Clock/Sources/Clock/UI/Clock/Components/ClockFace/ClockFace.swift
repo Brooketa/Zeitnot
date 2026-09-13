@@ -83,10 +83,37 @@ struct ClockFace: View {
 
 extension ClockFace {
 
-    typealias Model = ClockFaceModel
-    typealias Side = ClockFaceSide
-    typealias State = ClockFaceState
-    typealias TimeDisplay = ClockFaceTimeDisplay
+    struct Model {
+
+        let side: Side
+        let state: State
+        let timeDisplay: TimeDisplay
+
+    }
+
+    enum Side {
+
+        case white
+        case black
+
+    }
+
+    enum State {
+
+        case awaitingStart
+        case toMove
+        case lowTime
+        case waiting
+        case flagged
+
+    }
+
+    enum TimeDisplay: Equatable {
+
+        case digital(DigitalFace.Model)
+        case analog(AnalogFace.Model)
+
+    }
 
     enum Action {
 

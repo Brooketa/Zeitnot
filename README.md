@@ -85,8 +85,8 @@ Zeitnot/
 └── androidApp/                        # Gradle project, Kotlin and Compose
 ```
 
-`Shared` holds the domain, the game rules and both presenters, and builds for iOS and for Android's
-`arm64-v8a` and `x86_64`. It imports `Observation` and nothing else — no SwiftUI, and no
+`Shared` holds the domain, the game rules and the snapshot a screen reads, and builds for iOS and for
+Android's `arm64-v8a` and `x86_64`. Presenters are platform code: each app writes its own over it. It imports `Observation` and nothing else — no SwiftUI, and no
 copy, since `LocalizedStringResource` does not exist on every platform it targets. The views, the
 String Catalogs and the images stay in the iOS packages.
 
@@ -110,8 +110,8 @@ echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties
 With an emulator running or a device attached, `runDebug` builds, installs and launches in one step;
 `:app:assembleDebug` builds the APK alone. Either way `Shared` is cross-compiled for both packaged
 ABIs and staged into the APK with the Swift runtime libraries it depends on, so there is no separate
-Swift step. The screen reads `Shared is loaded`; anything missing from the packaging crashes the app
-on launch instead of failing quietly.
+Swift step. The app opens on the preset list and plays a game through the shared Swift domain;
+anything missing from the packaging crashes the app on launch instead of failing quietly.
 
 Opening `androidApp/` in Android Studio works too — it creates the `app` run configuration itself.
 

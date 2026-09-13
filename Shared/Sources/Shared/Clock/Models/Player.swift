@@ -1,9 +1,9 @@
-enum Player {
+public enum Player: Equatable, Sendable {
 
     case white
     case black
 
-    var opponent: Player {
+    public var opponent: Player {
         self == .white ? .black : .white
     }
 

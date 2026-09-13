@@ -23,19 +23,20 @@ No circular dependencies are permitted. Feature modules must not import each oth
 
 ### Shared
 
-The `Shared` module is **the game itself** — the vocabulary every feature means the same thing by, the rules that govern play, and the presenters that turn game state into what a screen shows. Every platform builds it, so it sits at the repository root. Its only import is `Observation`.
+The `Shared` module is **the game itself** — the vocabulary every feature means the same thing by, the rules that govern play, and the snapshot a screen reads to know what is true. Every platform builds it, so it sits at the repository root. It holds no presentation: each platform writes its own presenters and view models over it.
 
 **What belongs here:**
 - Domain value types and tokens used by **more than one feature** (`TimeControl`, `RulesetCategory`, `GameConfiguration`, `PresetRuleset`)
 - Domain formatting every screen must agree on (the shared time reading)
 - Services that hold state and own rules (`GameService`), with the seams they inject (`TimeSourceProtocol`, `TickerProtocol`)
-- Presenters, and the **pure view models** they hand out — a side, a state, a time reading, degrees, a category token
-- Each feature's routing protocol, because the presenter that calls it lives here
+- The **snapshot** a platform renders from — per-clock remaining time, move count and status, whose turn it is, the move number, the winner
+- **Any rule that decides what is true**, even one a presenter used to ask: the low-time threshold, the convention that only Black may start, the move number, a clock's status
 
 **What does NOT belong here:**
 - Anything that imports `SwiftUI`, `UIKit` or `CoreUI`
 - **Any copy at all.** No String Catalog, no `LocalizedStringResource`, no `String(localized:)` — the type does not exist on every platform this module builds for
-- A view model that carries words. `RulesetCell.Model` and `StartGameBar.Model` carry copy and stay in `Setup`
+- **Presenters, view models and routing protocols.** They are presentation, and each platform owns its own
+- UI state such as a display mode or a dialog flag, which never leaves the platform that draws it
 - Anything drawn: views, images, colours, spacing
 
 **Dependencies:** None. `Shared` is a zero-dependency module.
@@ -102,22 +103,16 @@ Zeitnot/
 │   ├── Docs/
 │   │   └── Shared.md
 │   └── Sources/
-│       ├── Common/
-│       │   └── Navigation/             # Every feature's routing protocol
-│       │       ├── ClockRoutingProtocol.swift
-│       │       └── SetupRoutingProtocol.swift
-│       └── Shared/
-│           ├── Types/                  # TimeControl, RulesetCategory, GameConfiguration, PresetRuleset
-│           ├── Extensions/
-│           │   └── Duration+TimeReading.swift
-│           ├── Clock/
-│           │   ├── ClockPresenter.swift
-│           │   ├── Models/             # Player, PlayerClock, GameState, DisplayMode
-│           │   ├── Services/           # GameService, Ticker, TimeSource
-│           │   └── ViewModels/         # HeaderModel, ClockFaceModel, DialHands, ...
-│           └── Setup/
-│               ├── SetupPresenter.swift
-│               └── ViewModels/         # RulesetModel, StartGameModel
+│       ├── Shared/
+│       │   ├── Types/                  # TimeControl, RulesetCategory, GameConfiguration, PresetRuleset
+│       │   ├── Extensions/
+│       │   │   └── Duration+TimeReading.swift
+│       │   └── Clock/
+│       │       ├── Models/             # Player, PlayerClock, PlayerClocks
+│       │       ├── Services/           # GameService, Ticker, TimeSource
+│       │       └── Snapshots/          # GameSnapshot, ClockSnapshot, ClockStatus
+│       ├── CJNI/                       # jni.h, Android only
+│       └── SharedBridge/               # The JNI entry points Kotlin calls
 │
 ├── iosApp/                             # The iOS app and its iOS-only packages
 │   ├── Zeitnot.xcodeproj
@@ -180,12 +175,19 @@ Zeitnot/
     ├── settings.gradle.kts
     ├── gradle/
     │   └── libs.versions.toml          # Plugin and library versions
-    └── app/
-        ├── build.gradle.kts            # Also cross-compiles Shared and stages it into jniLibs
-        └── src/main/
-            ├── AndroidManifest.xml
-            ├── kotlin/                 # Compose UI
-            └── res/
+    ├── app/
+    │   ├── build.gradle.kts            # Also cross-compiles Shared and stages it into jniLibs
+    │   └── src/main/
+    │       ├── AndroidManifest.xml
+    │       ├── kotlin/com/zeitnot/android/
+    │       │   ├── domain/             # Contracts and the values that cross them
+    │       │   ├── bridge/             # The only package that knows Swift exists
+    │       │   ├── clock/              # ClockPresenter, ClockScreen
+    │       │   └── setup/              # SetupPresenter, SetupScreen
+    │       └── res/
+    └── core-ui/                        # Design tokens — the Compose CoreUI
+        ├── Docs/
+        └── src/main/kotlin/
 ```
 
 Notes on the tree:
