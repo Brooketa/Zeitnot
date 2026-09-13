@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,7 +41,12 @@ fun StartGameBar(
         modifier = modifier
             .fillMaxWidth()
             .background(Brush.verticalGradient(listOf(Color.Transparent, ColorPalette.background)))
-            .padding(horizontal = Spacing.large, vertical = Spacing.extraSmall)) {
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(
+                start = Spacing.large,
+                end = Spacing.large,
+                top = SCRIM_HEIGHT,
+                bottom = Spacing.extraSmall)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,31 +82,34 @@ private fun ForwardArrow() {
     Canvas(modifier = Modifier.size(ARROW_DIAMETER)) {
         val centre = size.minDimension / 2
         val stroke = ARROW_STROKE.toPx()
+        val half = ARROW_SIZE.toPx() / 2
 
-        drawCircle(color = ColorPalette.inkInverse, radius = centre)
+        drawCircle(color = ColorPalette.accentRaised, radius = centre)
 
         drawLine(
-            color = ColorPalette.accent,
-            start = Offset(size.width * 0.34f, centre),
-            end = Offset(size.width * 0.66f, centre),
+            color = ColorPalette.inkInverse,
+            start = Offset(centre - half, centre),
+            end = Offset(centre + half, centre),
             strokeWidth = stroke,
             cap = StrokeCap.Round)
 
         drawLine(
-            color = ColorPalette.accent,
-            start = Offset(size.width * 0.54f, size.height * 0.36f),
-            end = Offset(size.width * 0.68f, centre),
+            color = ColorPalette.inkInverse,
+            start = Offset(centre + half - half * 0.6f, centre - half * 0.6f),
+            end = Offset(centre + half, centre),
             strokeWidth = stroke,
             cap = StrokeCap.Round)
 
         drawLine(
-            color = ColorPalette.accent,
-            start = Offset(size.width * 0.54f, size.height * 0.64f),
-            end = Offset(size.width * 0.68f, centre),
+            color = ColorPalette.inkInverse,
+            start = Offset(centre + half - half * 0.6f, centre + half * 0.6f),
+            end = Offset(centre + half, centre),
             strokeWidth = stroke,
             cap = StrokeCap.Round)
     }
 }
 
-private val ARROW_DIAMETER = 34.dp
+private val SCRIM_HEIGHT = 32.dp
+private val ARROW_DIAMETER = 36.dp
+private val ARROW_SIZE = 14.dp
 private val ARROW_STROKE = 2.dp

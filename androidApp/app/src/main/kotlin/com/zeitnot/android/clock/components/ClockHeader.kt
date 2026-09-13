@@ -7,8 +7,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
@@ -31,17 +33,34 @@ import com.zeitnot.android.domain.RulesetCategory
 
 @Composable
 fun ClockHeader(model: HeaderModel, onBack: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(HEADER_HEIGHT),
+        contentAlignment = Alignment.Center) {
+        Ruleset(model = model)
+
+        BackControl(
+            onBack = onBack,
+            modifier = Modifier.align(Alignment.CenterStart))
+
+        BasicText(
+            text = stringResource(R.string.move_number, model.moveNumber).uppercase(),
+            style = Typography.label.copy(color = ColorPalette.textSecondary),
+            modifier = Modifier.align(Alignment.CenterEnd))
+    }
+}
+
+@Composable
+private fun Ruleset(model: HeaderModel) {
     val dotColor by animateColorAsState(
-        targetValue = if (model.isRunning) ColorPalette.accent else ColorPalette.rule,
+        targetValue = if (model.isRunning) ColorPalette.accent else ColorPalette.textTertiary,
         animationSpec = tween(DOT_FADE_DURATION),
         label = "statusDot")
 
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
         verticalAlignment = Alignment.CenterVertically) {
-        BackControl(onBack = onBack)
-
         Canvas(modifier = Modifier.size(DOT_DIAMETER)) {
             drawCircle(color = dotColor)
         }
@@ -52,20 +71,14 @@ fun ClockHeader(model: HeaderModel, onBack: () -> Unit, modifier: Modifier = Mod
                 stringResource(model.category.nameResource),
                 model.baseMinutes,
                 model.incrementSeconds).uppercase(),
-            style = Typography.label)
-
-        BasicText(
-            text = stringResource(R.string.move_number, model.moveNumber).uppercase(),
-            style = Typography.label,
-            modifier = Modifier.fillMaxWidth(),
-            maxLines = 1)
+            style = Typography.label.copy(color = ColorPalette.ink))
     }
 }
 
 @Composable
-private fun BackControl(onBack: () -> Unit) {
+private fun BackControl(onBack: () -> Unit, modifier: Modifier = Modifier) {
     Canvas(
-        modifier = Modifier
+        modifier = modifier
             .size(BACK_DIAMETER)
             .clip(CircleShape)
             .background(ColorPalette.surface)
@@ -74,20 +87,20 @@ private fun BackControl(onBack: () -> Unit) {
                 indication = null,
                 onClick = onBack)) {
         val centre = size.minDimension / 2
-        val stroke = CHEVRON_WIDTH.toPx()
+        val half = CHEVRON_SIZE.toPx() / 2
 
         drawLine(
             color = ColorPalette.ink,
-            start = Offset(size.width * 0.56f, size.height * 0.34f),
-            end = Offset(size.width * 0.42f, centre),
-            strokeWidth = stroke,
+            start = Offset(centre + half * 0.5f, centre - half),
+            end = Offset(centre - half * 0.5f, centre),
+            strokeWidth = CHEVRON_WIDTH.toPx(),
             cap = StrokeCap.Round)
 
         drawLine(
             color = ColorPalette.ink,
-            start = Offset(size.width * 0.42f, centre),
-            end = Offset(size.width * 0.56f, size.height * 0.66f),
-            strokeWidth = stroke,
+            start = Offset(centre - half * 0.5f, centre),
+            end = Offset(centre + half * 0.5f, centre + half),
+            strokeWidth = CHEVRON_WIDTH.toPx(),
             cap = StrokeCap.Round)
     }
 }
@@ -102,6 +115,8 @@ private val RulesetCategory.nameResource: Int
 
 private const val DOT_FADE_DURATION = 200
 
-private val DOT_DIAMETER = 8.dp
+private val HEADER_HEIGHT = 44.dp
+private val DOT_DIAMETER = 7.dp
 private val BACK_DIAMETER = 44.dp
-private val CHEVRON_WIDTH = 2.dp
+private val CHEVRON_SIZE = 20.dp
+private val CHEVRON_WIDTH = 2.5.dp

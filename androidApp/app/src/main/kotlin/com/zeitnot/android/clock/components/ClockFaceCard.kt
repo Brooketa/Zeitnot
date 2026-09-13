@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -53,6 +54,11 @@ fun ClockFaceCard(
     Column(
         modifier = modifier
             .fillMaxHeight()
+            .shadow(
+                elevation = SHADOW_ELEVATION,
+                shape = RoundedCornerShape(CORNER_RADIUS),
+                ambientColor = ColorPalette.ink,
+                spotColor = ColorPalette.ink)
             .clip(RoundedCornerShape(CORNER_RADIUS))
             .background(background)
             .turnRing(appearance)
@@ -89,7 +95,7 @@ fun ClockFaceCard(
         }
 
         BasicText(
-            text = model.caption,
+            text = model.caption.ifEmpty { CAPTION_PLACEHOLDER },
             style = Typography.label.copy(color = appearance.name, textAlign = TextAlign.Center),
             modifier = Modifier.fillMaxWidth())
     }
@@ -174,9 +180,11 @@ private val Player.nameResource: Int
     }
 
 private const val STATE_CHANGE_DURATION = 200
-private const val PULSE_DURATION = 600
-private const val RING_PULSE_MINIMUM = 0.2f
+private const val PULSE_DURATION = 500
+private const val RING_PULSE_MINIMUM = 0.25f
+private const val CAPTION_PLACEHOLDER = " "
 private const val DIAL_HEIGHT_FRACTION = 0.95f
 
 private val CORNER_RADIUS = 26.dp
+private val SHADOW_ELEVATION = 3.dp
 private val RING_WIDTH = 3.dp

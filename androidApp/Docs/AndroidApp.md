@@ -81,6 +81,21 @@ and closing twice fails cleanly rather than double-releasing.
 
 ---
 
+## Where Android differs from iOS
+
+The design is one design, and the tokens, sizes and copy match. These five things cannot, and are
+deliberate rather than oversights:
+
+| Difference | Why |
+|---|---|
+| The clock dial is **drawn**, not loaded | The iOS artwork is a vector PDF with live text; Android can load neither. The geometry is copied exactly, so a change has to be made in both places. |
+| The back control is a plain **surface circle** | iOS uses Liquid Glass, which has no Android equivalent. |
+| The card shadow is **approximate** | iOS specifies ink at 12% with a 3pt radius and 1pt offset; Compose shadows are elevation-driven, so 3dp is the closest equivalent rather than the same recipe. |
+| Dialogs blur only on **Android 12+** | `Modifier.blur` needs API 31. Below it the dim and fade still happen. |
+| Scrolling **stretches** rather than bounces | Overscroll is a platform idiom. An Android app that rubber-bands reads as a port. |
+
+---
+
 ## What ships in the APK
 
 `Shared` is built once per packaged ABI — `arm64-v8a` and `x86_64` — and staged into `jniLibs/`
